@@ -10,8 +10,8 @@ the SDK, connects an EDU client to the robot, and receives live robot state. Che
 [compatibility matrix](../../../release/compatibility.md) for the supported robot software
 image, and the release's `EDU_SDK_MANIFEST.json` for the version pairing.
 
-Install the Python wheels from [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)
-(pre-release). The release manifest, not identical version numbers, defines the pairing:
+Install the Python wheels from [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24).
+The release manifest, not identical version numbers, defines the pairing:
 
 | Distribution | Version | Purpose |
 | --- | --- | --- |

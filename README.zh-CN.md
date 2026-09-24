@@ -71,7 +71,7 @@ bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:r
 及[兼容矩阵](release/compatibility.zh-CN.md)。
 
 当前文档与示例使用 Python／C++ 和 Bazel，包含相机、运控、RCP 和语音访问。
-在线执行前应检查 SDK 预发布版配套关系及设备前提。
+在线执行前应检查 SDK 配套关系及设备前提。
 
 开发者侧 Skills 与[设备 Agent API](docs/interfaces/agent/README.zh-CN.md)中的
 HTTP MCP、Skill／AGENTS.md 注入能力分开。

@@ -74,7 +74,7 @@ Check the [robot guides](docs/robots/README.md) and [compatibility matrix](relea
 
 The documented Python and C++ workflows use Bazel-based Recipes; Blueprints remain planned.
 The documented Python and C++ examples include camera, locomotion, RCP and audio access.
-Check the pre-release SDK pairing and device prerequisites before live execution.
+Check the SDK pairing and device prerequisites before live execution.
 
 Developer-side Skills are separate from the [device Agent APIs](docs/interfaces/agent/README.md)
 for HTTP MCP and Skill / AGENTS.md injection. Local checks do not contact devices or change

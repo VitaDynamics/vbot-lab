@@ -5,7 +5,7 @@
 ## Unreleased
 
 - Bundle the VbotBaboEDU URDF, its variants and referenced STL meshes under `assets/robots/foot_quadruped/`; `model.json` lists the entry file and meshes.
-- Move the SDK guides to `edu-sdk-2026.9.24`: Aorta 2026.9.23 (C++ `find_package` works without a version) and EDU schema pack 2026.9.24, whose `vbot_edu_msgs` wheel pins that Aorta release and carries `LICENSE`/`NOTICE`. Releases attach the FlatBuffers license text next to its PyPI wheel.
+- Move the SDK guides to `edu-sdk-2026.9.24`: Aorta 2026.9.23 (C++ `find_package` works without a version) and EDU schema pack 2026.9.24, whose `vbot_edu_msgs` wheel pins that Aorta release and carries `LICENSE`/`NOTICE`. Releases attach the FlatBuffers license text next to its PyPI wheel. After robot verification `edu-sdk-2026.9.24` is a regular release, no longer a pre-release.
 - Document the EDU router: client and peer session files, free names shared among EDU programs, the published Foxglove bridge configuration, and `zenohd` 1.10.x for off-robot work.
 - Remove the maintainer release runbook and the release and schema-sync workflows; releases no longer attach the ROS 2 bridge bundle.
 - `schemas/ros2/` holds only the ROS 2 definitions the public bridge routes use (152 of the previous 375), with `routes.json` replacing the route manifest, `MANIFEST.json` replacing `SYNC_MANIFEST.json`, and third-party licenses in `THIRD_PARTY_NOTICES.txt`; `tests/check_schemas.py` checks the set.

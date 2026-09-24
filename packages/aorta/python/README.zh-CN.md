@@ -9,7 +9,7 @@ Aorta Python SDK 通过 [vbot-lab Release](https://github.com/VitaDynamics/vbot-
 版本配对见 Release 内的 `EDU_SDK_MANIFEST.json`。
 
 从 [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)
-预发布版本安装 Python wheel。版本配套以发布清单为准，而不是要求各包版本号相同：
+安装 Python wheel。版本配套以发布清单为准，而不是要求各包版本号相同：
 
 | 发行包 | 版本 | 用途 |
 | --- | --- | --- |

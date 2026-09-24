@@ -20,7 +20,7 @@
 各分类覆盖上表所列实现，并非每条公开路由都有独立示例。SLAM 读取不切换模式；
 主动建图、保存与定位按[建图流程](../docs/guides/mapping-localization.zh-CN.md)执行。现有辅助示例入口继续保留。
 
-这些入口已有 Python／C++ 源码与 Bazel 目标。支持范围为当前四足 EDU，SDK 配套为 edu-sdk-2026.9.24 预发布；安装步骤见 [客户端开发库](../packages/README.zh-CN.md)及 [Python SDK](../packages/aorta/python/README.zh-CN.md)。SDK 可导入、代码可构建不代表设备接口已就绪；先检查目标固件的路由与类型。
+这些入口已有 Python／C++ 源码与 Bazel 目标。支持范围为当前四足 EDU，SDK 配套为 edu-sdk-2026.9.24；安装步骤见 [客户端开发库](../packages/README.zh-CN.md)及 [Python SDK](../packages/aorta/python/README.zh-CN.md)。SDK 可导入、代码可构建不代表设备接口已就绪；先检查目标固件的路由与类型。
 
 ## Python 运行流程
 

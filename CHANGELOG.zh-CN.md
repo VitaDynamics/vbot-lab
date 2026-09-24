@@ -5,7 +5,7 @@
 ## Unreleased
 
 - 在 `assets/robots/foot_quadruped/` 附带 VbotBaboEDU 的 URDF、其变体与引用的 STL 网格；`model.json` 列出入口文件与网格。
-- SDK 指南改用 `edu-sdk-2026.9.24`：Aorta 2026.9.23（C++ `find_package` 可不带版本号）与 EDU schema pack 2026.9.24，其 `vbot_edu_msgs` wheel 钉该 Aorta 版本并附带 `LICENSE`/`NOTICE`。Release 在 PyPI 的 FlatBuffers wheel 旁附上其许可证文本。
+- SDK 指南改用 `edu-sdk-2026.9.24`：Aorta 2026.9.23（C++ `find_package` 可不带版本号）与 EDU schema pack 2026.9.24，其 `vbot_edu_msgs` wheel 钉该 Aorta 版本并附带 `LICENSE`/`NOTICE`。Release 在 PyPI 的 FlatBuffers wheel 旁附上其许可证文本。`edu-sdk-2026.9.24` 经真机验证后转为正式版本，不再是预发布。
 - 说明 EDU 路由器：client 与 peer 会话文件、EDU 程序之间共享的任意名称、发布的 Foxglove bridge 配置，以及离机开发使用 `zenohd` 1.10.x。
 - 移除面向维护者的发布手册以及发布、schema 同步 workflow；release 不再附带 ROS 2 bridge bundle。
 - `schemas/ros2/` 只保留公开 bridge 路由使用的 ROS 2 定义（原 375 个中的 152 个），以 `routes.json` 取代路由清单、`MANIFEST.json` 取代 `SYNC_MANIFEST.json`，第三方许可证见 `THIRD_PARTY_NOTICES.txt`；由 `tests/check_schemas.py` 校验。

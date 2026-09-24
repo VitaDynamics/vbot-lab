@@ -21,7 +21,7 @@ Categories describe the implemented scope above, not one example for every publi
 SLAM observation does not change modes; use the [mapping workflow](../docs/guides/mapping-localization.md)
 for explicit mapping, saving and localization. Existing helper entry points remain available.
 
-These entries include Python/C++ source and Bazel targets. They target the current foot_quadruped EDU scope with the edu-sdk-2026.9.24 pre-release; install through [client libraries](../packages/README.md) and [Python SDK](../packages/aorta/python/README.md). SDK imports and a successful build do not establish live interface readiness; check routes and types on the selected firmware first.
+These entries include Python/C++ source and Bazel targets. They target the current foot_quadruped EDU scope with the edu-sdk-2026.9.24 release; install through [client libraries](../packages/README.md) and [Python SDK](../packages/aorta/python/README.md). SDK imports and a successful build do not establish live interface readiness; check routes and types on the selected firmware first.
 
 ## Python workflow
 

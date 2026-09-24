@@ -2,7 +2,7 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-使用 [edu-sdk-2026.9.24 预发布版](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)：
+使用 [edu-sdk-2026.9.24 版本](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)：
 C++ SDK `2026.9.23`、ABI `12`，配套 EDU Schema pack `2026.9.24-v4`。
 示例使用 C++17、Bazel 7.6.1 与发布包中的生成头文件，不依赖 Python wheel，也无需本地生成 Schema。
 

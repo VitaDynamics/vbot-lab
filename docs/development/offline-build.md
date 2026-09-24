@@ -11,7 +11,7 @@ the Aorta SDK, compiler, Python interpreter, or FFmpeg.
 
 Obtain the release-matched bundle from your development-environment provider, or
 prepare it on a connected machine using the procedure below. No prebuilt bundle
-is attached to the current SDK pre-release yet; the preparation tool does not
+is attached to the current SDK release yet; the preparation tool does not
 publish one. Do not assume an existing development image contains it.
 
 Prepare these items before disconnecting:
