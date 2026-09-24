@@ -1,0 +1,23 @@
+// LocomotionEvent — locomotion runtime action events
+//
+// Aorta topic schema for ROS2 `/locomotion/event`
+// (`vbot_ros2_msgs/lowlevel_msg/msg/LocomotionEvent.msg`), published by the
+// locomotion service (action runtime events, e.g. terminal action outcomes).
+// Consumers: rcp, recording chain.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace locomotion;
+
+table LocomotionEvent {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  req_id: string (id: 1);
+  source: string (id: 2);
+  event_name: string (id: 3);
+  action_name: string (id: 4);
+  success: bool = false (id: 5);
+  reason: string (id: 6);
+  params_json: string (id: 7);  // opaque runtime params passthrough (mirrors msg)
+}
+
+root_type LocomotionEvent;

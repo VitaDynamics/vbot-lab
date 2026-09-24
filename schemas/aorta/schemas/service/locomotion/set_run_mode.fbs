@@ -1,0 +1,57 @@
+// SetRunMode — locomotion running-mode switch service
+//
+// Aorta typed service for ROS2 `/locomotion/set_run_mode`
+// (`vbot_ros2_msgs/function_msgs/srv/SetRunMode.srv`), served by the locomotion
+// service. Dual-stack with the ROS2 service during the migration window: one
+// handler serves both legs, so field semantics stay identical.
+//
+// ROS2 ↔ Aorta mapping notes:
+//   - `uint8 mode` + `MODE_*` constants → `RunMode: ubyte` enum with identical
+//     numeric values. `RECENT = 255` mirrors the `0xFF` sentinel
+//     (re-resolve to the currently active running mode).
+//   - `has_is_traction_user_param` + `is_traction_user_param` (ROS2 presence
+//     flag pattern) → optional `traction_user_param` sub-table; field absent
+//     ↔ `has_is_traction_user_param == false`.
+//   - `bool success` / `string message` / `int32 error_code` →
+//     `status: ServiceStatus` (SUCCESS ↔ `success == true`) + `message` +
+//     `error_code`, following `service/function/set_follow_speed.fbs`.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.locomotion;
+
+// Mirrors `SetRunMode.srv` MODE_* constants (identical numeric values).
+enum RunMode: ubyte {
+  MANUAL = 0,    // MODE_MANUAL (RL_TROT)
+  IDLE = 1,      // MODE_IDLE
+  LOCO = 2,      // MODE_LOCO
+  MPC = 3,       // MODE_MPC
+  PILOT = 4,     // MODE_PILOT
+  INDOOR = 5,    // MODE_INDOOR
+  RECENT = 255,  // 0xFF sentinel: re-enter the currently active mode
+}
+
+// Present only when the caller supplies the traction user-param override
+// (ROS2 `has_is_traction_user_param == true`; consumed only for MANUAL).
+table TractionUserParam {
+  is_user_param: bool = false (id: 0);
+}
+
+table SetRunModeRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);  // reserved; mirrors srv field, currently unread by the handler
+  mode: RunMode = MANUAL (id: 2);
+  req_id: string (id: 3);  // RCP task-report idempotency key
+  pre_check: bool = false (id: 4);  // reserved; mirrors srv field, currently unread by the handler
+  traction_user_param: TractionUserParam (id: 5);  // absent == no override
+}
+
+table SetRunModeResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: int (id: 3);
+}
+
+root_type SetRunModeRequest;

@@ -1,0 +1,34 @@
+// UWB Ranging Data
+//
+// Published on every AoA measurement from the UWB anchor (typically 10–15 Hz).
+// Carries distance, angle, pitch, RSSI array, and confidence from the UWB
+// chipset's AoA algorithm.
+//
+// Topic: uwb/ranging (Best-effort QoS, Volatile durability, depth=10).
+//
+// ROS2 migration mapping:
+//   /uwb/data (uwb_location/msg/UWB) -> uwb/ranging (aorta.uwb.UwbRangingData)
+//
+// Fields dropped vs. the ROS2 message:
+//   - rssi_len: redundant; consumers read len(rssi) from the vector.
+//   - has_living_body, has_head_touch: reserved; always false in the current
+//     implementation and not carried on this topic.
+//   - frame_id / header.stamp: covered by aorta_header.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.uwb;
+
+table UwbRangingData {
+  aorta_header:      aorta.sys.AortaHeader (id: 0);
+  sync_cnt:          uint32 = 0            (id: 1);  // monotonic frame counter from UWB chipset
+  distance:          float32 = 0.0         (id: 2);  // raw distance to tag (meters)
+  angle:             float32 = 0.0         (id: 3);  // raw horizontal angle (degrees)
+  pitch:             float32 = 0.0         (id: 4);  // raw vertical angle / pitch (degrees)
+  rssi:              [int8]                (id: 5);  // per-antenna RSSI values (dBm)
+  pos_confidence:    uint8 = 0             (id: 6);  // 0–100 position confidence score
+  distance_filtered: float32 = 0.0         (id: 7);  // Kalman-filtered distance (meters)
+  angle_filtered:    float32 = 0.0         (id: 8);  // Kalman-filtered angle (degrees)
+}
+
+root_type UwbRangingData;

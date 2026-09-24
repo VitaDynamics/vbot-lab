@@ -1,0 +1,6 @@
+string target_name
+---
+bool success
+string message
+std_msgs/Header header  # 时间戳
+geometry_msgs/Point[] path_points # 轨迹序列

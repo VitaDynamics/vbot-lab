@@ -1,0 +1,14 @@
+// DisplayStatus — display status topic
+//
+// Aorta topic equivalent for ROS2 `/display_node/status`.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.peripheral;
+
+table DisplayStatus {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  data: string (id: 1);
+}
+
+root_type DisplayStatus;

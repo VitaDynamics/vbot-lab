@@ -1,0 +1,20 @@
+filegroup(
+    name = "repository_files",
+    srcs = [
+        "BUILD.bazel",
+        "README.md",
+        "README.zh-CN.md",
+        "model.json",
+        ":urdf",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "urdf",
+    srcs = glob([
+        "urdf/*.urdf",
+        "meshes/*",
+    ]),
+    visibility = ["//visibility:public"],
+)

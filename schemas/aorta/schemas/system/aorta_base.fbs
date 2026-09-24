@@ -1,0 +1,9 @@
+namespace aorta.sys;
+
+table AortaHeader {
+  publish_stamp_ns: ulong; // Publish timestamp in nanoseconds.
+  publisher_node: string;  // Publisher node name.
+  sequence: ulong;         // Per-topic sequence number.
+}
+
+root_type AortaHeader;

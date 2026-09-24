@@ -1,0 +1,42 @@
+// ActionReport — terminal BODY/HEAD locomotion action outcome
+//
+// Aorta topic for ROS2 `/locomotion/action_report`, published by locomotion
+// and subscribed by rcp as the dedicated action-completion path, so consumers
+// need not reconstruct completion from nonzero-to-IDLE edges of the periodic
+// body/head action-status fields.
+//
+// This follows the established terminal-report pattern: the topic carries
+// terminal outcomes only. The service/start acknowledgement and transient
+// started phase are not published here. For each accepted action lifecycle,
+// the producer emits exactly one terminal report with SUCCESS, FAILURE, or
+// CANCELLED. `req_id` may be null or empty for an uncorrelated legacy action.
+// `error_code` and `reason` carry the terminal error information and are empty
+// or zero on success. Publication ordering uses `aorta_header.sequence`; no
+// topic-local stamp or sequence is duplicated in this payload.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace locomotion;
+
+enum ActionFamily: ubyte {
+  BODY = 0,
+  HEAD = 1,
+}
+
+enum ActionTerminalStatus: ubyte {
+  SUCCESS = 0,
+  FAILURE = 1,
+  CANCELLED = 2,
+}
+
+table ActionReport {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  action_family: ActionFamily = BODY (id: 1);
+  action_name: string (id: 2);
+  terminal_status: ActionTerminalStatus = SUCCESS (id: 3);
+  req_id: string (id: 4);
+  error_code: int = 0 (id: 5);
+  reason: string (id: 6);
+}
+
+root_type ActionReport;

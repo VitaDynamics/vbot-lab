@@ -1,0 +1,26 @@
+// LightGradient — peripheral RGB gradient service
+//
+// Aorta typed service for ROS2 `/light_node/gradient`
+// (`vbot_ros2_msgs/peripheral_msgs/srv/LightGradient.srv`).
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.peripheral;
+
+table LightGradientRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  colors: [ubyte] (id: 1);          // RGB triplets: R1,G1,B1,R2,G2,B2,...
+  brightness: ubyte = 0 (id: 2);
+  transition_time: float = 0.0 (id: 3);
+  loop: bool = false (id: 4);
+  duration_ms: ushort = 0 (id: 5);  // 0=infinite
+}
+
+table LightGradientResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+}
+
+root_type LightGradientRequest;

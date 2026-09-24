@@ -1,0 +1,37 @@
+// Twist — velocity command
+//
+// Shared Aorta topic schema for `locomotion/velocity_command`. Replaces ROS
+// geometry_msgs/Twist (http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html):
+// it retains the `linear` and `angular` Vector3 wire shape, but this endpoint's
+// command contract is planar: `linear.x/y` are body-frame translational
+// velocities and `angular.z` is yaw rate. `linear.z` and `angular.x/y` are
+// reserved and publishers must set them to zero. Consumed by the locomotion
+// control loop; lives in the navigation package alongside odometry, which
+// carries the matching Twist observation.
+//
+// Design notes:
+//   - Field IDs are stable; new fields MUST be appended with new IDs.
+//   - Fixed-size Vector3 structs → no per-message allocation.
+//   - namespace "aorta.topic.navigation" matches the navigation package.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.navigation;
+
+// Mirrors geometry_msgs/Vector3. Fixed-size struct (all scalar).
+struct Vector3 {
+  x: double;
+  y: double;
+  z: double;
+}
+
+// Root table; codegen appends Msg suffix -> TwistMsg.
+// Mirrors geometry_msgs/Twist { Vector3 linear; Vector3 angular; }.
+table Twist {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+
+  linear:       Vector3               (id: 1);  // m/s: x/y command; z reserved (must be 0).
+  angular:      Vector3               (id: 2);  // rad/s: z yaw command; x/y reserved (must be 0).
+}
+
+root_type Twist;

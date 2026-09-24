@@ -1,0 +1,31 @@
+// UWB Head Touch Event
+//
+// Published when the UWB module detects a head-touch interaction.
+// Topic: uwb/head_touch (Reliable QoS, StateUpdate semantics, depth=3).
+//
+// Migrated from the empty ROS2 event topic /uwb/head_touch,
+// extended with head-touch counters so downstream consumers (RCP for the
+// event trigger, and the LLM context provider) can reason about cumulative
+// and per-boot touch frequency without re-implementing local counters.
+//
+// Counter semantics — both include the current event:
+//   - total_count: lifetime cumulative head-touch count; persisted via
+//     the existing sw property storage on the publisher side.
+//   - since_boot_count: head-touch count since the current boot; resets
+//     to 0 on every reboot.
+//
+// The UWB module's internal consecutive-count debouncing state is NOT
+// exposed here — it is an implementation detail of the debouncer and
+// would surface intermediate false-positive states to subscribers.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.uwb;
+
+table HeadTouchEvent {
+  aorta_header:     aorta.sys.AortaHeader (id: 0);
+  total_count:      uint64 = 0            (id: 1);
+  since_boot_count: uint32 = 0            (id: 2);
+}
+
+root_type HeadTouchEvent;

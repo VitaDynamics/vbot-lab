@@ -1,0 +1,23 @@
+// Locomotion Joy — joystick axes and buttons for robot control.
+//
+// Migrated from ROS2 sensor_msgs/msg/Joy.msg.
+//
+// Mapping notes:
+//   - `sensor_msgs/Joy.header` is dropped; transport time is carried by
+//     `aorta_header.publish_stamp_ns`. The upstream `frame_id`/`stamp` were
+//     always a constant literal and an unread duplicate of the publish
+//     time respectively, so they are not carried over here.
+//   - `axes: float32[]` / `buttons: int32[]` map directly to
+//     `sensor_msgs/Joy.axes` / `.buttons`.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace locomotion;
+
+table Joy {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  axes: [float] (id: 1);
+  buttons: [int] (id: 2);
+}
+
+root_type Joy;

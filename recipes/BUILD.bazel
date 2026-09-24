@@ -1,0 +1,31 @@
+py_library(
+    name = "common",
+    srcs = ["__init__.py", "common.py", "observe.py"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "cpp_common",
+    hdrs = ["cpp_common.h", "observe.h"],
+    deps = ["@aorta_release//:sdk"],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "repository_files",
+    srcs = glob(["*.md", "*.py", "*.bazel", "*.h"]) + [
+        "//recipes/audio:repository_files",
+        "//recipes/sensors:repository_files",
+        "//recipes/perception:repository_files",
+        "//recipes/system-peripherals:repository_files",
+        "//recipes/slam:repository_files",
+        "//recipes/camera:repository_files",
+        "//recipes/device-info:repository_files",
+        "//recipes/locomotion:repository_files",
+        "//recipes/rcp-task:repository_files",
+        "//recipes/service-call:repository_files",
+        "//recipes/subscribe-state:repository_files",
+    ],
+    visibility = ["//visibility:public"],
+)

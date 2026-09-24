@@ -1,0 +1,80 @@
+{
+  "file_counts": {
+    "aorta_fbs": 63,
+    "ros2": {
+      "aorta_msgs": {
+        "action": 1,
+        "msg": 103,
+        "srv": 1
+      },
+      "camera_msgs": {
+        "action": 0,
+        "msg": 2,
+        "srv": 1
+      },
+      "firmware_version_msgs": {
+        "action": 0,
+        "msg": 2,
+        "srv": 1
+      },
+      "foxglove_msgs": {
+        "action": 0,
+        "msg": 3,
+        "srv": 0
+      },
+      "function_msgs": {
+        "action": 0,
+        "msg": 3,
+        "srv": 3
+      },
+      "lowlevel_msg": {
+        "action": 0,
+        "msg": 3,
+        "srv": 1
+      },
+      "peripheral_msgs": {
+        "action": 0,
+        "msg": 1,
+        "srv": 6
+      },
+      "slam_msgs": {
+        "action": 0,
+        "msg": 1,
+        "srv": 3
+      },
+      "software_msgs": {
+        "action": 0,
+        "msg": 4,
+        "srv": 1
+      },
+      "speech_msgs": {
+        "action": 0,
+        "msg": 0,
+        "srv": 1
+      },
+      "uwb_location": {
+        "action": 0,
+        "msg": 1,
+        "srv": 0
+      },
+      "uwb_msgs": {
+        "action": 0,
+        "msg": 1,
+        "srv": 0
+      },
+      "vision_msgs": {
+        "action": 0,
+        "msg": 9,
+        "srv": 0
+      }
+    },
+    "routes": 70
+  },
+  "format_version": 1,
+  "ros2_bridge_version": "2026.09.24",
+  "schema_pack": {
+    "asset": "aorta-edu-schema-pack-2026.9.24-v4.tar.zst",
+    "sha256": "16991e633a63da9ef39d8f773a1aac8f2d28d0773501d31d7859a7acd100fe70",
+    "version": "2026.9.24"
+  }
+}

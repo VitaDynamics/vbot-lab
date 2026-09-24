@@ -1,0 +1,22 @@
+# 请求
+uint8 target_state     # Target state: 0=OFF, 1=ON
+uint8 mode             # Function mode (e.g., specific head movement pattern) # Past Action Name should be mode as int
+string req_id          # Request ID for trace
+bool pre_check         # If true, only perform the prepare/check phase
+string action_path     # Optional: action/trajectory path for CSV actions
+
+
+# User Friendly Definition Here 
+uint8 ANGLE_CONTROL = 0
+uint8 STREAM = 1
+
+int32 duration_ms    # 播放时间，单位毫秒，-1表示播完这个序列
+bool loop_enabled    # 是否循环播放
+float32 playback_rate  # 播放速率，1.0为正常速度，0.5为半速，2.0为2倍速
+float32[] target_angles  # 目标角度数组，当action_name为"angle_control"时使用，依次为pitch、yaw角度（弧度）
+---
+# 响应
+# --- Unified response fields ---
+bool success         # 是否成功
+string message       # 响应消息
+int32 error_code     # Optional error code

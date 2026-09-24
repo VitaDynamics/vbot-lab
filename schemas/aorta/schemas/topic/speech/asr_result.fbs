@@ -1,0 +1,25 @@
+// Topic: `speech/asr_result`
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.speech;
+
+/// Source route of the ASR result. This identifies the product input path, not
+/// the speech SDK vendor.
+enum AsrProvider: ubyte {
+  UNKNOWN = 0,
+  /// Robot-body ASR, such as speech_service_v2's Baidu pipeline.
+  BODY = 1,
+  /// Signalling-path ASR (the tag-side pipeline).
+  TAG = 2,
+}
+
+table AsrResult {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  /// UTF-8 transcript. This is non-empty for every published sample.
+  text: string (id: 1);
+  /// Product input path that produced this final ASR result.
+  provider: AsrProvider = UNKNOWN (id: 2);
+}
+
+root_type AsrResult;

@@ -1,0 +1,6 @@
+# now only support 480 * 854 jpeg image
+ShowImg[] images
+uint32[] duration_ms
+---
+bool success
+string message

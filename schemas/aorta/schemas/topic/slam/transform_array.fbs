@@ -1,0 +1,47 @@
+// Static frame family on `slam/static_transforms` (SLAM -> Spatial Service
+// frame bridging).
+//
+// Whole static frame family in one atomically-arriving message, replacing the
+// ROS2 latched `/tf_static` batch on the new topic `slam/static_transforms`.
+//
+// This is a SEPARATE table on a SEPARATE topic rather than a widening of the
+// single-edge static transform message: that message's consumer reads
+// `/slam/tf_static` and hard-requires the single map -> lidar_init edge, so
+// that topic and table stay byte-identical.
+// Note aorta has no transient_local: late subscribers of this topic only see the
+// next periodic republish, which is why the authoritative latched copy of the
+// same edge set lives in the ContextStore key `slam/static_frames`.
+//
+// Split into its own .fbs in 2026-08: reflection decode uses the
+// bfbs-declared root_type, so each published table needs its own .fbs /
+// root_type. While the batch table shared a file with the single-edge
+// message, aorta-cli `topic echo` / TUI / foxglove bridge decoded
+// `slam/static_transforms` payloads as the wrong root table ("string contains
+// non-utf8 bytes").
+//
+// Shared fixed-shape geometry (Vector3 / Quaternion) lives in
+// transform_types.fbs.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/topic/slam/transform_types.fbs";
+
+namespace aorta.topic.slam;
+
+// One edge of a multi-edge transform message. Deliberately header-less: only
+// the enclosing TransformArray carries the aorta_header / timestamp, matching
+// the ROS2 leg where one tf2_msgs/TFMessage stamped a whole batch.
+table Transform {
+  frame_id: string (id: 0);
+  child_frame_id: string (id: 1);
+  translation: Vector3 (id: 2);
+  rotation: Quaternion (id: 3);
+}
+
+table TransformArray {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong = 0 (id: 1);
+  transforms: [Transform] (id: 2);
+  is_static: bool = false (id: 3);
+}
+
+root_type TransformArray;

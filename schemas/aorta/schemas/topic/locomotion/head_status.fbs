@@ -1,0 +1,19 @@
+// HeadStatus — locomotion head controller status
+//
+// Aorta topic schema for ROS2 `/locomotion/head/status` (String-serialized
+// on the ROS2 leg; this schema mirrors the head controller's native comm-port
+// status struct, so the Aorta leg is typed rather than re-serialized).
+
+include "schemas/system/aorta_base.fbs";
+
+namespace locomotion;
+
+table HeadStatus {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  state: ubyte = 0 (id: 1);
+  current_action: string (id: 2);
+  pending_action: string (id: 3);
+  fault_reason: string (id: 4);
+}
+
+root_type HeadStatus;

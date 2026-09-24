@@ -1,0 +1,2039 @@
+{
+  "format_version": 1,
+  "ros_distro": "humble",
+  "limits": {
+    "max_service_in_flight": 8,
+    "service_rate_per_second": 5.0,
+    "service_burst": 10
+  },
+  "external_packages": [
+    "action_msgs",
+    "builtin_interfaces",
+    "diagnostic_msgs",
+    "geometry_msgs",
+    "nav_msgs",
+    "sensor_msgs",
+    "std_msgs",
+    "tf2_msgs",
+    "unique_identifier_msgs"
+  ],
+  "routes": [
+    {
+      "id": "audio.raw_audio_dump",
+      "row": 52,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/raw_audio_dump",
+        "schema": "aorta/schemas/topic/foxglove_schema/RawAudio.fbs",
+        "types": {
+          "message": "foxglove.RawAudio"
+        }
+      },
+      "ros": {
+        "name": "/raw_audio_dump",
+        "type": "foxglove_msgs/msg/RawAudio"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 5
+      }
+    },
+    {
+      "id": "audio.uwb_adpcm_segment",
+      "row": 55,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/audio/uwb_adpcm_segment",
+        "schema": "aorta/schemas/topic/foxglove_schema/RawAudio.fbs",
+        "types": {
+          "message": "foxglove.RawAudio"
+        }
+      },
+      "ros": {
+        "name": "/audio/uwb_adpcm_segment",
+        "type": "foxglove_msgs/msg/RawAudio"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "display.display_imgs",
+      "row": 41,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/display_imgs",
+        "schema": "aorta/schemas/service/peripheral/display_imgs.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.DisplayImgsRequest",
+          "response": "aorta.services.peripheral.DisplayImgsResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/display_imgs",
+        "type": "peripheral_msgs/srv/DisplayImgs"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 8000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 8388608
+      }
+    },
+    {
+      "id": "display.get_supported_emotions",
+      "row": 39,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/get_supported_emotions",
+        "schema": "aorta/schemas/service/peripheral/get_supported_emotions.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.GetSupportedEmotionsRequest",
+          "response": "aorta.services.peripheral.GetSupportedEmotionsResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/get_supported_emotions",
+        "type": "peripheral_msgs/srv/GetSupportedEmotions"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "display.play_emotion",
+      "row": 40,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/play_emotion",
+        "schema": "aorta/schemas/service/peripheral/play_emotion.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.PlayEmotionRequest",
+          "response": "aorta.services.peripheral.PlayEmotionResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/play_emotion",
+        "type": "peripheral_msgs/srv/PlayEmotion"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "display.status",
+      "row": 42,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/display_node/status",
+        "schema": "aorta/schemas/topic/peripheral/display_status.fbs",
+        "types": {
+          "message": "aorta.topic.peripheral.DisplayStatus"
+        }
+      },
+      "ros": {
+        "name": "/display_node/status",
+        "type": "aorta_msgs/msg/DisplayStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "ear_light.control",
+      "row": 44,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/light_node/control",
+        "schema": "aorta/schemas/service/peripheral/light_control.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.LightControlRequest",
+          "response": "aorta.services.peripheral.LightControlResponse"
+        }
+      },
+      "ros": {
+        "name": "/light_node/control",
+        "type": "peripheral_msgs/srv/LightControl"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "ear_light.ear_modulation",
+      "row": 46,
+      "kind": "topic",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/light/ear_modulation",
+        "schema": "aorta/schemas/topic/peripheral/ear_modulation.fbs",
+        "types": {
+          "message": "aorta.topic.peripheral.EarModulation"
+        }
+      },
+      "ros": {
+        "name": "/light/ear_modulation",
+        "type": "aorta_msgs/msg/EarModulation"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": 250,
+        "zero_on_deadman": true,
+        "rate_per_second": 30.0,
+        "burst": 5,
+        "max_request_bytes": 4096,
+        "bounds": [
+          {
+            "field": "value",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "unit": "normalized"
+          }
+        ],
+        "finite_fields": [
+          "value"
+        ]
+      }
+    },
+    {
+      "id": "ear_light.get_status",
+      "row": 43,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/light_node/status",
+        "schema": "aorta/schemas/service/peripheral/get_light_status.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.GetLightStatusRequest",
+          "response": "aorta.services.peripheral.GetLightStatusResponse"
+        }
+      },
+      "ros": {
+        "name": "/light_node/status",
+        "type": "peripheral_msgs/srv/GetLightStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "ear_light.gradient",
+      "row": 45,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/light_node/gradient",
+        "schema": "aorta/schemas/service/peripheral/light_gradient.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.LightGradientRequest",
+          "response": "aorta.services.peripheral.LightGradientResponse"
+        }
+      },
+      "ros": {
+        "name": "/light_node/gradient",
+        "type": "peripheral_msgs/srv/LightGradient"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "locomotion.action_report",
+      "row": 22,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/action_report",
+        "schema": "aorta/schemas/topic/locomotion/action_report.fbs",
+        "types": {
+          "message": "locomotion.ActionReport"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/action_report",
+        "type": "aorta_msgs/msg/ActionReport"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "locomotion.body_action_status",
+      "row": 19,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/body_action_status",
+        "schema": "aorta/schemas/topic/locomotion/body_action_status.fbs",
+        "types": {
+          "message": "locomotion.BodyActionStatus"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/body_action_status",
+        "type": "function_msgs/msg/BodyActionStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "locomotion.body_task_report",
+      "row": 21,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/body/task_report",
+        "schema": "aorta/schemas/topic/task/task_report.fbs",
+        "types": {
+          "message": "aorta.topic.task.TaskReport"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/body/task_report",
+        "type": "aorta_msgs/msg/TaskReport"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "locomotion.event",
+      "row": 23,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/event",
+        "schema": "aorta/schemas/topic/locomotion/locomotion_event.fbs",
+        "types": {
+          "message": "locomotion.LocomotionEvent"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/event",
+        "type": "software_msgs/msg/LocomotionEvent"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "locomotion.head_action",
+      "row": 27,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/head_action",
+        "schema": "aorta/schemas/service/locomotion/head_action.fbs",
+        "types": {
+          "request": "aorta.services.locomotion.HeadActionRequest",
+          "response": "aorta.services.locomotion.HeadActionResponse"
+        }
+      },
+      "ros": {
+        "name": "/head_action",
+        "type": "lowlevel_msg/srv/HeadAction"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "locomotion.head_status",
+      "row": 20,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/head_status",
+        "schema": "aorta/schemas/topic/locomotion/head_status.fbs",
+        "types": {
+          "message": "locomotion.HeadStatus"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/head_status",
+        "type": "aorta_msgs/msg/HeadStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "locomotion.head_task_report",
+      "row": 21,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/head/task_report",
+        "schema": "aorta/schemas/topic/task/task_report.fbs",
+        "types": {
+          "message": "aorta.topic.task.TaskReport"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/head/task_report",
+        "type": "aorta_msgs/msg/TaskReport"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "locomotion.joy",
+      "row": 24,
+      "kind": "topic",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/joy",
+        "schema": "aorta/schemas/topic/locomotion/joy.fbs",
+        "types": {
+          "message": "locomotion.Joy"
+        }
+      },
+      "ros": {
+        "name": "/joy",
+        "type": "sensor_msgs/msg/Joy"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": 250,
+        "zero_on_deadman": true,
+        "rate_per_second": 50.0,
+        "burst": 5,
+        "max_request_bytes": 4096,
+        "bounds": [
+          {
+            "field": "axes",
+            "minimum": -1.0,
+            "maximum": 1.0,
+            "unit": "normalized"
+          }
+        ],
+        "finite_fields": [
+          "axes"
+        ]
+      }
+    },
+    {
+      "id": "locomotion.lowlevel_action",
+      "row": 26,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/lowlevel_action",
+        "schema": "aorta/schemas/service/locomotion/lowlevel_action.fbs",
+        "types": {
+          "request": "aorta.services.locomotion.LowlevelActionRequest",
+          "response": "aorta.services.locomotion.LowlevelActionResponse"
+        }
+      },
+      "ros": {
+        "name": "/sm/action/lowlevel",
+        "type": "software_msgs/srv/LowlevelAction"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "locomotion.runtime_control",
+      "row": 29,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/runtime_control",
+        "schema": "aorta/schemas/service/locomotion/runtime_control.fbs",
+        "types": {
+          "request": "aorta.services.locomotion.RuntimeControlRequest",
+          "response": "aorta.services.locomotion.RuntimeControlResponse"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/runtime_control",
+        "type": "aorta_msgs/srv/RuntimeControl"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "locomotion.set_run_mode",
+      "row": 28,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/set_run_mode",
+        "schema": "aorta/schemas/service/locomotion/set_run_mode.fbs",
+        "types": {
+          "request": "aorta.services.locomotion.SetRunModeRequest",
+          "response": "aorta.services.locomotion.SetRunModeResponse"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/set_run_mode",
+        "type": "function_msgs/srv/SetRunMode"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576,
+        "enum_domains": [
+          {
+            "field": "mode",
+            "allowed": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "locomotion.status",
+      "row": 18,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/locomotion/status",
+        "schema": "aorta/schemas/topic/locomotion/locomotion_status.fbs",
+        "types": {
+          "message": "locomotion.LocomotionStatus"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/status",
+        "type": "software_msgs/msg/LocomotionStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "locomotion.vel_cmd",
+      "row": 25,
+      "kind": "topic",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/velocity_command",
+        "schema": "aorta/schemas/topic/navigation/twist.fbs",
+        "types": {
+          "message": "aorta.topic.navigation.Twist"
+        }
+      },
+      "ros": {
+        "name": "/vel_cmd",
+        "type": "geometry_msgs/msg/Twist"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": 250,
+        "zero_on_deadman": true,
+        "rate_per_second": 50.0,
+        "burst": 5,
+        "max_request_bytes": 4096,
+        "bounds": [
+          {
+            "field": "linear.x",
+            "minimum": -0.5,
+            "maximum": 0.5,
+            "unit": "m/s"
+          },
+          {
+            "field": "linear.y",
+            "minimum": -0.5,
+            "maximum": 0.5,
+            "unit": "m/s"
+          },
+          {
+            "field": "angular.z",
+            "minimum": -1.0,
+            "maximum": 1.0,
+            "unit": "rad/s"
+          }
+        ],
+        "finite_fields": [
+          "linear.x",
+          "linear.y",
+          "linear.z",
+          "angular.x",
+          "angular.y",
+          "angular.z"
+        ],
+        "exact_zero_fields": [
+          "linear.z",
+          "angular.x",
+          "angular.y"
+        ]
+      }
+    },
+    {
+      "id": "perception.detections2d",
+      "row": 53,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/perception/detections2d",
+        "schema": "aorta/schemas/topic/perception/detection_2d.fbs",
+        "types": {
+          "message": "perception.Detection2DArray"
+        }
+      },
+      "ros": {
+        "name": "/perception/detections2d",
+        "type": "vision_msgs/msg/Detection2DArray"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "perception.poses",
+      "row": 54,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/perception/poses",
+        "schema": "aorta/schemas/topic/perception/pose_detection.fbs",
+        "types": {
+          "message": "perception.PoseDetection"
+        }
+      },
+      "ros": {
+        "name": "/perception/poses",
+        "type": "vision_msgs/msg/PoseDetection"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "rcp.execute_task",
+      "row": 30,
+      "kind": "action",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/rcp/execute_task",
+        "schema": "aorta/schemas/action/rcp/execute_task.fbs",
+        "types": {
+          "goal": "aorta.action.rcp.ExecuteTaskGoal",
+          "result": "aorta.action.rcp.ExecuteTaskResult",
+          "feedback": "aorta.action.rcp.ExecuteTaskFeedbackData"
+        }
+      },
+      "ros": {
+        "name": "/rcp/execute_task",
+        "type": "aorta_msgs/action/ExecuteTask"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "rcp.function_input",
+      "row": 32,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/rcp/function_input",
+        "schema": "aorta/schemas/service/rcp/function_input.fbs",
+        "types": {
+          "request": "aorta.services.rcp.FunctionInputRequest",
+          "response": "aorta.services.rcp.FunctionInputResponse"
+        }
+      },
+      "ros": {
+        "name": "/function_input",
+        "type": "function_msgs/srv/FunctionInput"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 8000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 2.0,
+        "burst": 4,
+        "max_request_bytes": 262144
+      }
+    },
+    {
+      "id": "rcp.trace",
+      "row": 31,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/rcp/trace",
+        "schema": "aorta/schemas/topic/rcp/trace_event.fbs",
+        "types": {
+          "message": "aorta.topic.rcp.TraceEvent"
+        }
+      },
+      "ros": {
+        "name": "/rcp/trace",
+        "type": "function_msgs/msg/TraceEvent"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "sensor.bms_state",
+      "row": 1,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/bms_state",
+        "schema": "aorta/schemas/topic/bms/bms_state.fbs",
+        "types": {
+          "message": "bms.BmsState"
+        }
+      },
+      "ros": {
+        "name": "/bms_state",
+        "type": "lowlevel_msg/msg/BmsState"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "sensor.gnss_fix",
+      "row": 2,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/gnss/fix",
+        "schema": "aorta/schemas/topic/gnss/nav_sat_fix.fbs",
+        "types": {
+          "message": "aorta.topic.gnss.NavSatFix"
+        }
+      },
+      "ros": {
+        "name": "/gnss/fix",
+        "type": "sensor_msgs/msg/NavSatFix"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "sensor.gnss_fusion",
+      "row": 3,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/gnss/fusion",
+        "schema": "aorta/schemas/topic/gnss/gnss_fusion.fbs",
+        "types": {
+          "message": "gnss.GnssFusion"
+        }
+      },
+      "ros": {
+        "name": "/gnss/fusion",
+        "type": "sensor_msgs/msg/NavSatFix"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "sensor.gnss_fusion_extra",
+      "row": 3,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/gnss/fusion",
+        "schema": "aorta/schemas/topic/gnss/gnss_fusion.fbs",
+        "types": {
+          "message": "gnss.GnssFusion"
+        }
+      },
+      "ros": {
+        "name": "/gnss/fusion_extra",
+        "type": "aorta_msgs/msg/GnssFusionExtra"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "sensor.imu_raw",
+      "row": 4,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/imu_raw",
+        "schema": "aorta/schemas/topic/sensor/imu.fbs",
+        "types": {
+          "message": "aorta.topic.sensor.Imu"
+        }
+      },
+      "ros": {
+        "name": "/imu_raw",
+        "type": "sensor_msgs/msg/Imu"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 5
+      }
+    },
+    {
+      "id": "sensor.lidar_diagnostic_status",
+      "row": 7,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/lidar_diagnostic_status",
+        "schema": "aorta/schemas/topic/sensor/diagnostic_status.fbs",
+        "types": {
+          "message": "aorta.topic.sensor.DiagnosticArray"
+        }
+      },
+      "ros": {
+        "name": "/lidar_diagnostic_status",
+        "type": "diagnostic_msgs/msg/DiagnosticArray"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "sensor.lidar_imu",
+      "row": 6,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/lidar_imu",
+        "schema": "aorta/schemas/topic/sensor/imu.fbs",
+        "types": {
+          "message": "aorta.topic.sensor.Imu"
+        }
+      },
+      "ros": {
+        "name": "/lidar_imu",
+        "type": "sensor_msgs/msg/Imu"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 5
+      }
+    },
+    {
+      "id": "sensor.lidar_packets",
+      "row": 8,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/lidar_packets",
+        "schema": "aorta/schemas/topic/sensor/lidar_packet.fbs",
+        "types": {
+          "message": "aorta.topic.sensor.LidarPacket"
+        }
+      },
+      "ros": {
+        "name": "/lidar_packets",
+        "type": "aorta_msgs/msg/LidarPacket"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "sensor.lidar_points",
+      "row": 5,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/lidar_points",
+        "schema": "aorta/schemas/topic/foxglove_schema/PointCloud.fbs",
+        "types": {
+          "message": "foxglove.PointCloud"
+        }
+      },
+      "ros": {
+        "name": "/lidar_points",
+        "type": "sensor_msgs/msg/PointCloud2"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "sensor.servo_status",
+      "row": 12,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/lowlevel/servo_status",
+        "schema": "aorta/schemas/topic/lowlevel/servo_status.fbs",
+        "types": {
+          "message": "lowlevel.ServoStatuses"
+        }
+      },
+      "ros": {
+        "name": "/servo/status",
+        "type": "lowlevel_msg/msg/ServoStatuses"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 5
+      }
+    },
+    {
+      "id": "sensor.uwb_audio_done",
+      "row": 56,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/uwb/audio_done",
+        "schema": "aorta/schemas/topic/uwb/audio_done.fbs",
+        "types": {
+          "message": "aorta.uwb.AudioDoneEvent"
+        }
+      },
+      "ros": {
+        "name": "/uwb/audio_done",
+        "type": "aorta_msgs/msg/AudioDoneEvent"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 3
+      }
+    },
+    {
+      "id": "sensor.uwb_head_touch",
+      "row": 11,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/uwb/head_touch",
+        "schema": "aorta/schemas/topic/uwb/head_touch_event.fbs",
+        "types": {
+          "message": "aorta.uwb.HeadTouchEvent"
+        }
+      },
+      "ros": {
+        "name": "/uwb/head_touch",
+        "type": "aorta_msgs/msg/HeadTouchEvent"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "sensor.uwb_ranging",
+      "row": 9,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/uwb/ranging",
+        "schema": "aorta/schemas/topic/uwb/ranging.fbs",
+        "types": {
+          "message": "aorta.uwb.UwbRangingData"
+        }
+      },
+      "ros": {
+        "name": "/uwb/data",
+        "type": "uwb_location/msg/UWB"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 5
+      }
+    },
+    {
+      "id": "sensor.uwb_state",
+      "row": 10,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/uwb/state",
+        "schema": "aorta/schemas/topic/uwb/state.fbs",
+        "types": {
+          "message": "aorta.uwb.UwbState"
+        }
+      },
+      "ros": {
+        "name": "/uwb/state",
+        "type": "uwb_msgs/msg/Status"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "slam.get_path_to_target",
+      "row": 38,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/get_path_to_target",
+        "schema": "aorta/schemas/service/slam/slam_control_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.GetPathToTargetRequest",
+          "response": "aorta.services.slam.GetPathToTargetResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/get_path_to_target",
+        "type": "slam_msgs/srv/GetPathToTarget"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "slam.grid_map_compressed",
+      "row": 36,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/slam/grid_map/compressed",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedImage.fbs",
+        "types": {
+          "message": "foxglove.CompressedImage"
+        }
+      },
+      "ros": {
+        "name": "/grid_map/compressed",
+        "type": "foxglove_msgs/msg/CompressedImage"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "slam.odometry",
+      "row": 34,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/odometry",
+        "schema": "aorta/schemas/topic/navigation/odometry.fbs",
+        "types": {
+          "message": "aorta.topic.navigation.Odometry"
+        }
+      },
+      "ros": {
+        "name": "/odometry",
+        "type": "nav_msgs/msg/Odometry"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 5
+      }
+    },
+    {
+      "id": "slam.query_map",
+      "row": 38,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/query_map",
+        "schema": "aorta/schemas/service/slam/slam_control_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.QueryMapRequest",
+          "response": "aorta.services.slam.QueryMapResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/query_map",
+        "type": "slam_msgs/srv/QueryMap"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 8000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "slam.set_slam_mode",
+      "row": 37,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/set_slam_mode",
+        "schema": "aorta/schemas/service/slam/slam_control_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.SetSlamModeRequest",
+          "response": "aorta.services.slam.SetSlamModeResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/set_slam_mode",
+        "type": "slam_msgs/srv/SetSlamMode"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "slam.status",
+      "row": 33,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/slam/status",
+        "schema": "aorta/schemas/topic/slam/slam_status.fbs",
+        "types": {
+          "message": "aorta.topic.slam.SlamStatus"
+        }
+      },
+      "ros": {
+        "name": "/slam/status",
+        "type": "slam_msgs/msg/SlamStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "slam.tf",
+      "row": 34,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/odometry",
+        "schema": "aorta/schemas/topic/navigation/odometry.fbs",
+        "types": {
+          "message": "aorta.topic.navigation.Odometry"
+        }
+      },
+      "ros": {
+        "name": "/tf",
+        "type": "tf2_msgs/msg/TFMessage"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "slam.tf_static",
+      "row": 35,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/slam/static_transforms",
+        "schema": "aorta/schemas/topic/slam/transform_array.fbs",
+        "types": {
+          "message": "aorta.topic.slam.TransformArray"
+        }
+      },
+      "ros": {
+        "name": "/tf_static",
+        "type": "tf2_msgs/msg/TFMessage"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "speech.asr_result",
+      "row": 51,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/speech/asr_result",
+        "schema": "aorta/schemas/topic/speech/asr_result.fbs",
+        "types": {
+          "message": "aorta.topic.speech.AsrResult"
+        }
+      },
+      "ros": {
+        "name": "/speech/asr_result",
+        "type": "aorta_msgs/msg/AsrResult"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "speech.set_speak",
+      "row": 48,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/speech/set_speak",
+        "schema": "aorta/schemas/service/speech/set_speak.fbs",
+        "types": {
+          "request": "aorta.services.speech.SetSpeakRequest",
+          "response": "aorta.services.speech.SetSpeakResponse"
+        }
+      },
+      "ros": {
+        "name": "/set_speak",
+        "type": "function_msgs/srv/SetSpeak"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "speech.voice_event",
+      "row": 49,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/voice/event",
+        "schema": "aorta/schemas/topic/voice/voice_event.fbs",
+        "types": {
+          "message": "aorta.voice.VoiceEvent"
+        }
+      },
+      "ros": {
+        "name": "/voice/event",
+        "type": "aorta_msgs/msg/VoiceEvent"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "speech.volume_control",
+      "row": 47,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/volume_control",
+        "schema": "aorta/schemas/service/speech/volume_control.fbs",
+        "types": {
+          "request": "aorta.services.speech.VolumeControlRequest",
+          "response": "aorta.services.speech.VolumeControlResponse"
+        }
+      },
+      "ros": {
+        "name": "/volume_control",
+        "type": "speech_msgs/srv/VolumeControl"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "stereo.get_jpeg_images",
+      "row": 17,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/get_jpeg_images",
+        "schema": "aorta/schemas/service/stereo/get_jpeg_images.fbs",
+        "types": {
+          "request": "aorta.services.stereo.GetJpegImagesRequest",
+          "response": "aorta.services.stereo.GetJpegImagesResponse"
+        }
+      },
+      "ros": {
+        "name": "/get_jpeg_images",
+        "type": "camera_msgs/srv/GetJpegImages"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 8000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "stereo.left.camera_info",
+      "row": 14,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/stereo_left/camera_info",
+        "schema": "aorta/schemas/topic/foxglove_schema/CameraCalibration.fbs",
+        "types": {
+          "message": "foxglove.CameraCalibration"
+        }
+      },
+      "ros": {
+        "name": "/stereo_left/camera_info",
+        "type": "sensor_msgs/msg/CameraInfo"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.left.h265",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_left_raw/h265",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_left_raw/h265",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.left.h265_half",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_left_raw/h265_half",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_left_raw/h265_half",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.left.h265_quarter",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_left_raw/h265_quarter",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_left_raw/h265_quarter",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.left.h265_undistort",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_left_raw/h265_undistort",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_left_raw/h265_undistort",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.right.camera_info",
+      "row": 14,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/stereo_right/camera_info",
+        "schema": "aorta/schemas/topic/foxglove_schema/CameraCalibration.fbs",
+        "types": {
+          "message": "foxglove.CameraCalibration"
+        }
+      },
+      "ros": {
+        "name": "/stereo_right/camera_info",
+        "type": "sensor_msgs/msg/CameraInfo"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.right.h265",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_right_raw/h265",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_right_raw/h265",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.right.h265_half",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_right_raw/h265_half",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_right_raw/h265_half",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.right.h265_quarter",
+      "row": 15,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/image_right_raw/h265_quarter",
+        "schema": "aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs",
+        "types": {
+          "message": "foxglove.CompressedVideo"
+        }
+      },
+      "ros": {
+        "name": "/image_right_raw/h265_quarter",
+        "type": "foxglove_msgs/msg/CompressedVideo"
+      },
+      "qos": {
+        "reliability": "best_effort",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 1
+      }
+    },
+    {
+      "id": "stereo.tag_detection",
+      "row": 16,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/stereo_apriltag/detection",
+        "schema": "aorta/schemas/topic/sensor/stereo_tag_detection.fbs",
+        "types": {
+          "message": "aorta.topic.sensor.StereoTagDetection"
+        }
+      },
+      "ros": {
+        "name": "/function/stereo_tag_detection",
+        "type": "function_msgs/msg/StereoTagDetection"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "system.firmware_version.lidar",
+      "row": 13,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/firmware_version/lidar",
+        "schema": "aorta/schemas/service/system/get_firmware_version.fbs",
+        "types": {
+          "request": "aorta.services.system.GetFirmwareVersionRequest",
+          "response": "aorta.services.system.GetFirmwareVersionResponse"
+        }
+      },
+      "ros": {
+        "name": "/firmware_version/lidar",
+        "type": "firmware_version_msgs/srv/GetFirmwareVersion"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576,
+        "enum_domains": [
+          {
+            "field": "target_device_type",
+            "allowed": [
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "system.firmware_version.motor",
+      "row": 13,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/firmware_version/motor",
+        "schema": "aorta/schemas/service/system/get_firmware_version.fbs",
+        "types": {
+          "request": "aorta.services.system.GetFirmwareVersionRequest",
+          "response": "aorta.services.system.GetFirmwareVersionResponse"
+        }
+      },
+      "ros": {
+        "name": "/firmware_version/motor",
+        "type": "firmware_version_msgs/srv/GetFirmwareVersion"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576,
+        "enum_domains": [
+          {
+            "field": "target_device_type",
+            "allowed": [
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "system.firmware_version.servo",
+      "row": 13,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/firmware_version/servo",
+        "schema": "aorta/schemas/service/system/get_firmware_version.fbs",
+        "types": {
+          "request": "aorta.services.system.GetFirmwareVersionRequest",
+          "response": "aorta.services.system.GetFirmwareVersionResponse"
+        }
+      },
+      "ros": {
+        "name": "/firmware_version/servo",
+        "type": "firmware_version_msgs/srv/GetFirmwareVersion"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576,
+        "enum_domains": [
+          {
+            "field": "target_device_type",
+            "allowed": [
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "system.firmware_version.uwb",
+      "row": 13,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/firmware_version/uwb",
+        "schema": "aorta/schemas/service/system/get_firmware_version.fbs",
+        "types": {
+          "request": "aorta.services.system.GetFirmwareVersionRequest",
+          "response": "aorta.services.system.GetFirmwareVersionResponse"
+        }
+      },
+      "ros": {
+        "name": "/firmware_version/uwb",
+        "type": "firmware_version_msgs/srv/GetFirmwareVersion"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 1048576,
+        "enum_domains": [
+          {
+            "field": "target_device_type",
+            "allowed": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "system.sm_status",
+      "row": 50,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/system/sm_status",
+        "schema": "aorta/schemas/topic/system/sm_status.fbs",
+        "types": {
+          "message": "sm.SmStatus"
+        }
+      },
+      "ros": {
+        "name": "/sm/status",
+        "type": "software_msgs/msg/SystemStateMachineStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "transient_local",
+        "history": "keep_last",
+        "depth": 1
+      }
+    }
+  ]
+}

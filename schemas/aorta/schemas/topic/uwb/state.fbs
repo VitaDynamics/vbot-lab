@@ -1,0 +1,44 @@
+// UWB Node State Snapshot
+//
+// Published periodically (1 Hz timer) by the UWB node to report its
+// operational state: BLE connection, ranging activity, battery, and
+// hardware identity.
+//
+// Topic: uwb/state (Reliable QoS, StateUpdate semantics, depth=1).
+//
+// ROS2 migration mapping:
+//   /uwb/state (uwb_msgs/msg/Status) -> uwb/state (aorta.uwb.UwbState)
+//
+// State enum values mirror uwb_msgs/msg/Status STATUS_* constants so
+// cross-language consumers can compare without re-encoding.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.uwb;
+
+/// Mirrors uwb_msgs/msg/Status STATE_* constants.
+enum UwbConnectionState: ubyte {
+  IDLE = 0,       // BLE not connected, no ranging
+  CONNECTED = 1,  // BLE connected, tag paired but not ranging
+  RANGING = 2,    // Actively ranging (distance/angle data flowing)
+}
+
+/// Mirrors uwb_msgs/msg/Status MODE_* constants.
+enum UwbMode: ubyte {
+  BLE = 0,     // Normal BLE + ranging mode
+  ANCHOR = 1,  // Anchor-only mode (no tag pairing)
+}
+
+table UwbState {
+  aorta_header:       aorta.sys.AortaHeader (id: 0);
+  state:              UwbConnectionState = IDLE   (id: 1);
+  mode:               UwbMode = BLE               (id: 2);
+  battery_percentage: uint8 = 0                   (id: 3);  // 0–100
+  preamble_code:      uint8 = 0                   (id: 4);  // UWB channel preamble code
+  tag_mac_addr:       [uint8]                     (id: 5);  // 6-byte MAC address
+  rssi_dbm:           int16 = 0                   (id: 6);  // BLE RSSI in dBm
+  angle_offset:       float32 = 0.0               (id: 7);  // Calibrated angle offset (degrees)
+  is_charging:        bool = false                (id: 8);
+}
+
+root_type UwbState;

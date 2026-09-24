@@ -1,0 +1,75 @@
+// System State Machine Status
+//
+// Shared Aorta topic schema for /system/sm_status.
+// Mirrors the ROS2 software_msgs/SystemStateMachineStatus semantics,
+// exposing the system-level HSM state (including POWER_SAVING) to
+// downstream LLM consumers for idle-detection.
+//
+// Design notes:
+//   - Field IDs are stable; new fields MUST be appended with new IDs.
+//   - Field order mirrors upstream SystemStateMachineStatus.msg.
+//   - namespace "sm" avoids collision with libc ::system in C++ codegen.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace sm;
+
+enum SmCategory: ubyte {
+  State = 0,
+  OTA = 1,
+  Alert = 2,
+}
+
+// Flow/lifecycle status; named SmFlowStatus to avoid collision with root table SmStatus.
+enum SmFlowStatus: ubyte {
+  Unknown = 0,
+  Started = 1,
+  Running = 2,
+  Success = 3,
+  Failed = 4,
+  Cancelled = 5,
+}
+
+enum SmSeverity: ubyte {
+  Info = 0,
+  Warning = 1,
+  Error = 2,
+  Critical = 3,
+}
+
+table KeyValue {
+  key:   string (id: 0);
+  value: string (id: 1);
+}
+
+// A single entry in the hierarchical state path.
+table StatePathEntry {
+  state_id:   ushort (id: 0);
+  state_name: string (id: 1);
+}
+
+// Root table; codegen appends Msg suffix -> SmStatusMsg.
+table SmStatus {
+  aorta_header:        aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong                 (id: 1);
+  heartbeat_seq:       ulong = 0             (id: 2);
+
+  category: SmCategory   = State             (id: 3);
+  status:   SmFlowStatus = Unknown           (id: 4);
+
+  state_id:   ushort                         (id: 5);
+  state_name: string                         (id: 6);
+
+  active_state_path: [StatePathEntry]        (id: 7);
+
+  message:  string                           (id: 8);
+  data:     [KeyValue]                       (id: 9);
+
+  severity:  SmSeverity = Info               (id: 10);
+  is_active: bool = false                    (id: 11);
+
+  // Convenience flag derived from state_name; not in upstream.
+  in_power_saving: bool = false              (id: 12);
+}
+
+root_type SmStatus;

@@ -1,0 +1,40 @@
+// UWB Audio Done Event
+//
+// Published when the UWB module finishes transferring an audio segment.
+// Topic: uwb/audio_done (Reliable QoS, Volatile durability, depth=3).
+//
+// Aorta equivalent of the ROS2 /uwb/audio_done (std_msgs/Empty). The primary
+// consumer is the ASR client, which uses it to immediately end the ASR
+// session and trigger the network-unavailable voice cue — relying on the idle
+// watchdog alone would introduce a ~6.5s latency regression.
+//
+// `timestamp_ns` carries the monotonic clock value at the moment the UWB
+// module detected the end-of-segment signal (0x8 0x3). It enables latency
+// diagnostics: audio_done → EndSession round-trip measurement.
+//
+// QoS rationale (why Reliable + Volatile, NOT StateUpdate):
+// audio_done is a control signal, not retained state. A retained (transient-
+// local) durability would replay the last done event to a subscriber that
+// joins or restarts, causing a ghost session termination. Reliable delivery
+// reduces loss under normal load, but the publisher MUST also set
+// CongestionControl::Block (the default is Drop) so the signal is never
+// silently discarded under egress congestion — otherwise the ASR consumer
+// falls back to the ~6.5s idle watchdog latency path.
+//
+// ROS2 → Aorta migration mapping:
+//   /uwb/audio_done (std_msgs/Empty) → uwb/audio_done (AudioDoneEvent)
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/user_interaction/user_interaction_context.fbs";
+
+namespace aorta.uwb;
+
+table AudioDoneEvent {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  /// Monotonic timestamp (nanoseconds) at segment-end detection.
+  timestamp_ns: uint64 = 0            (id: 1);
+  /// Optional identity of the UWB voice turn being closed by this edge.
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext (id: 2);
+}
+
+root_type AudioDoneEvent;

@@ -1,0 +1,15 @@
+# Volume Control Service
+# 音量控制服务
+
+# Request fields
+# 请求字段
+string app_name                      # 设置音量的应用名称
+uint8 volume                         # 音量值 (0-100, 0表示静音，100表示最大音量)
+
+---
+# Response fields
+# 响应字段
+bool success                         # 操作是否成功
+string message                       # 响应消息
+uint8 current_volume                 # 当前音量值 (0-100)
+

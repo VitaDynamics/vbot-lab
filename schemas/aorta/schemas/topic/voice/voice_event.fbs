@@ -1,0 +1,378 @@
+// Aorta Voice Event Protocol
+//
+// Unified voice interaction event schema for the voice pipeline.
+// Topic: voice/event, Reliable QoS.
+// Unifies the events emitted by every supported speech provider onto one
+// schema.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/user_interaction/user_interaction_context.fbs";
+
+namespace aorta.voice;
+
+/// Voice interaction state machine states
+enum VoiceState: ubyte {
+  IDLE        = 0,
+  LISTENING   = 1,
+  THINKING    = 2,
+  SPEAKING    = 3,
+  INTERRUPTED = 4,
+  EXECUTING   = 5
+}
+
+/// Interrupt arbitration decision.
+enum Decision: ubyte {
+  ALLOW = 0,
+  DENY  = 1,
+  QUEUE = 2,
+  DEFER = 3
+}
+
+/// Wake-up source enumeration
+enum WakeUpSource: ubyte {
+  KEYWORD,
+  BUTTON,
+  SYSTEM,
+  EXTERNAL
+}
+
+enum WakeUpDecision: ubyte {
+  PENDING,
+  NORMAL,
+  ONESHOT
+}
+
+/// Voice pipeline provider identity for role × provider admission.
+/// Additive tag on event variants; UNKNOWN preserves legacy decoder behavior.
+enum ProviderId: ubyte {
+  UNKNOWN       = 0,
+  BAIDU         = 1,
+  DOUBAO        = 2,
+  OFFLINE_LOCAL = 3,
+  EXTERNAL      = 4
+}
+
+table WakeUpEvent {
+  source: WakeUpSource;
+  confidence: float;
+  keyword: string;
+  /// Deprecated: kept additively for wire compat. Producers MUST emit
+  /// PENDING here. Hub-side oneshot signalling moved to `OneshotSignalEvent`;
+  /// the hub's authoritative pairing outcome is published on the hub's own
+  /// command channel and is not part of this schema.
+  decision: WakeUpDecision = PENDING;
+  doa_angle: short = -1;
+  provider: ProviderId = UNKNOWN;
+}
+
+/// Executor-observed instant at which local audio capture of the user's
+/// utterance ended — the provider ASR SDK reported end-of-capture while the
+/// recognition result is still outstanding. Marks the moment the user
+/// finished speaking their first utterance.
+///
+/// Emitted unconditionally — independent of mode gating. Latency tooling
+/// pairs it with the first `AsrEvent` of the same `VoiceEvent.session_id`
+/// that arrives at or after this event, measuring the speech-end →
+/// first-ASR-result latency (pure recognition latency, free of the
+/// user-dependent utterance duration).
+table SpeechCaptureEndEvent {
+}
+
+/// Executor-observed ALSA system volume snapshot. Emitted after successful
+/// volume writes for observability; semantic voice adjustments are resolved
+/// inside the executor, which owns the ALSA state.
+table SystemVolumeStateEvent {
+  percent: ubyte;
+  min_percent: ubyte;
+  max_percent: ubyte;
+}
+
+/// Executor → hub oneshot signal from the wake-up SDK.
+///
+/// Replaces the prior empty-keyword `WakeUpEvent{decision=NORMAL/ONESHOT}`
+/// dual-use that forced the hub dispatcher to discriminate by string
+/// emptiness. `is_oneshot` is the SDK's oneshot bit (0 = no oneshot detected
+/// in the post-wakeup window, non-zero = oneshot detected); the hub feeds it
+/// into its command arbitration to settle the wake/oneshot pairing window
+/// opened by the prior `WakeUpEvent`.
+table OneshotSignalEvent {
+  is_oneshot: bool;
+}
+
+table AsrEvent {
+  text: string;
+  is_final: bool;
+  confidence: float;
+  language: string;
+  /// True when the ASR engine rejected the recognition (low confidence /
+  /// out-of-domain / VAD noise). When set, consumers should treat the
+  /// utterance as non-actionable and ignore `text`.
+  is_reject: bool = false;
+  /// Engine-specific free-form rationale paired with `is_reject` (empty
+  /// when not rejected). Observability only — do not branch policy on it.
+  reject_reason: string;
+  provider: ProviderId = UNKNOWN;
+  /// Monotonic profile epoch stamped by publishers; the hub rejects events
+  /// whose epoch disagrees with the hub's active mode-profile snapshot.
+  mode_epoch: uint = 0;
+}
+
+/// Executor → hub voice activity detector lifecycle observation from the
+/// provider ASR SDK. The hub may use STARTED/ENDED for listening freshness and
+/// endpoint observations; FINISHED is a provider lifecycle completion signal
+/// and should remain observability-first unless a policy explicitly opts in.
+enum VadPhase: ubyte {
+  UNKNOWN  = 0,
+  STARTED  = 1,
+  ENDED    = 2,
+  FINISHED = 3
+}
+
+table VadEvent {
+  phase: VadPhase = UNKNOWN;
+  /// Direction-of-arrival angle when the SDK reports one; -1 means absent.
+  doa_angle: short = -1;
+  provider: ProviderId = UNKNOWN;
+  /// Monotonic profile epoch stamped by publishers; the hub rejects events
+  /// whose epoch disagrees with the hub's active mode-profile snapshot.
+  mode_epoch: uint = 0;
+}
+
+table CommandSlot {
+  key: string;
+  value: string;
+}
+
+table CommandWordEvent {
+  command: string;
+  confidence: float;
+  params: [string];
+  source: string;
+  raw_text: string;
+  domain: string;
+  command_id: string;
+  slots: [CommandSlot];
+  /// Typed provider tag derived from `source`; keep `source` for legacy decoders.
+  provider: ProviderId = UNKNOWN;
+}
+
+enum TtsLink: ubyte {
+  UNKNOWN          = 0,
+  BAIDU_CHAT       = 1,
+  BAIDU_ACTIVE     = 2,
+  DOUBAO           = 3,
+  OFFLINE_LOCAL    = 4,
+  MACHINE_LANGUAGE = 5
+}
+
+enum TtsKind: ubyte {
+  UNKNOWN          = 0,
+  CHAT             = 1,
+  ACTIVE           = 2,
+  OFFLINE          = 3,
+  MACHINE_LANGUAGE = 4
+}
+
+table TtsStartEvent {
+  text: string;
+  voice_id: string;
+  interrupt_generation: uint64;
+  sn: string;
+  link: TtsLink = UNKNOWN;
+  kind: TtsKind = UNKNOWN;
+  audio_name: string;  // For offline TTS (e.g., "TTS_070")
+  audio_session_id: uint64 = 0;
+  expected_first_frame_timeout_ms: uint32 = 0;
+}
+
+table TtsEndEvent {
+  reason: string;
+  interrupted: bool;
+}
+
+table TtsDataCompleteEvent {
+  sn: string;
+  link: TtsLink = UNKNOWN;
+}
+
+table TtsPlaybackCompleteEvent {
+  sn: string;
+  link: TtsLink = UNKNOWN;
+  interrupted: bool;
+  reason: string;
+  audio_session_id: uint64 = 0;
+}
+
+table InterruptEvent {
+  session_id: uint64 (id: 0);
+  generation: uint64 (id: 1);
+  reason: string (id: 2);
+  source: string (id: 3);
+  priority: ubyte (id: 4);
+  decision: Decision (id: 5);
+  /// Optional correlation id for request-scoped interrupts, e.g.
+  /// `/set_speak target_state=0` cancelling one machine-language request.
+  req_id: string (id: 6);
+}
+
+table VoiceStateEvent {
+  previous_state: VoiceState;
+  new_state: VoiceState;
+  reason: string;
+}
+
+/// ASR engine error — published when the ASR SDK reports a fatal or
+/// recoverable error (e.g. provider error=4/domain=31). Observers turn off
+/// the wakeup light on unrecoverable errors.
+table AsrErrorEvent {
+  error_code: short;
+  domain: short;
+  reason: string;
+  recoverable: bool;
+}
+
+/// Hub → executor signal that a TTS audio stream stalled.
+///
+/// Published by the voice policy service after a TTS stream registered via
+/// `TtsStartEvent.expected_first_frame_timeout_ms` failed to complete within
+/// the configured budget. The executor reacts by marking the named channel
+/// session complete in its audio mixer.
+table TtsAudioTimeoutEvent {
+  audio_session_id: uint64;
+  channel: string;
+  reason: string;
+}
+
+/// Phases of a machine-language playback session lifecycle, mirrored from
+/// the speech executor so the hub can own the speaking-context RUNNING/IDLE
+/// writes and the channel-cancellation set instead of leaving them as
+/// executor-local globals.
+///
+/// REGISTER  - executor enqueued a registration intent on `set_speak`;
+///             carries `tts_code` (machine_language_name) + `req_id`.
+/// CREATE    - audio mixer reports the playback session was created;
+///             carries `mixer_session_id`.
+/// START     - audio mixer reports the playback session started;
+///             carries `mixer_session_id`.
+/// END       - audio mixer reports the playback session ended; carries
+///             `mixer_session_id` and a free-form `reason` string
+///             ("completed" / "interrupted" / "discarded" / etc.).
+enum MachineLanguagePhase: ubyte { REGISTER = 0, CREATE = 1, START = 2, END = 3 }
+
+table MachineLanguageEvent {
+  phase: MachineLanguagePhase;
+  channel: ubyte;             // numeric audio channel id
+  tts_code: string;           // executor's machine_language_name
+  req_id: string;             // executor-supplied request id
+  mixer_session_id: uint64 = 0;
+  reason: string;
+}
+
+/// ASR recognition mode tri-state, mirroring the legacy
+/// `cmd_recognition_mode` integer (`vbot_ros2_msgs/speech_msgs/srv/SpeechControl.srv`).
+/// OFF=0 disables recognition; SPEECH_SERVICE=1 uses the cloud speech
+/// service (historical default); DOUBAO_ASR=2 selects the alternate cloud
+/// ASR provider. Encoded as ubyte for wire compatibility.
+enum CmdRecognitionMode: ubyte {
+  OFF           = 0,
+  SPEECH_SERVICE = 1,  // default — matches legacy integer value 1
+  DOUBAO_ASR    = 2
+}
+
+/// Hub-authoritative broadcast of the consolidated mode-gate state.
+/// Executors subscribe to this and replace any local mode atomics they
+/// previously maintained.
+table ModeStateEvent {
+  action_mode: bool;
+  avatar_mode: bool;
+  navigation_mode: bool;
+  low_power_voice_disable: bool;
+  chat_function_enabled: bool = true;
+  continuous_cmd_enabled: bool = true;
+  cmd_recognition_mode: CmdRecognitionMode = SPEECH_SERVICE;  // default=1 matches legacy
+}
+
+/// Logical robot modes the executor can request the hub enter / exit.
+/// Names mirror the hub's internal mode-gate states.
+enum ModeGateMode: ubyte {
+  ACTION,
+  AVATAR,
+  NAVIGATION,
+  LOW_POWER
+}
+
+/// Executor → hub typed request to flip a robot mode on or off.
+/// Replaces the string-encoded form previously carried on `InterruptEvent`
+/// as source `"SystemModeSwitch"` with reason
+/// `mode_gate:mode=Action,state=enter`.
+///
+/// The hub re-broadcasts `ModeStateEvent` after applying the request.
+table ModeGateModeEvent {
+  mode: ModeGateMode;
+  active: bool;       // true = enter, false = exit
+  origin: string;     // observability: handler/source that emitted this
+  reason: string;     // optional human-readable rationale
+}
+
+/// Bit positions selecting which fields in `ModeGateSwitchSet` are
+/// authoritative on this message. Fields whose bit is unset must be
+/// ignored by the hub (use additive sets, never blanket overwrites).
+enum ModeGateSwitchField: ubyte (bit_flags) {
+  ChatFunctionEnabled,
+  ContinuousCmdEnabled,
+  CmdRecognitionMode
+}
+
+/// Executor → hub typed write request for persistent voice switches.
+/// `fields_set` is a bit-flag mask (`ModeGateSwitchField`) — only the
+/// fields whose bit is set are applied; the rest are read-as-zero
+/// placeholders the hub must ignore.
+///
+/// The hub re-broadcasts `ModeStateEvent` after applying. If the hub
+/// rejects the write (e.g. LowPower active), it broadcasts the
+/// unchanged `ModeStateEvent` so subscribers stay in sync.
+table ModeGateSwitchSet {
+  fields_set: ModeGateSwitchField;  // bit-mask of which fields below are authoritative
+  chat_function_enabled: bool;
+  continuous_cmd_enabled: bool;
+  cmd_recognition_mode: CmdRecognitionMode;  // ignored unless CmdRecognitionMode bit set in fields_set
+  origin: string;
+  reason: string;
+}
+
+/// Discriminated union for polymorphic voice event payload
+union VoiceEventPayload {
+  WakeUpEvent,
+  AsrEvent,
+  CommandWordEvent,
+  TtsStartEvent,
+  TtsEndEvent,
+  InterruptEvent,
+  VoiceStateEvent,
+  AsrErrorEvent,
+  ModeStateEvent,
+  ModeGateModeEvent,
+  ModeGateSwitchSet,
+  TtsDataCompleteEvent,
+  TtsPlaybackCompleteEvent,
+  TtsAudioTimeoutEvent,
+  MachineLanguageEvent,
+  OneshotSignalEvent,
+  SystemVolumeStateEvent,
+  SpeechCaptureEndEvent,
+  VadEvent
+}
+
+/// Root voice event message wrapping AortaHeader + lifecycle fields.
+/// `provider_id` is the publisher's pipeline-role identity stamped on every
+/// event so hub-side admission can reject stale events after profile switches.
+table VoiceEvent {
+  aorta_header: aorta.sys.AortaHeader;
+  session_id: uint64;
+  generation: uint64;
+  payload: VoiceEventPayload;
+  provider_id: ProviderId = UNKNOWN;
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext;
+}
+
+root_type VoiceEvent;

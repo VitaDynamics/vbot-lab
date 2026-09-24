@@ -1,0 +1,47 @@
+include "schemas/shared/action_common/action_common.fbs";
+include "schemas/shared/user_interaction/user_interaction_context.fbs";
+include "schemas/service/rcp/function_input.fbs";
+
+namespace aorta.action.rcp;
+
+enum ExecuteTaskErrorCategory : byte {
+  NONE = 0,
+  TIMEOUT = 1,
+  VALIDATION = 2,
+  SERVICE_UNAVAILABLE = 3,
+  PERMISSION_DENIED = 4,
+  RESOURCE_EXHAUSTED = 5,
+  INTERNAL_ERROR = 6,
+  PRECONDITION_FAILED = 7,
+  CANCELLED_BY_USER = 8,
+  RECOVERY_FAILED = 9,
+  ADMISSION_CHARGING_BLOCKED = 10,
+  ADMISSION_CHARGING_RESOURCE_BLOCKED = 11,
+  ADMISSION_STATE_RESTRICTED = 12,
+  ADMISSION_RESOURCE_UNAVAILABLE = 13,
+  ADMISSION_CONTEXT_SUPPRESSED = 14,
+}
+
+table ExecuteTaskGoal {
+  source: string;
+  // Same semantic as FunctionInputRequest.input.
+  // FlatBuffers JSON uses input_type + input.
+  input: aorta.services.rcp.DagInput;
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext;
+}
+
+table ExecuteTaskResult {
+  duration_ms: ulong;
+  error_category: ExecuteTaskErrorCategory = NONE;
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext;
+}
+
+table ExecuteTaskFeedbackData {
+  current_node: string;
+  completed_nodes: uint;
+  total_nodes: uint;
+  progress_pct: ubyte;
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext;
+}
+
+root_type ExecuteTaskGoal;

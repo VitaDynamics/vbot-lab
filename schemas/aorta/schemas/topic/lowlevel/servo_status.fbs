@@ -1,0 +1,50 @@
+// ServoStatuses — per-servo hardware state batch
+//
+// Aorta topic schema for ROS2 `/servo/status`
+// (`vbot_ros2_msgs/lowlevel_msg/msg/ServoStatuses.msg`, SensorData QoS),
+// published by the locomotion service's hardware port. Field-for-field
+// mirror of lowlevel_msg/ServoStatus (0x400 hardware / 0x300
+// thermal-integral / 0x500 motion CAN frames).
+
+include "schemas/system/aorta_base.fbs";
+
+namespace lowlevel;
+
+table ServoStatus {
+  servo_id: ushort = 0 (id: 0);
+  joint_name: string (id: 1);
+  joint_target_angle: float (id: 2);   // deg, from last command
+  joint_current_angle: float (id: 3);  // deg, from latest feedback
+  // 0x400 hardware state (RPDO3)
+  hw_is_valid: bool = false (id: 4);
+  hw_voltage_fault: bool = false (id: 5);
+  hw_current_fault: bool = false (id: 6);
+  hw_temp_fault: bool = false (id: 7);
+  hw_stall_fault: bool = false (id: 8);
+  hw_hardware_fault: bool = false (id: 9);
+  hw_position_protection_fault: bool = false (id: 10);
+  hw_thermal_integral_protection_fault: bool = false (id: 11);
+  hw_voltage_v: float (id: 12);
+  hw_temperature_c: float (id: 13);
+  hw_current_ma: float (id: 14);
+  // 0x300 thermal-integral state (passthrough)
+  thermal_integral_is_valid: bool = false (id: 15);
+  thermal_integral_error_bits: ushort = 0 (id: 16);
+  thermal_integral_reserved_bits: ubyte = 0 (id: 17);
+  thermal_integral_servo_state: ubyte = 0 (id: 18);
+  thermal_integral_current_1_ma: int = 0 (id: 19);
+  thermal_integral_current_2_ma: int = 0 (id: 20);
+  // 0x500 motion state
+  motion_is_valid: bool = false (id: 21);
+  motion_position: float (id: 22);
+  motion_speed_dps: float (id: 23);
+  motion_torque: float (id: 24);
+  motion_run_times_cnt: ushort = 0 (id: 25);
+}
+
+table ServoStatuses {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  statuses: [ServoStatus] (id: 1);
+}
+
+root_type ServoStatuses;

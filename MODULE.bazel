@@ -1,0 +1,9 @@
+module(
+    name = "vbot_lab",
+    version = "0.0.0",
+)
+
+# Python recipes use native Bazel rules; install release wheels in the selected runtime interpreter.
+
+aorta_release_repository = use_repo_rule("//packages/aorta/cpp:repositories.bzl", "aorta_release_repository")
+aorta_release_repository(name = "aorta_release")

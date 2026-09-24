@@ -1,0 +1,16 @@
+# 请求: 设置运行模式 / 建图使能 / 触发一次重定位（异步）
+# 注意：模式常量定义在 slam_msgs/msg/SLAMStatus.msg 中（例如 SLAMStatus::MODE_ODOMETRY 等）
+uint8 mode               # 目标模式，参考 slam_msgs/msg/SLAMStatus.msg 中的 MODE_ 常量
+bool request_reloc       # 是否请求一次重定位（异步触发）
+string map_name          # 地图名（非路径）：
+                         # - mode=MODE_MAPPING 且为空：进入建图
+                         # - mode=MODE_MAPPING 且非空：结束建图并保存到 /app_param/map/{map_name}
+                         # - mode=MODE_LOCALIZATION 且非空：加载 /app_param/map/{map_name} 后进入定位
+                         # - mode=MODE_LOCALIZATION 且为空：仅在已定位且已加载地图时允许
+string client_id         # 可选，调用者标识
+uint64 client_req_id     # 可选：调用者自定义请求 ID（用于匹配）
+---
+# 响应: 服务端是否接受请求（接受后通过 /slam/status 汇报进度/结果）
+bool accepted
+string message
+uint64 server_task_id  # server 分配的任务 id（0 表示无异步任务）

@@ -1,0 +1,30 @@
+// RCP task trace event topic
+//
+// Aorta topic for ROS2 `/rcp/trace`
+// (`vbot_ros2_msgs/function_msgs/msg/TraceEvent.msg`), published by rcp's trace
+// publisher and consumed by the application agent (task-outcome tracking)
+// and the MCAP recorder. Field-for-field mirror of the .msg; event_type keeps the
+// EVENT_TYPE_* constants verbatim.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.rcp;
+
+table TraceEvent {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  /// Request identifier for tracing correlated events.
+  request_id: string (id: 1);
+  /// EVENT_TYPE_* constant (0..12, same values as the .msg).
+  event_type: ubyte = 0 (id: 2);
+  /// Event timestamp, ISO 8601 (YYYY-MM-DDTHH:MM:SS.sssZ).
+  timestamp: string (id: 3);
+  /// Flexible JSON payload (task outcomes, errors, timing).
+  payload_json: string (id: 4);
+  /// Hierarchical trace fields.
+  trace_id: string (id: 5);
+  parent_id: string (id: 6);
+  task_level: ubyte = 0 (id: 7);
+  subtask_name: string (id: 8);
+}
+
+root_type TraceEvent;

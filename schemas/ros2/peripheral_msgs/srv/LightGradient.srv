@@ -1,0 +1,10 @@
+# 请求
+uint8[] colors                 # 颜色序列 [R1,G1,B1,R2,G2,B2,...] 每3个为一组RGB
+uint8 brightness               # 亮度值 (0-255)
+float32 transition_time        # 每个颜色切换时间(秒)
+bool loop                      # 是否循环播放
+uint16 duration_ms             # 持续时间(毫秒), 0表示无限
+---
+# 响应
+bool success                   # 是否成功
+string message                 # 响应消息 

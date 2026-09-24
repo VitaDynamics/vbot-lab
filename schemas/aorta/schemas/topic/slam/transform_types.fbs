@@ -1,0 +1,22 @@
+// Shared fixed-shape geometry building blocks for the slam transform schemas
+// (transform_stamped.fbs, transform_array.fbs).
+//
+// Deliberately root-less: per the schema-authoring conventions, foundational
+// geometry/value schemas reused as nested types must not carry an aorta_header
+// and are not publishable roots, so this file declares no includes and no
+// root_type.
+
+namespace aorta.topic.slam;
+
+struct Vector3 {
+  x: double;
+  y: double;
+  z: double;
+}
+
+struct Quaternion {
+  x: double;
+  y: double;
+  z: double;
+  w: double;
+}

@@ -1,0 +1,49 @@
+// Common Status Definitions for Services
+//
+// Shared enums and tables for service responses across all Aorta services.
+
+namespace aorta.services.common;
+
+/// Standard service execution status
+enum ServiceStatus: byte {
+  /// Service executed successfully
+  SUCCESS = 0,
+  
+  /// Service failed due to invalid request parameters
+  INVALID_REQUEST = 1,
+  
+  /// Service timeout during execution
+  TIMEOUT = 2,
+  
+  /// Service unavailable or not ready
+  UNAVAILABLE = 3,
+  
+  /// Service encountered internal error
+  INTERNAL_ERROR = 4,
+  
+  /// Service rejected request (e.g., resource limit)
+  REJECTED = 5,
+  
+  /// Service partially succeeded (check error_message)
+  PARTIAL_SUCCESS = 6,
+  
+  /// Request was cancelled by user
+  CANCELLED = 7,
+}
+
+/// Extended error information (optional)
+table ErrorInfo {
+  /// Error code (application-specific)
+  code: int;
+  
+  /// Human-readable error message
+  message: string;
+  
+  /// Stack trace or diagnostic info (for debugging)
+  details: string;
+  
+  /// Timestamp when error occurred (nanoseconds)
+  timestamp_ns: ulong;
+}
+
+root_type ErrorInfo;

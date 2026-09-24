@@ -1,0 +1,47 @@
+// Perception - Pose Detection Schema (COCO-17 Keypoints)
+//
+// Aorta message for human pose estimation results.
+// Mirrors vision_msgs::msg::PoseDetection from ROS2 but in FlatBuffers.
+// Each message contains one detected person with 17 COCO keypoints.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace perception;
+
+// 3D point for bounding box corners (z = 0 for 2D detections).
+// Fixed-size struct: 12 bytes.
+struct Point3D {
+  x: float;
+  y: float;
+  z: float;
+}
+
+// Single keypoint with pixel coordinates and confidence (logit).
+// Fixed-size struct: 12 bytes.
+//
+// COCO-17 keypoint order:
+//   0=nose, 1=left_eye, 2=right_eye, 3=left_ear, 4=right_ear,
+//   5=left_shoulder, 6=right_shoulder, 7=left_elbow, 8=right_elbow,
+//   9=left_wrist, 10=right_wrist, 11=left_hip, 12=right_hip,
+//   13=left_knee, 14=right_knee, 15=left_ankle, 16=right_ankle
+//
+// `confidence` is a logit value: > 0 means > 50% probability.
+struct Keypoint2D {
+  x: float;
+  y: float;
+  confidence: float;
+}
+
+// Single pose detection result for one person.
+table PoseDetection {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  class_id: int                       (id: 1);  // Detection class (0 = person)
+  score: float                        (id: 2);  // Overall detection confidence [0.0, 1.0]
+  bbox_min: Point3D                   (id: 3);  // Top-left corner of bounding box (pixels)
+  bbox_max: Point3D                   (id: 4);  // Bottom-right corner of bounding box (pixels)
+  keypoints: [Keypoint2D]             (id: 5);  // COCO-17 keypoints in pixel coordinates
+  frame_id: string                    (id: 6);  // Source frame, e.g. "stereo_camera"
+  timestamp_ns: ulong                 (id: 7);  // Sensor capture time
+}
+
+root_type PoseDetection;

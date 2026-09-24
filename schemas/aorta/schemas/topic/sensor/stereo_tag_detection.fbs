@@ -1,0 +1,30 @@
+// Stereo AprilTag detection topic schema.
+//
+// Mirrors function_msgs/msg/StereoTagDetection. Fixed-size ROS arrays are
+// represented as double vectors with the same element order.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.sensor;
+
+table StereoTagDetection {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  timestamp_ns: ulong = 0 (id: 1);
+  frame_id: string (id: 2);
+  left_valid: bool = false (id: 3);
+  left_tag_id: int = -1 (id: 4);
+  left_decision_margin: double = 0.0 (id: 5);
+  left_corners: [double] (id: 6);
+  right_valid: bool = false (id: 7);
+  right_tag_id: int = -1 (id: 8);
+  right_decision_margin: double = 0.0 (id: 9);
+  right_corners: [double] (id: 10);
+  left_k: [double] (id: 11);
+  left_d: [double] (id: 12);
+  left_frame_id: string (id: 13);
+  right_k: [double] (id: 14);
+  right_d: [double] (id: 15);
+  right_frame_id: string (id: 16);
+}
+
+root_type StereoTagDetection;

@@ -1,0 +1,24 @@
+// Unified user-interaction identity propagated explicitly by opt-in business messages.
+//
+// user_interaction_id stores a UUIDv7 as a canonical lowercase hyphenated
+// string. Unknown is only a wire default; producers must use a concrete source
+// type when a user-interaction context exists.
+
+namespace aorta.user_interaction.common;
+
+enum SourceEventType : ubyte {
+  Unknown = 0,
+  UserVoiceLocal = 1,
+  UserVoiceSignaling = 2,
+  UserTouch = 3,
+  UserApp = 4,
+  UserCloud = 5
+}
+
+table UserInteractionContext {
+  user_interaction_id: string (id: 0);
+  source_event_type: SourceEventType = Unknown (id: 1);
+  source_timestamp_ns: ulong (id: 2);
+}
+
+root_type UserInteractionContext;

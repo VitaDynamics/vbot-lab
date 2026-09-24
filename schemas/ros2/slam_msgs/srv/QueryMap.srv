@@ -1,0 +1,49 @@
+# Query map points around nearest pose to target timestamp.
+# Query mode (V2): single-direction view cone in camera frame.
+
+# Target timestamp used to used to obtain pose via interpolation/extrapolation from pose buffer
+builtin_interfaces/Time stamp
+
+# Query mode.
+uint8 QUERY_MODE_FOV = 0
+uint8 QUERY_MODE_PIXEL = 1
+uint8 mode
+
+# Camera id for query mode.
+int32 camera_id
+
+# Pixel coordinate for pixel query mode.
+# x, y: pixel position in image (required).
+# z: predicted depth in meters (z-depth, camera frame). If z > 0, the 3D point is
+#    reconstructed directly from the pixel + depth without searching the map.
+#    Set z <= 0 (e.g. -1) to indicate unknown depth and fall back to map FOV filtering.
+geometry_msgs/Point pixel
+
+# Query radius (meters). Deprecated, kept only for compatibility.
+float32 radius
+
+# FOV in degrees (used as cone angle threshold in camera frame).
+float32 hor_fov
+float32 ver_fov
+
+# Query direction in camera frame (for FOV mode).
+geometry_msgs/Vector3 dir_cam
+
+# Max returned points after filtering.
+uint32 max_points
+---
+# Error codes.
+uint32 ERROR_CODE_OK = 0
+uint32 ERROR_CODE_INVALID_ARGUMENT = 1
+uint32 ERROR_CODE_TIME_MISMATCH = 2
+uint32 ERROR_CODE_NO_MAP_DATA = 3
+uint32 ERROR_CODE_INTERNAL = 4
+
+bool success
+uint32 error_code
+string message
+std_msgs/Header header
+sensor_msgs/PointCloud2 cloud
+uint32 point_count_raw
+uint32 point_count_after_filter
+float32 matched_time_diff_ms

@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "Usage help · 使用帮助"
+    url: https://forum.vbot.cn/c/help/9
+    about: "Ask device and Viewer questions in Vbot 超能社区 · 设备使用与 Viewer 问题优先到社区反馈。"
+  - name: "Development discussions · 开发交流"
+    url: https://forum.vbot.cn/c/skills-agent/8
+    about: "Discuss SDKs, applications and Agent development · 交流 SDK、应用与 Agent 开发。"
+  - name: "Ideas and suggestions · 灵感与建议"
+    url: https://forum.vbot.cn/c/ideas/7
+    about: "Suggest capabilities and workflow improvements · 提出新能力需求与使用体验建议。"
+  - name: "Security report · 安全反馈"
+    url: https://github.com/VitaDynamics/vbot-lab/security/policy
+    about: "Email vbot-edu@vbot.cn privately; do not open a public issue · 请私下发送邮件，不要公开漏洞细节。"
