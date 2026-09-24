@@ -27,7 +27,7 @@ Features without a runnable implementation are marked as planned or pending inte
 ## Continue building
 
 - [Vbot Viewer](guides/vbot-viewer.md): inspect and edit URDF models in the browser; separate from live robot data.
-- [Robot models](../assets/robots/README.md): resource locations and availability by robot type; local model files are not bundled yet.
+- [Robot models](../assets/robots/README.md): resource locations and availability by robot type; `foot_quadruped` bundles URDF and meshes.
 
 - [Device resources](resources/README.md): body/head trajectories, expression IDs and light modes, independent of RCP orchestration.
 

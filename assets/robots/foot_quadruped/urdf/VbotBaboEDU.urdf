@@ -1,0 +1,888 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot name="VbotBaboEDU">
+  <mujoco>
+    <compiler
+            balanceinertia="true"
+            discardvisual="false"
+            meshdir="../meshes/"
+        />
+  </mujoco>
+  <link name="base">
+    <inertial>
+      <origin xyz="0.001180 0.000376 0.001739" rpy="0 0 0" />
+      <mass value="7.858237" />
+      <inertia
+                ixx="0.037035"
+                ixy="-0.000022"
+                ixz="-0.002161"
+                iyy="0.082568"
+                iyz="0.000111"
+                izz="0.096260"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/base_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_middle_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.004583" />
+      <geometry>
+        <box size="0.266658 0.202409 0.137826" />
+      </geometry>
+    </collision>
+    <collision name='collision_front_dangban_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.247938 0.0 0.006492" />
+      <geometry>
+        <box size="0.011651 0.058022 0.058022" />
+      </geometry>
+    </collision>
+    <collision name='collision_back_dangban_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.249278 0.0 0.006492" />
+      <geometry>
+        <box size="0.011651 0.058022 0.047636" />
+      </geometry>
+    </collision>
+    <collision name='collision_low_bar_FL_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0832 0.041 -0.0978" />
+      <geometry>
+        <box size="0.016 0.016 0.013" />
+      </geometry>
+    </collision>
+    <collision name='collision_low_bar_FR_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0832 -0.041 -0.0978" />
+      <geometry>
+        <box size="0.016 0.016 0.013" />
+      </geometry>
+    </collision>
+    <collision name='collision_low_bar_RL_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.1078 0.041 -0.0978" />
+      <geometry>
+        <box size="0.016 0.016 0.013" />
+      </geometry>
+    </collision>
+    <collision name='collision_low_bar_RR_box'>
+      <origin rpy="0.0 0.0 0.0" xyz="-0.1078 -0.041 -0.0978" />
+      <geometry>
+        <box size="0.016 0.016 0.013" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="FR_hip">
+    <inertial>
+      <origin xyz="-0.026879 0.012587 0.000000" rpy="0 0 0" />
+      <mass value="0.091104" />
+      <inertia
+                ixx="0.000017"
+                ixy="-0.000010"
+                ixz="0.000000"
+                iyy="0.000054"
+                iyz="0.000000"
+                izz="0.000056"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FR_hip.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="FR_hip_joint" type="revolute">
+    <origin xyz="0.18091 -0.051 0" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="FR_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.73304" upper="0.73304" effort="17" velocity="37.7" />
+  </joint>
+  <link name="FR_thigh">
+    <inertial>
+      <origin xyz="-0.000395 0.039515 -0.020793" rpy="0 0 0" />
+      <mass value="1.456637" />
+      <inertia
+                ixx="0.005831"
+                ixy="-0.000065"
+                ixz="-0.000184"
+                iyy="0.004141"
+                iyz="-0.001293"
+                izz="0.002735"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FR_thigh.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_mainlink_box'>
+      <origin rpy="0.0 -0.086216 0.0" xyz="-0.029488 -0.000724 -0.10287" />
+      <geometry>
+        <box size="0.025819 0.026 0.12564" />
+      </geometry>
+    </collision>
+    <collision name='collision_self_check_box'>
+      <origin rpy="0.0 0.126875 0.0" xyz="0.01289 -0.000372 -0.102949" />
+      <geometry>
+        <box size="0.00252 0.026 0.125545" />
+      </geometry>
+    </collision>
+    <collision name='collision_motor_cylinder'>
+      <origin rpy="4.712389 -0.0 0.0" xyz="0.0 0.02351 -0.000177" />
+      <geometry>
+        <cylinder length="0.07691" radius="0.044" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_left_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 0.014268 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_right_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 -0.014448 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="FR_thigh_joint" type="revolute">
+    <origin xyz="0 -0.0985 0" rpy="0 0 0" />
+    <parent link="FR_hip" />
+    <child link="FR_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.559" upper="3.1298" effort="17" velocity="37.7" />
+  </joint>
+  <link name="FR_calf">
+    <inertial>
+      <origin xyz="0.003589 0.000000 -0.094879" rpy="0 0 0" />
+      <mass value="0.111600" />
+      <inertia
+                ixx="0.000650"
+                ixy="0.000000"
+                ixz="0.000055"
+                iyy="0.000663"
+                iyz="0.000000"
+                izz="0.000021"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FR_calf.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_upper_box'>
+      <origin rpy="0.0 0.094285 0.0" xyz="0.018049 0.00000 -0.186508" />
+      <geometry>
+        <box size="0.024 0.015288 0.048535" />
+      </geometry>
+    </collision>
+    <collision name='collision_middle_box'>
+      <origin rpy="0.0 -0.206277 0.0" xyz="0.00376 0.00000 -0.099894" />
+      <geometry>
+        <box size="0.02 0.018 0.12" />
+      </geometry>
+    </collision>
+    <collision name='collision_lower_box'>
+      <origin rpy="0.0 0.013223 0.0" xyz="-0.005451 0.00000 -0.017378" />
+      <geometry>
+        <box size="0.028 0.015288 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_backprotect_box'>
+      <origin rpy="0.0 0.382487 0.0" xyz="-0.001309 0.00000 -0.175631" />
+      <geometry>
+        <box size="0.004 0.015288 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="FR_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.1985" rpy="0 0 0" />
+    <parent link="FR_thigh" />
+    <child link="FR_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.6387" upper="-0.7854" effort="34" velocity="18.9" />
+  </joint>
+  <link name="FR_foot">
+    <inertial>
+      <origin xyz="-0.001276 0.000000 -0.002092" rpy="0 0 0" />
+      <mass value="0.046000" />
+      <inertia
+                ixx="0.000010"
+                ixy="0.000000"
+                ixz="0.000001"
+                iyy="0.000009"
+                iyz="0.000000"
+                izz="0.000011"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FR_foot.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_foot_sphere'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.0 0.0" />
+      <geometry>
+        <sphere radius="0.0225" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="FR_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0.000 -0.214" rpy="0 0 0" />
+    <parent link="FR_calf" />
+    <child link="FR_foot" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <link name="FL_hip">
+    <inertial>
+      <origin xyz="-0.026879 -0.012587 0.000000" rpy="0 0 0" />
+      <mass value="0.091104" />
+      <inertia
+                ixx="0.000017"
+                ixy="0.000010"
+                ixz="0.000000"
+                iyy="0.000054"
+                iyz="0.000000"
+                izz="0.000056"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FL_hip.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="FL_hip_joint" type="revolute">
+    <origin xyz="0.18091 0.051 0" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="FL_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.73304" upper="0.73304" effort="17" velocity="37.7" />
+  </joint>
+  <link name="FL_thigh">
+    <inertial>
+      <origin xyz="-0.000395 -0.039515 -0.020793" rpy="0 0 0" />
+      <mass value="1.456637" />
+      <inertia
+                ixx="0.005831"
+                ixy="0.000065"
+                ixz="-0.000184"
+                iyy="0.004141"
+                iyz="0.001293"
+                izz="0.002735"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FL_thigh.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision name='collision_mainlink_box'>
+      <origin rpy="0.0 -0.086216 0.0" xyz="-0.029488 0.000724 -0.10287" />
+      <geometry>
+        <box size="0.025819 0.026 0.12564" />
+      </geometry>
+    </collision>
+    <collision name='collision_self_check_box'>
+      <origin rpy="0.0 0.126875 0.0" xyz="0.01289 0.000372 -0.102949" />
+      <geometry>
+        <box size="0.00252 0.026 0.125545" />
+      </geometry>
+    </collision>
+    <collision name='collision_motor_cylinder'>
+      <origin rpy="4.712389 -0.0 0.0" xyz="0.0 -0.02351 -0.000177" />
+      <geometry>
+        <cylinder length="0.07691" radius="0.044" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_left_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 -0.014268 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_right_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 0.014448 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="FL_thigh_joint" type="revolute">
+    <origin xyz="0 0.0985 0" rpy="0 0 0" />
+    <parent link="FL_hip" />
+    <child link="FL_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.559" upper="3.1298" effort="17" velocity="37.7" />
+  </joint>
+  <link name="FL_calf">
+    <inertial>
+      <origin xyz="0.003589 0.000000 -0.094879" rpy="0 0 0" />
+      <mass value="0.111600" />
+      <inertia
+                ixx="0.000650"
+                ixy="0.000000"
+                ixz="0.000055"
+                iyy="0.000663"
+                iyz="0.000000"
+                izz="0.000021"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FL_calf.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_upper_box'>
+      <origin rpy="0.0 0.094285 0.0" xyz="0.018049 -0.00000 -0.186508" />
+      <geometry>
+        <box size="0.024 0.015288 0.048535" />
+      </geometry>
+    </collision>
+    <collision name='collision_middle_box'>
+      <origin rpy="0.0 -0.206277 0.0" xyz="0.00376 -0.00000 -0.099894" />
+      <geometry>
+        <box size="0.02 0.018 0.12" />
+      </geometry>
+    </collision>
+    <collision name='collision_lower_box'>
+      <origin rpy="0.0 0.013223 0.0" xyz="-0.005451 -0.00000 -0.017378" />
+      <geometry>
+        <box size="0.028 0.015288 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_backprotect_box'>
+      <origin rpy="0.0 0.382487 0.0" xyz="-0.001309 -0.00000 -0.175631" />
+      <geometry>
+        <box size="0.004 0.015288 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="FL_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.1985" rpy="0 0 0" />
+    <parent link="FL_thigh" />
+    <child link="FL_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.6387" upper="-0.7854" effort="34" velocity="18.9" />
+  </joint>
+  <link name="FL_foot">
+    <inertial>
+      <origin xyz="-0.001276 0.000000 -0.002092" rpy="0 0 0" />
+      <mass value="0.046000" />
+      <inertia
+                ixx="0.000010"
+                ixy="0.000000"
+                ixz="0.000001"
+                iyy="0.000009"
+                iyz="0.000000"
+                izz="0.000011"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/FL_foot.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision name='collision_foot_sphere'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.0 0.0" />
+      <geometry>
+        <sphere radius="0.0225" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="FL_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.214" rpy="0 0 0" />
+    <parent link="FL_calf" />
+    <child link="FL_foot" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <link name="RR_hip">
+    <inertial>
+      <origin xyz="0.026879 0.012587 0.000000" rpy="0 0 0" />
+      <mass value="0.091104" />
+      <inertia
+                ixx="0.000017"
+                ixy="0.000010"
+                ixz="0.000000"
+                iyy="0.000054"
+                iyz="0.000000"
+                izz="0.000056"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RR_hip.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="RR_hip_joint" type="revolute">
+    <origin xyz="-0.18104 -0.051 0" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="RR_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.73304" upper="0.73304" effort="17" velocity="37.7" />
+  </joint>
+  <link name="RR_thigh">
+    <inertial>
+      <origin xyz="-0.000395 0.039515 -0.020793" rpy="0 0 0" />
+      <mass value="1.456637" />
+      <inertia
+                ixx="0.005831"
+                ixy="-0.000065"
+                ixz="-0.000184"
+                iyy="0.004141"
+                iyz="-0.001293"
+                izz="0.002735"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RR_thigh.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision name='collision_mainlink_box'>
+      <origin rpy="0.0 -0.086216 0.0" xyz="-0.029488 -0.000724 -0.10287" />
+      <geometry>
+        <box size="0.025819 0.026 0.12564" />
+      </geometry>
+    </collision>
+    <collision name='collision_self_check_box'>
+      <origin rpy="0.0 0.126875 0.0" xyz="0.01289 -0.000372 -0.102949" />
+      <geometry>
+        <box size="0.00252 0.026 0.125545" />
+      </geometry>
+    </collision>
+    <collision name='collision_motor_cylinder'>
+      <origin rpy="4.712389 -0.0 0.0" xyz="0.0 0.02351 -0.000177" />
+      <geometry>
+        <cylinder length="0.07691" radius="0.044" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_left_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 0.014268 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_right_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 -0.014448 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RR_thigh_joint" type="revolute">
+    <origin xyz="0 -0.0985 0" rpy="0 0 0" />
+    <parent link="RR_hip" />
+    <child link="RR_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.51181" upper="4.177" effort="17" velocity="37.7" />
+  </joint>
+  <link name="RR_calf">
+    <inertial>
+      <origin xyz="0.003589 0.000000 -0.094879" rpy="0 0 0" />
+      <mass value="0.111600" />
+      <inertia
+                ixx="0.000650"
+                ixy="0.000000"
+                ixz="0.000055"
+                iyy="0.000663"
+                iyz="0.000000"
+                izz="0.000021"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RR_calf.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_upper_box'>
+      <origin rpy="0.0 0.094285 0.0" xyz="0.018049 0.00000 -0.186508" />
+      <geometry>
+        <box size="0.024 0.015288 0.048535" />
+      </geometry>
+    </collision>
+    <collision name='collision_middle_box'>
+      <origin rpy="0.0 -0.206277 0.0" xyz="0.00376 0.00000 -0.099894" />
+      <geometry>
+        <box size="0.02 0.018 0.12" />
+      </geometry>
+    </collision>
+    <collision name='collision_lower_box'>
+      <origin rpy="0.0 0.013223 0.0" xyz="-0.005451 0.00000 -0.017378" />
+      <geometry>
+        <box size="0.028 0.015288 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_backprotect_box'>
+      <origin rpy="0.0 0.382487 0.0" xyz="-0.001309 0.00000 -0.175631" />
+      <geometry>
+        <box size="0.004 0.015288 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RR_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.1985" rpy="0 0 0" />
+    <parent link="RR_thigh" />
+    <child link="RR_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.6387" upper="-0.7854" effort="34" velocity="18.9" />
+  </joint>
+  <link name="RR_foot">
+    <inertial>
+      <origin xyz="-0.001276 0.000000 -0.002092" rpy="0 0 0" />
+      <mass value="0.046000" />
+      <inertia
+                ixx="0.000010"
+                ixy="0.000000"
+                ixz="0.000001"
+                iyy="0.000009"
+                iyz="0.000000"
+                izz="0.000011"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RR_foot.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_foot_sphere'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.0 0.0" />
+      <geometry>
+        <sphere radius="0.0225" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RR_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0.000 -0.214" rpy="0 0 0" />
+    <parent link="RR_calf" />
+    <child link="RR_foot" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <link name="RL_hip">
+    <inertial>
+      <origin xyz="0.026879 -0.012587 0.000000" rpy="0 0 0" />
+      <mass value="0.091104" />
+      <inertia
+                ixx="0.000017"
+                ixy="-0.000010"
+                ixz="0.000000"
+                iyy="0.000054"
+                iyz="0.000000"
+                izz="0.000056"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RL_hip.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="RL_hip_joint" type="revolute">
+    <origin xyz="-0.18104 0.051 0" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="RL_hip" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.73304" upper="0.73304" effort="17" velocity="37.7" />
+  </joint>
+  <link name="RL_thigh">
+    <inertial>
+      <origin xyz="-0.000395 -0.039515 -0.020793" rpy="0 0 0" />
+      <mass value="1.456637" />
+      <inertia
+                ixx="0.005831"
+                ixy="0.000065"
+                ixz="-0.000184"
+                iyy="0.004141"
+                iyz="0.001293"
+                izz="0.002735"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RL_thigh.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision name='collision_mainlink_box'>
+      <origin rpy="0.0 -0.086216 0.0" xyz="-0.029488 0.000724 -0.10287" />
+      <geometry>
+        <box size="0.025819 0.026 0.12564" />
+      </geometry>
+    </collision>
+    <collision name='collision_self_check_box'>
+      <origin rpy="0.0 0.126875 0.0" xyz="0.01289 0.000372 -0.102949" />
+      <geometry>
+        <box size="0.00252 0.026 0.125545" />
+      </geometry>
+    </collision>
+    <collision name='collision_motor_cylinder'>
+      <origin rpy="4.712389 -0.0 0.0" xyz="0.0 -0.02351 -0.000177" />
+      <geometry>
+        <cylinder length="0.07691" radius="0.044" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_left_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 -0.014268 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_revo_right_box'>
+      <origin rpy="0.0 -0.191986 0.0" xyz="-0.00614 0.014448 -0.188644" />
+      <geometry>
+        <box size="0.03 0.004 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RL_thigh_joint" type="revolute">
+    <origin xyz="0 0.0985 0" rpy="0 0 0" />
+    <parent link="RL_hip" />
+    <child link="RL_thigh" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.51181" upper="4.177" effort="17" velocity="37.7" />
+  </joint>
+  <link name="RL_calf">
+    <inertial>
+      <origin xyz="0.003589 0.000000 -0.094879" rpy="0 0 0" />
+      <mass value="0.111600" />
+      <inertia
+                ixx="0.000650"
+                ixy="0.000000"
+                ixz="0.000055"
+                iyy="0.000663"
+                iyz="0.000000"
+                izz="0.000021"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RL_calf.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+    <collision name='collision_upper_box'>
+      <origin rpy="0.0 0.094285 0.0" xyz="0.018049 -0.00000 -0.186508" />
+      <geometry>
+        <box size="0.024 0.015288 0.048535" />
+      </geometry>
+    </collision>
+    <collision name='collision_middle_box'>
+      <origin rpy="0.0 -0.206277 0.0" xyz="0.00376 -0.00000 -0.099894" />
+      <geometry>
+        <box size="0.02 0.018 0.12" />
+      </geometry>
+    </collision>
+    <collision name='collision_lower_box'>
+      <origin rpy="0.0 0.013223 0.0" xyz="-0.005451 -0.00000 -0.017378" />
+      <geometry>
+        <box size="0.028 0.015288 0.04" />
+      </geometry>
+    </collision>
+    <collision name='collision_backprotect_box'>
+      <origin rpy="0.0 0.382487 0.0" xyz="-0.001309 -0.00000 -0.175631" />
+      <geometry>
+        <box size="0.004 0.015288 0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RL_calf_joint" type="revolute">
+    <origin xyz="0 0 -0.1985" rpy="0 0 0" />
+    <parent link="RL_thigh" />
+    <child link="RL_calf" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.6387" upper="-0.7854" effort="34" velocity="18.9" />
+  </joint>
+  <link name="RL_foot">
+    <inertial>
+      <origin xyz="-0.001276 0.000000 -0.002092" rpy="0 0 0" />
+      <mass value="0.046000" />
+      <inertia
+                ixx="0.000010"
+                ixy="0.000000"
+                ixz="0.000001"
+                iyy="0.000009"
+                iyz="0.000000"
+                izz="0.000011"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/RL_foot.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision name='collision_foot_sphere'>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 -0.0 0.0" />
+      <geometry>
+        <sphere radius="0.0225" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="RL_foot_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 -0.214" rpy="0 0 0" />
+    <parent link="RL_calf" />
+    <child link="RL_foot" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <link name="head_yaw">
+    <inertial>
+      <origin xyz="0.000463 0.000913 -0.022053" rpy="0 0 0" />
+      <mass value="0.081066" />
+      <inertia
+                ixx="0.000083"
+                ixy="0.000000"
+                ixz="0.000000"
+                iyy="0.000074"
+                iyz="0.000000"
+                izz="0.000027"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/head_yaw.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="head_yaw_joint" type="revolute">
+    <origin xyz="0.17287 0 0.12752" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="head_yaw" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.69813" upper="0.69813" effort="0" velocity="0" />
+  </joint>
+  <link name="head_pitch">
+    <inertial>
+      <origin xyz="0.014588 0.000575 0.014123" rpy="0 0 0" />
+      <mass value="1.256393" />
+      <inertia
+                ixx="0.002536"
+                ixy="0.000035"
+                ixz="0.000079"
+                iyy="0.003283"
+                iyz="0.000012"
+                izz="0.003909"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/head_pitch.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.898039215686275 0.898039215686275 0.898039215686275 1" />
+      </material>
+    </visual>
+      <collision name='collision_head_box'>
+        <origin rpy="0.0 -0.0 0.0" xyz="0 0 0" />
+      <geometry>
+          <box size="0.169204 0.090048 0.083746" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="head_pitch_joint" type="revolute">
+    <origin xyz="0 0 0.028" rpy="0 0 0" />
+    <parent link="head_yaw" />
+    <child link="head_pitch" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.5236" upper="0.20944" effort="0" velocity="0" />
+  </joint>
+  <link name="vita_logo">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0.000001" />
+      <inertia
+                ixx="0.000074"
+                ixy="0.000000"
+                ixz="0.000000"
+                iyy="0.000066"
+                iyz="0.000000"
+                izz="0.000024"
+            />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://VbotBaboEDU/meshes/vita_logo.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.38 0.36 0.35 1.00" />
+      </material>
+    </visual>
+  </link>
+  <joint name="vita_logo_joint" type="fixed" dont_collapse="true">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="vita_logo" />
+  </joint>
+</robot>

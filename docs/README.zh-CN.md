@@ -25,7 +25,7 @@ Codex 或 Claude Code 配置见[与 Agent 开始开发](agents/README.zh-CN.md)�
 ## 继续构建
 
 - [Vbot Viewer](guides/vbot-viewer.zh-CN.md)：在浏览器中查看与编辑 URDF 模型，与设备实时数据查看分开。
-- [机器人模型](../assets/robots/README.zh-CN.md)：按设备类型组织的资源位置及状态，目前尚未附带本地模型文件。
+- [机器人模型](../assets/robots/README.zh-CN.md)：按设备类型组织的资源位置及状态，`foot_quadruped` 已附带 URDF 与网格。
 
 - [设备资源](resources/README.zh-CN.md)：身体／头部轨迹、表情 ID 与灯光模式，独立于 RCP 编排。
 

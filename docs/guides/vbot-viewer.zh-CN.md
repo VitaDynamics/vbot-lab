@@ -23,7 +23,7 @@ Viewer 用于**机器人描述与模型姿态**；[Foxglove](foxglove.zh-CN.md) 
 4. 在**文件**中选择需要的 URDF，查看或编辑前确认模型名称与文件名。
 
 仓库中的模型位置是 [assets/robots/foot_quadruped](../../assets/robots/foot_quadruped/README.zh-CN.md)。
-目前仅预留目录，未附带 URDF 或网格文件。可以先在线浏览模型，不能将预留目录当作可导入的模型包。
+该目录附带 VbotBaboEDU 的 URDF 与网格快照；在线模型可能独立更新，本地入口文件以 `model.json` 为准。
 网站中显示其他机器人模型，不代表这些设备类型已开放 EDU 接口。
 
 ## 2. 查看结构与模型姿态

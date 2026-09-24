@@ -7,7 +7,7 @@
 
 | 设备类型 | 模型入口 | 本地资源 |
 | --- | --- | --- |
-| `foot_quadruped` | [VbotBaboEDU](foot_quadruped/README.zh-CN.md) | 仅预留目录，未附带 URDF 与网格 |
+| `foot_quadruped` | [VbotBaboEDU](foot_quadruped/README.zh-CN.md) | 已附带 URDF 与网格 |
 
 可先按 [Vbot Viewer 指南](../../docs/guides/vbot-viewer.zh-CN.md)在线浏览模型。
 在线可用不代表模型文件已包含在当前仓库，也不代表各类型均已开放 EDU 软件支持。

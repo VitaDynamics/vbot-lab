@@ -27,8 +27,8 @@ may differ; switch between **EN / 中文** in the header.
 
 The current repository's model location is
 [assets/robots/foot_quadruped](../../assets/robots/foot_quadruped/README.md).
-It currently reserves space only: no URDF or meshes are bundled. Use the online model
-for viewing; do not treat the reserved directory as an importable model package.
+It bundles a snapshot of the VbotBaboEDU URDF and meshes. The online model can change
+independently; check `model.json` for the local entry file.
 Other models visible on the website do not establish EDU interface support for other robot types.
 
 ## 2. Inspect structure and model poses

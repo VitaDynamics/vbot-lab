@@ -4,24 +4,26 @@
 
 模型：**VbotBaboEDU**。设备类型：`foot_quadruped`。
 
-当前目录仅预留模型位置，**未附带 URDF、网格或纹理文件**。
-[model.json](model.json) 的 `availability` 为 `not_bundled`，`urdf` 为 `null`，
-当前仓库没有可从此处加载的模型。
-
-可打开[在线模型](https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU)，
-按 [Viewer 指南](../../../docs/guides/vbot-viewer.zh-CN.md)查看结构。
-网站中的模型与本地资源目录是独立的。
+本目录附带 VbotBaboEDU 的 URDF 及其引用的网格。[model.json](model.json) 的 `availability`
+为 `bundled`，并给出 `urdf` 入口文件与网格列表；其中路径均相对于本目录。未附带纹理。
 
 ## 资源布局
 
-- `urdf/`：预留 URDF 描述及其入口文件的位置。
-- `meshes/`：预留上述描述引用的网格位置。
-- `textures/`：可选，仅在模型文件存在纹理依赖时创建。
-- `model.json`：具体模型标识、设备类型、公开 Viewer 地址与本地可用状态。
+- `urdf/VbotBaboEDU.urdf`：默认入口，包含机身、四条腿与头部偏航／俯仰链。
+- `urdf/VbotBaboEDU_*.urdf`：变体 `mock_head`、`mock_head_silence`（静音足端网格）、
+  `backboard` 与 `backboard_bracket`。
+- `meshes/`：URDF 文件引用的 STL 网格。
+- `model.json`：模型标识、设备类型、入口文件、网格列表与公开 Viewer 地址。
 
-URDF 和网格占位目录不包含示例或备用机器人。目前没有可运行的模型目标，
-`BUILD.bazel` 仅为仓库检查提供元数据与文档。
-具体硬件修订、坐标约定、资源版本与许可条款，待模型包提供后再说明，不预先假定。
+## 加载 URDF
+
+网格路径使用 `package://VbotBaboEDU/meshes/...` URI。在 URDF 加载器中将
+`package://VbotBaboEDU/` 前缀映射到本目录，或将本目录放入名为 `VbotBaboEDU` 的 ROS 2 包。
+预期结果：加载器能解析全部网格，`VbotBaboEDU.urdf` 显示 19 个关节。
+
+模型姿态、关节限位、惯性参数与网格用于可视化和仿真，属于描述数据，不是机器人控制指令或硬件实测值。
+这些文件是快照，[在线模型](https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU)可能独立更新
+（参见 [Viewer 指南](../../../docs/guides/vbot-viewer.zh-CN.md)）。`model_license` 尚未声明。
 
 设备开发见[四足 EDU 指南](../../../docs/robots/foot_quadruped/README.zh-CN.md)。
 模型问题与建议可按[社区与支持](../../../docs/community/README.zh-CN.md)反馈。

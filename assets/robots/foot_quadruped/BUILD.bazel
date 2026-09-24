@@ -5,8 +5,15 @@ filegroup(
         "README.md",
         "README.zh-CN.md",
         "model.json",
-        "urdf/.gitkeep",
-        "meshes/.gitkeep",
     ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "urdf",
+    srcs = glob([
+        "urdf/*.urdf",
+        "meshes/*",
+    ]),
     visibility = ["//visibility:public"],
 )

@@ -8,7 +8,7 @@
 
 ## 开发入口
 
-- [Vbot Viewer](../../guides/vbot-viewer.zh-CN.md)与[模型资源](../../../assets/robots/foot_quadruped/README.zh-CN.md)：可在线查看模型，本地模型目录目前仅预留，尚未附带 URDF 或网格。
+- [Vbot Viewer](../../guides/vbot-viewer.zh-CN.md)与[模型资源](../../../assets/robots/foot_quadruped/README.zh-CN.md)：可在线查看模型，也可在本地加载随仓库提供的 URDF 与网格。
 
 - [两类机器狗共用的有线连接与 SSH 登录指南](../quadruped-common/connection.zh-CN.md)：连接转接头、设置电脑网卡，并使用 `vbot` 账户登录。
 - [设备 shell 配置](../../getting-started/device-environment.zh-CN.md)与 [Aorta／ROS 2 兼容接口](../../interfaces/aorta-ros2.zh-CN.md)：SSH 登录后，在设备终端配置 `vbot` 环境并检查 CLI 访问，无需等待 SDK 接入。

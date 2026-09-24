@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+from xml.etree import ElementTree
 from pathlib import Path
 import re
 import shlex
@@ -142,7 +143,7 @@ class RepositoryChecks(unittest.TestCase):
         self.assertEqual(images[0], images[1])
         self.assertTrue((REPO_ROOT / "docs/guides/assets/vbot-viewer/overview.jpg").is_file())
 
-    def test_robot_models_reserve_one_type_directory_without_fake_assets(self):
+    def test_robot_models_bundle_foot_quadruped_urdf(self):
         root = REPO_ROOT / "assets/robots"
         self.assertEqual(sorted(p.name for p in root.iterdir() if p.is_dir()), ["foot_quadruped"])
         model = root / "foot_quadruped"
@@ -150,19 +151,25 @@ class RepositoryChecks(unittest.TestCase):
         self.assertEqual(metadata["format_version"], 1)
         self.assertEqual(metadata["robot_type"], model.name)
         self.assertEqual(metadata["model_id"], "VbotBaboEDU")
-        self.assertEqual(metadata["availability"], "not_bundled")
-        self.assertIsNone(metadata["urdf"])
+        self.assertEqual(metadata["availability"], "bundled")
+        self.assertEqual(metadata["urdf"], "urdf/VbotBaboEDU.urdf")
         self.assertIsNone(metadata["model_license"])
-        self.assertEqual(metadata["meshes"], [])
         self.assertEqual(metadata["textures"], [])
         self.assertEqual(metadata["viewer_url"], "https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU")
         self.assertFalse((model / "vbot_babo_edu").exists())
         self.assertFalse((model / "textures").exists())
-        for folder in ("urdf", "meshes"):
-            self.assertEqual(sorted(p.name for p in (model / folder).iterdir()), [".gitkeep"])
-            self.assertEqual((model / folder / ".gitkeep").stat().st_size, 0)
+        self.assertTrue((model / metadata["urdf"]).is_file())
+        self.assertEqual(sorted(metadata["meshes"]),
+                         sorted(f"meshes/{p.name}" for p in (model / "meshes").iterdir()))
+        referenced = set()
+        for urdf in (model / "urdf").glob("*.urdf"):
+            for mesh in ElementTree.parse(urdf).getroot().iter("mesh"):
+                filename = mesh.get("filename")
+                self.assertTrue(filename.startswith("package://VbotBaboEDU/meshes/"), filename)
+                referenced.add(filename.removeprefix("package://VbotBaboEDU/"))
+        self.assertEqual(referenced, set(metadata["meshes"]))
         for suffix in (".md", ".zh-CN.md"):
-            self.assertIn("not_bundled", (model / f"README{suffix}").read_text())
+            self.assertIn("bundled", (model / f"README{suffix}").read_text())
             self.assertIn("model.json", document_links((model / f"README{suffix}").read_text()))
         self.assertIn("//assets/robots/foot_quadruped:repository_files", (REPO_ROOT / "BUILD.bazel").read_text())
 

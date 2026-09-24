@@ -8,7 +8,7 @@ identifies its model and whether local files are available.
 
 | Robot type | Model entry | Local resources |
 | --- | --- | --- |
-| `foot_quadruped` | [VbotBaboEDU](foot_quadruped/README.md) | Directory reserved; URDF and meshes are not bundled |
+| `foot_quadruped` | [VbotBaboEDU](foot_quadruped/README.md) | URDF and meshes bundled |
 
 Use [Vbot Viewer](../../docs/guides/vbot-viewer.md) to browse the online model.
 Online availability does not mean its files are included in this checkout or that
