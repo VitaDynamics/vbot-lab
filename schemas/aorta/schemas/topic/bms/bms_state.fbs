@@ -1,0 +1,116 @@
+// BMS Battery Status
+//
+// Shared Aorta topic schema for /bms_state.
+// Mirrors lowlevel_msg/BmsState semantics.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace bms;
+
+// Device information wrappers
+struct Version3 {
+  v0: ubyte;
+  v1: ubyte;
+  v2: ubyte;
+}
+
+struct Version3Ushort {
+  v0: ushort;
+  v1: ushort;
+  v2: ushort;
+}
+
+// Temperature and voltage arrays
+struct TempArray16 {
+  values: [float:16];
+}
+
+struct VoltageArray16 {
+  values: [ushort:16];
+}
+
+// High-level charging progress derived by the system monitor from BMS current
+// and alarm signals. This enum intentionally does not encode docking/navigation
+// phases, nor does it replace the charger-connection bit. Consumers that need
+// to distinguish "not plugged in" from "plugged in but no effective charging
+// current" must also read `is_charger_connected`.
+enum ChargeState : ubyte {
+  // No valid BMS-derived charge state is available yet, or BMS communication
+  // failed and the publisher reset the state.
+  UNKNOWN = 0,
+  // No confirmed effective charging current. This can mean unplugged, connected
+  // but idle, waiting, floating, or below the charging-current threshold.
+  IDLE = 1,
+  // Effective charging current has been confirmed by the publisher-side debounce.
+  CHARGING = 2,
+  // BMS reports the full-charge condition. Use SOC/current/alarm fields for
+  // diagnostics; this state does not imply any docking task phase.
+  FULL = 3,
+}
+
+table BmsState {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong          (id: 1);
+
+  // System control
+  request_shutdown: bool = false       (id: 2);
+
+  // Device information
+  protocol_version: Version3          (id: 3);
+  vendor: string                       (id: 4);
+  hw_version: Version3                  (id: 5);
+  sw_version: Version3                  (id: 6);
+  last_alarm: uint = 0                (id: 7);
+  nominal_capacity_mah: uint = 0      (id: 8);
+  count_ntc_cell: ubyte = 0           (id: 9);
+  count_ntc_mos: ubyte = 0            (id: 10);
+  count_serial: ubyte = 0             (id: 11);
+  manufacturer_year: ushort = 0      (id: 12);
+  manufacturer_month: ubyte = 0       (id: 13);
+  manufacturer_day: ubyte = 0         (id: 14);
+  serial_number: string               (id: 15);
+
+  // Battery status
+  voltage_mv: uint = 0               (id: 16);
+  current_ma: int = 0                (id: 17);
+  soc_percent: float = 0.0          (id: 18);
+  soh_percent: float = 0.0          (id: 19);
+  remaining_capacity_mah: uint = 0   (id: 20);
+
+  // MOS switch status
+  mos_charge_is_open: ubyte = 0       (id: 21);
+  mos_discharge_is_open: ubyte = 0   (id: 22);
+  mos_xt30_is_open: ubyte = 0         (id: 23);
+  mos_pre_discharge_is_open: ubyte = 0 (id: 24);
+
+  // Alarm information
+  alarm: ushort = 0                  (id: 25);
+  vendor_alarm: uint = 0             (id: 26);
+
+  // Temperature and voltage arrays
+  temperatures_c: TempArray16         (id: 27);
+  voltages_single_mv: VoltageArray16  (id: 28);
+
+  // Cycle and capacity
+  cycles: ushort = 0                  (id: 29);
+  full_charge_capacity_mah: uint = 0  (id: 30);
+
+  // Charging information
+  charging_voltage_xt30_charger_mv: uint = 0 (id: 31);
+  charging_voltage_xt30_bus_mv: uint = 0     (id: 32);
+  equilibrium_state: uint = 0        (id: 33);
+  is_charger_connected: bool = false (id: 34);
+
+  // High-level charge progress derived by the system monitor. Interpret
+  // together with `is_charger_connected`, `current_ma`, `soc_percent`, and
+  // `alarm` when UI or policy code needs connection/diagnostic detail.
+  charge_state: ChargeState = UNKNOWN (id: 35);
+
+  // Power-button status appended for rolling wire compatibility with
+  // lowlevel_msg/BmsState. A false validity flag means the count was not
+  // obtained from a valid query in this publication cycle.
+  button_press_count: ushort = 0 (id: 36);
+  button_press_count_valid: bool = false (id: 37);
+}
+
+root_type BmsState;

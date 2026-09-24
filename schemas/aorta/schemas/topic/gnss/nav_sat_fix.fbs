@@ -1,0 +1,167 @@
+// GNSS raw fix topic schema.
+//
+// Sole, wire-frozen contract for `/gnss/fix` (the peripheral GNSS node -> the
+// SLAM coarse locator and GPS measurement intake). The same shape is used by
+// the optional `/gps/phone` input. It mirrors sensor_msgs/msg/NavSatFix. The
+// three enums duplicate the ones in
+// `topic/gnss/gnss_fusion.fbs` on purpose: that schema models the *fused*
+// output (it carries a `source` discriminator and drops raw-fix semantics), and
+// the raw-fix wire contract remains independent from it.
+//
+// `header.frame_id` is deliberately dropped: the publisher emits the constant
+// "gnss" and no consumer reads it.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.gnss;
+
+// Mirrors sensor_msgs/NavSatStatus.status.
+enum NavSatStatus: byte {
+  NO_FIX = -1,
+  FIX = 0,
+  SBAS_FIX = 1,
+  GBAS_FIX = 2,
+}
+
+// Mirrors sensor_msgs/NavSatStatus.service bitmask values.
+enum NavSatService: ubyte {
+  NONE = 0,
+  GPS = 1,
+  GLONASS = 2,
+  COMPASS = 4,
+  GALILEO = 8,
+}
+
+// Mirrors sensor_msgs/NavSatFix.position_covariance_type.
+enum NavSatCovarianceType: ubyte {
+  UNKNOWN = 0,
+  APPROXIMATED = 1,
+  DIAGONAL_KNOWN = 2,
+  KNOWN = 3,
+}
+
+enum GnssConstellation: ubyte {
+  UNKNOWN = 0,
+  GPS = 1,
+  GLONASS = 2,
+  BEIDOU = 3,
+  GALILEO = 4,
+  QZSS = 5,
+  SBAS = 6,
+  NAVIC = 7,
+}
+
+// Bit values for NavSatFix.validity_flags. The field itself is uint so flags
+// can be ORed and extended without changing the root table shape.
+enum GnssFixValidityFlag: uint {
+  NONE = 0,
+  UTC_TIME = 1,
+  UTC_DATE = 2,
+  UTC_TIMESTAMP = 4,
+  GEOID_SEPARATION = 8,
+  DIFFERENTIAL_AGE = 16,
+  DOP = 32,
+  SPEED = 64,
+  COURSE = 128,
+  MAGNETIC_VARIATION = 256,
+  GST_ERROR = 512,
+  SATELLITE_SUMMARY = 1024,
+  SATELLITE_DETAILS = 2048,
+  RECEIVER_STATUS = 4096,
+}
+
+// Bit values for SatelliteObservation.validity_flags.
+enum SatelliteValidityFlag: uint {
+  NONE = 0,
+  ELEVATION = 1,
+  AZIMUTH = 2,
+  CN0 = 4,
+  SIGNAL_ID = 8,
+  HEALTH = 16,
+  CARRIER_FREQUENCY = 32,
+  PSEUDORANGE = 64,
+  PSEUDORANGE_RATE = 128,
+  CARRIER_PHASE = 256,
+  DOPPLER = 512,
+  PSEUDORANGE_UNCERTAINTY = 1024,
+}
+
+// An NMEA-only receiver fills identity/elevation/azimuth/CN0 and used_in_fix.
+// Raw-measurement fields are intentionally part of the contract so a receiver
+// with measurement output does not require a new topic.
+table SatelliteObservation {
+  constellation: GnssConstellation = UNKNOWN (id: 0);
+  talker_id: string (id: 1);
+  satellite_id: ushort = 0 (id: 2);
+  signal_id: ushort = 0 (id: 3);
+  elevation_deg: float = 0.0 (id: 4);
+  azimuth_deg: float = 0.0 (id: 5);
+  cn0_dbhz: float = 0.0 (id: 6);
+  used_in_fix: bool = false (id: 7);
+  validity_flags: uint = 0 (id: 8);
+  observation_timestamp_ns: ulong = 0 (id: 9);
+  observation_age_ms: uint = 0 (id: 10);
+  healthy: bool = false (id: 11);
+  ephemeris_available: bool = false (id: 12);
+  almanac_available: bool = false (id: 13);
+  carrier_frequency_hz: double = 0.0 (id: 14);
+  pseudorange_m: double = 0.0 (id: 15);
+  pseudorange_rate_mps: double = 0.0 (id: 16);
+  carrier_phase_cycles: double = 0.0 (id: 17);
+  doppler_hz: double = 0.0 (id: 18);
+  pseudorange_uncertainty_m: double = 0.0 (id: 19);
+}
+
+table NavSatFix {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong = 0 (id: 1);  // Fix acquisition time (ROS header.stamp equivalent).
+  status: NavSatStatus = NO_FIX          (id: 2);
+  service: NavSatService = NONE          (id: 3);
+  latitude: double                       (id: 4);
+  longitude: double                      (id: 5);
+  altitude: double                       (id: 6);
+  position_covariance: [double]          (id: 7);  // Row-major 3x3, 9 elements.
+  position_covariance_type: NavSatCovarianceType = UNKNOWN (id: 8);
+  receive_timestamp_ns: ulong = 0        (id: 9);  // Arrival of the GGA epoch.
+  measurement_id: ulong = 0              (id: 10); // Stable across timer repeats.
+  publish_sequence: ulong = 0             (id: 11);
+  fix_quality: ubyte = 0                  (id: 12); // Raw GGA quality value.
+  fix_type: ubyte = 0                     (id: 13); // Raw GSA 1/2/3 value.
+  validity_flags: uint = 0                (id: 14); // GnssFixValidityFlag bits.
+  // NMEA sentence presence bits use the modem's CGPSNMEA bit assignment.
+  nmea_sentence_mask: uint = 0            (id: 15);
+  gnss_utc_time: string                   (id: 16); // hhmmss.sss, verbatim.
+  gnss_utc_date: string                   (id: 17); // ddmmyy, verbatim.
+  gnss_utc_timestamp_ns: ulong = 0        (id: 18);
+  geoid_separation_m: double = 0.0        (id: 19);
+  differential_age_s: float = 0.0         (id: 20);
+  differential_station_id: string         (id: 21);
+  satellites_used: ushort = 0             (id: 22);
+  satellites_visible: ushort = 0          (id: 23);
+  satellites_tracked: ushort = 0          (id: 24);
+  strong_satellites: ushort = 0           (id: 25); // C/N0 >= 25 dB-Hz.
+  gps_satellites_used: ushort = 0         (id: 26);
+  glonass_satellites_used: ushort = 0     (id: 27);
+  beidou_satellites_used: ushort = 0      (id: 28);
+  galileo_satellites_used: ushort = 0     (id: 29);
+  pdop: float = 0.0                       (id: 30);
+  hdop: float = 0.0                       (id: 31);
+  vdop: float = 0.0                       (id: 32);
+  ground_speed_mps: float = 0.0           (id: 33);
+  track_true_deg: float = 0.0             (id: 34);
+  magnetic_variation_deg: float = 0.0     (id: 35);
+  gst_range_rms_m: float = 0.0            (id: 36);
+  gst_semi_major_std_m: float = 0.0       (id: 37);
+  gst_semi_minor_std_m: float = 0.0       (id: 38);
+  gst_orientation_deg: float = 0.0        (id: 39);
+  gst_latitude_std_m: float = 0.0         (id: 40);
+  gst_longitude_std_m: float = 0.0        (id: 41);
+  gst_altitude_std_m: float = 0.0         (id: 42);
+  mode_indicators: string                 (id: 43);
+  navigation_status: string               (id: 44);
+  receiver_status_raw: string             (id: 45); // Latest AT+CGNSSINFO line.
+  receiver_status_age_ms: uint = 0        (id: 46);
+  satellites: [SatelliteObservation]      (id: 47);
+}
+
+root_type NavSatFix;

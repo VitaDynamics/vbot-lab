@@ -1,0 +1,32 @@
+// LightControl — peripheral RGB light control service
+//
+// Aorta typed service for ROS2 `/light_node/control`
+// (`vbot_ros2_msgs/peripheral_msgs/srv/LightControl.srv`).
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.peripheral;
+
+table LightControlRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);  // 0=OFF, 1=ON
+  req_id: string (id: 2);
+  pre_check: bool = false (id: 3);
+  mode: ubyte = 0 (id: 4);  // 0-5 basic, 8-247 custom, 248 OTA, 249 charging
+  red: ubyte = 0 (id: 5);
+  green: ubyte = 0 (id: 6);
+  blue: ubyte = 0 (id: 7);
+  brightness: ubyte = 0 (id: 8);
+  speed: float = 1.0 (id: 9);       // mode=CHARGING_PROGRESS: progress percent
+  duration_ms: ushort = 0 (id: 10); // 0=infinite
+}
+
+table LightControlResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: int = 0 (id: 3);
+}
+
+root_type LightControlRequest;

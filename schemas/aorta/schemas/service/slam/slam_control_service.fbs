@@ -1,0 +1,147 @@
+// SLAM runtime control/query services. Replaces the ROS2 services
+// `slam_msgs/srv/SetSlamMode`, `slam_msgs/srv/GetPathToTarget` and
+// `slam_msgs/srv/QueryMap` (all three ROS servers are deleted).
+//
+// Deliberate deltas from the ROS2 srv definitions:
+//   - `QueryMap.radius` is dropped. It was already marked "Deprecated, kept
+//     only for compatibility" and the server never read it.
+//   - `std_msgs/Header` collapses to `stamp_ns` + `frame_id`; `seq` was unused.
+//   - `sensor_msgs/PointCloud2` collapses to a packed `[MapPoint]` struct
+//     vector (x/y/z/intensity). The ROS reply went through `pcl::toROSMsg` on
+//     `pcl::PointXYZINormal`, so it also carried normal_{x,y,z} + curvature;
+//     no consumer ever read those fields.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.slam;
+
+// ============================================================================
+// /slam/set_slam_mode
+// ============================================================================
+
+// `mode` values mirror the MODE_ constants of slam_msgs/msg/SlamStatus, which
+// the Aorta status topic reproduces as `aorta.topic.slam.SlamStatus.operation_mode`.
+table SetSlamModeRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  mode: ubyte = 0 (id: 1);
+  request_reloc: bool = false (id: 2);
+  // Map NAME (not a path):
+  //   - mode=MAPPING     + empty  → enter mapping
+  //   - mode=MAPPING     + name   → finish mapping, save under the local map
+  //                                 storage directory as {name}
+  //   - mode=LOCALIZATION + name  → load {name} from the local map storage
+  //                                 directory, then localize
+  //   - mode=LOCALIZATION + empty → only allowed when already localized
+  map_name: string (id: 3);
+  client_id: string (id: 4);
+  client_req_id: ulong = 0 (id: 5);
+}
+
+// Ack-only: the server reports progress/outcome on the `/slam/status` topic.
+table SetSlamModeResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  accepted: bool = false (id: 2);
+  message: string (id: 3);
+  // Server-assigned async task id; 0 means "no async task".
+  server_task_id: ulong = 0 (id: 4);
+}
+
+// ============================================================================
+// /slam/get_path_to_target
+// ============================================================================
+
+// Keyframe waypoint in the head frame (the server converts it: the map is
+// stored in the lidar-IMU frame).
+struct PathPoint {
+  x: double;
+  y: double;
+  z: double;
+}
+
+table GetPathToTargetRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_name: string (id: 1);
+}
+
+table GetPathToTargetResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  success: bool = false (id: 2);
+  message: string (id: 3);
+  // Reply build time (was std_msgs/Header.stamp).
+  stamp_ns: ulong = 0 (id: 4);
+  frame_id: string (id: 5);
+  path_points: [PathPoint] (id: 6);
+}
+
+// ============================================================================
+// /slam/query_map
+// ============================================================================
+
+enum QueryMapMode : ubyte {
+  FOV = 0,
+  PIXEL = 1,
+}
+
+enum QueryMapErrorCode : ubyte {
+  OK = 0,
+  INVALID_ARGUMENT = 1,
+  TIME_MISMATCH = 2,
+  NO_MAP_DATA = 3,
+  INTERNAL = 4,
+}
+
+// Map point in the head frame, `intensity` carried through from the map cloud.
+struct MapPoint {
+  x: float;
+  y: float;
+  z: float;
+  intensity: float;
+}
+
+table QueryMapRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  // Target time; the server interpolates/extrapolates a pose from its buffer.
+  stamp_ns: ulong = 0 (id: 1);
+  mode: QueryMapMode = FOV (id: 2);
+  camera_id: int = 0 (id: 3);
+
+  // PIXEL mode: pixel position in the image (required).
+  pixel_x: double = 0.0 (id: 4);
+  pixel_y: double = 0.0 (id: 5);
+  // PIXEL mode: predicted z-depth in the camera frame, in meters. When > 0 the
+  // 3D point is reconstructed straight from pixel + depth with no map search.
+  // Use <= 0 (e.g. -1) for "unknown depth" and fall back to map FOV filtering.
+  pixel_depth_m: double = -1.0 (id: 6);
+
+  // Cone angle thresholds in the camera frame, degrees, (0, 180].
+  hor_fov_deg: float = 0.0 (id: 7);
+  ver_fov_deg: float = 0.0 (id: 8);
+
+  // FOV mode: query direction in the camera frame.
+  dir_cam_x: double = 0.0 (id: 9);
+  dir_cam_y: double = 0.0 (id: 10);
+  dir_cam_z: double = 0.0 (id: 11);
+
+  // Max returned points after filtering. Must be > 0.
+  max_points: uint = 0 (id: 12);
+}
+
+table QueryMapResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  success: bool = false (id: 2);
+  error_code: QueryMapErrorCode = INTERNAL (id: 3);
+  message: string (id: 4);
+  // Echo of the requested query time (was std_msgs/Header.stamp).
+  stamp_ns: ulong = 0 (id: 5);
+  frame_id: string (id: 6);
+  points: [MapPoint] (id: 7);
+  point_count_raw: uint = 0 (id: 8);
+  point_count_after_filter: uint = 0 (id: 9);
+  matched_time_diff_ms: float = 0.0 (id: 10);
+}
+
+root_type SetSlamModeRequest;

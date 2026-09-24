@@ -1,0 +1,47 @@
+// RuntimeControl — runtime control of the currently active locomotion action
+//
+// Aorta typed service for the `locomotion/runtime_control` channel, served by
+// the locomotion service, called by rcp (UWB mobility shortcuts). Aorta-native:
+// no ROS2 service counterpart. Runtime controls operate on the currently
+// running locomotion action; they never start or replace an action.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.locomotion;
+
+// Append-only. Runtime-control command vocabulary; currently only
+// TRY_RESUME_PILOT is defined.
+enum RuntimeControlCommand : ubyte {
+  UNKNOWN = 0,
+  TRY_RESUME_PILOT = 1,
+}
+
+// Outcome vocabulary shared by all runtime-control commands. Semantic
+// contract: APPLIED == the runtime event was dispatched; NOT_APPLICABLE ==
+// the current action/state cannot honor the command (e.g. the pilot is not
+// the active action or is not in a resumable state); FAILED == the request
+// reached the service but could not be executed. ALREADY_APPLIED and
+// CONFLICT are reserved vocabulary.
+enum RuntimeControlOutcome : ubyte {
+  UNSPECIFIED = 0,
+  APPLIED = 1,
+  ALREADY_APPLIED = 2,
+  NOT_APPLICABLE = 3,
+  CONFLICT = 4,
+  FAILED = 5,
+}
+
+table RuntimeControlRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  command: RuntimeControlCommand = UNKNOWN (id: 1);
+}
+
+table RuntimeControlResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  outcome: RuntimeControlOutcome = UNSPECIFIED (id: 2);
+  detail: string (id: 3);  // Human-readable diagnostic; stable parsing must not rely on it.
+}
+
+root_type RuntimeControlRequest;

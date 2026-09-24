@@ -1,0 +1,157 @@
+// GNSS - Fused coarse location topic
+//
+// Shared Aorta topic schema for /gnss/fusion.
+// Mirrors coarse fused NavSatFix semantics used by the SLAM service.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace gnss;
+
+enum GnssFusionSource: byte {
+  NONE = 0,
+  GNSS = 1,
+  CELL = 2,
+  CACHE = 3,
+  WIFI = 4,
+  MAP_ANCHOR = 5,
+}
+
+enum GnssFusionState: ubyte {
+  NO_GLOBAL = 0,
+  NETWORK_BOOTSTRAP = 1,
+  DIRECT_GNSS = 2,
+  GNSS_ANCHORED = 3,
+  MAP_ANCHORED = 4,
+  COASTING = 5,
+  FALLBACK = 6,
+  CACHE_FALLBACK = 7,
+  GNSS_TRANSLATION_ALIGNED = 8,
+}
+
+// Mirrors sensor_msgs/NavSatStatus.status.
+enum GnssFixStatus: byte {
+  NO_FIX = -1,
+  FIX = 0,
+  SBAS_FIX = 1,
+  GBAS_FIX = 2,
+}
+
+// Mirrors sensor_msgs/NavSatStatus.service bitmask values.
+enum GnssService: ubyte {
+  NONE = 0,
+  GPS = 1,
+  GLONASS = 2,
+  COMPASS = 4,
+  GALILEO = 8,
+}
+
+// Mirrors sensor_msgs/NavSatFix.position_covariance_type.
+enum GnssCovarianceType: ubyte {
+  UNKNOWN = 0,
+  APPROXIMATED = 1,
+  DIAGONAL_KNOWN = 2,
+  KNOWN = 3,
+}
+
+// Bit values for `network_input_mask`. A network fix can use several inputs
+// at the same time; keep this composable instead of adding one source enum for
+// every Wi-Fi/cell/history combination.
+enum GnssNetworkInput: ushort {
+  NONE = 0,
+  WIFI_APS = 1,
+  SERVING_CELL = 2,
+  NEIGHBOR_CELLS = 4,
+  HISTORY_CELLS = 8,
+  IP_ONLY = 16,
+}
+
+enum GnssCacheSaveReason: ubyte {
+  UNKNOWN = 0,
+  GRACEFUL_SHUTDOWN = 1,
+  MOTION_STOPPED = 2,
+  PERIODIC_MOVING = 3,
+  LEGACY = 4,
+}
+
+enum GnssYawAlignmentState: ubyte {
+  UNOBSERVED = 0,
+  CANDIDATE = 1,
+  CONFIRMED_SESSION = 2,
+  PRECISE_SESSION = 3,
+  MAP_ANCHORED = 4,
+  DEGRADED = 5,
+}
+
+enum GnssYawAlignmentSource: ubyte {
+  NONE = 0,
+  GNSS_TRAJECTORY = 1,
+  MAP_ANCHOR = 2,
+  // Time-paired network positions + local odometry, after SE(2) validation.
+  // Does not imply a compass measurement or GNSS-quality absolute accuracy.
+  NETWORK_TRAJECTORY = 3,
+}
+
+enum GnssYawAlignmentRejectReason: ubyte {
+  NONE = 0,
+  INSUFFICIENT_SAMPLES = 1,
+  INSUFFICIENT_DURATION = 2,
+  SHORT_BASELINE = 3,
+  FIT_FAILED = 4,
+  HIGH_RESIDUAL = 5,
+  TRANSLATION_UNCERTAIN = 6,
+  INSUFFICIENT_BLOCKS = 7,
+  INSUFFICIENT_LONG_BASELINES = 8,
+  LONG_BASELINE_INCONSISTENT = 9,
+  BLOCK_UNSTABLE = 10,
+  YAW_UNCERTAIN = 11,
+}
+
+table GnssFusion {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong          (id: 1);  // Sensor acquisition time, may differ from publish time.
+  source: GnssFusionSource = NONE     (id: 2);
+  valid: bool = false                 (id: 3);
+  latitude: double                    (id: 4);
+  longitude: double                   (id: 5);
+  altitude: double                    (id: 6);
+  fix_status: GnssFixStatus = NO_FIX  (id: 7);
+  service: GnssService = NONE         (id: 8);
+  accuracy_m: float                   (id: 9);
+  position_covariance: [double]       (id: 10);  // Row-major 3x3 covariance.
+  position_covariance_type: GnssCovarianceType = UNKNOWN (id: 11);
+  fusion_state: GnssFusionState = NO_GLOBAL (id: 12);
+  publish_timestamp_ns: ulong = 0              (id: 13);
+  source_timestamp_ns: ulong = 0               (id: 14);
+  source_age_ms: uint = 0                       (id: 15);
+  used_wifi: bool = false                       (id: 16);
+  propagated_by_slam: bool = false              (id: 17);
+  anchor_sample_count: uint = 0                 (id: 18);
+  anchor_robust_rms_m: float = 0.0              (id: 19);
+  network_input_mask: ushort = 0                (id: 20); // GnssNetworkInput bitmask.
+  wifi_ap_count: ushort = 0                     (id: 21);
+  serving_cell_count: ushort = 0                (id: 22);
+  neighbor_cell_count: ushort = 0               (id: 23);
+  history_cell_count: ushort = 0                (id: 24);
+  network_provenance_complete: bool = false     (id: 25);
+  cached_original_source: GnssFusionSource = NONE (id: 26);
+  cache_save_reason: GnssCacheSaveReason = UNKNOWN (id: 27);
+  absolute_source_timestamp_ns: ulong = 0        (id: 28);
+  correction_source: GnssFusionSource = NONE     (id: 29);
+  yaw_alignment_state: GnssYawAlignmentState = UNOBSERVED (id: 30);
+  yaw_alignment_source: GnssYawAlignmentSource = NONE     (id: 31);
+  map_to_enu_yaw_rad: double = 0.0                       (id: 32);
+  yaw_stddev_deg: float = 0.0                            (id: 33);
+  yaw_baseline_m: float = 0.0                            (id: 34);
+  yaw_effective_block_count: ushort = 0                  (id: 35);
+  yaw_robust_rms_m: float = 0.0                          (id: 36);
+  yaw_long_baseline_p90_deg: float = 0.0                 (id: 37);
+  yaw_alignment_reject_reason: GnssYawAlignmentRejectReason = INSUFFICIENT_SAMPLES (id: 38);
+  yaw_candidate_rad: double = 0.0                         (id: 39);
+  yaw_pair_consensus_rad: double = 0.0                    (id: 40);
+  yaw_fit_pair_delta_deg: float = 0.0                     (id: 41);
+  yaw_block_dispersion_deg: float = 0.0                   (id: 42);
+  yaw_sample_count: ushort = 0                            (id: 43);
+  yaw_long_baseline_pair_count: ushort = 0                (id: 44);
+}
+
+root_type GnssFusion;

@@ -1,0 +1,42 @@
+// HeadAction — locomotion head motion control
+//
+// Aorta typed service for ROS2 `/head_action`
+// (`vbot_ros2_msgs/lowlevel_msg/srv/HeadAction.srv`), served by the locomotion
+// service. Dual-stack during the migration window. Client: rcp (head tasks,
+// incl. resumable_action suspend/resume).
+//
+// ROS2 ↔ Aorta mapping: `bool success` → `status: ServiceStatus`; other
+// fields carry over 1:1.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.locomotion;
+
+// Mirrors HeadAction.srv mode constants.
+enum HeadActionMode: ubyte {
+  ANGLE_CONTROL = 0,
+  STREAM = 1,
+}
+
+table HeadActionRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);            // 0=OFF 1=ON
+  mode: HeadActionMode = ANGLE_CONTROL (id: 2);
+  req_id: string (id: 3);                     // request trace id
+  pre_check: bool = false (id: 4);            // prepare/check phase only
+  action_path: string (id: 5);                // CSV action path
+  duration_ms: int = 0 (id: 6);               // playback duration; -1 = play sequence to the end
+  loop_enabled: bool = false (id: 7);
+  playback_rate: float = 1.0 (id: 8);         // 1.0 normal, 0.5 half, 2.0 double
+  target_angles: [float] (id: 9);             // ANGLE_CONTROL: pitch, yaw (rad)
+}
+
+table HeadActionResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: int (id: 3);
+}
+
+root_type HeadActionRequest;

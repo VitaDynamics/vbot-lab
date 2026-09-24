@@ -1,0 +1,55 @@
+// BodyActionStatus — body action execution status
+//
+// Aorta topic schema for ROS2 `/function/body_action_status`
+// (`vbot_ros2_msgs/function_msgs/msg/BodyActionStatus.msg`), published by the
+// locomotion service; consumed by the function state machine.
+//
+// NOTE: `BodyActionMode` numeric values deliberately mirror
+// BodyActionStatus.msg's MODE_* constants, which are a DIFFERENT domain from
+// LowlevelAction.srv's mode constants despite overlapping names (e.g. here
+// 9=RL_PILOT, 11=LAYDOWN, 12=EXTERNAL, 13=OPENTRACK, 15=DAMPER; the srv has
+// 9=PILOT, 11=DAMPER, 12=QUIET_PASSIVE). Do NOT unify them.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace locomotion;
+
+// Mirrors BodyActionStatus.msg STATUS_* constants.
+enum BodyActionExecStatus: ubyte {
+  IDLE = 0,
+  RUNNING = 1,
+}
+
+// Mirrors BodyActionStatus.msg MODE_* constants (identical numeric values).
+enum BodyActionMode: ubyte {
+  PASSIVE = 0,
+  FIXED_STAND = 1,
+  FIXED_LAYDOWN = 2,
+  SAFE_STOP_SEQUENCE = 3,
+  SAFE_LAYDOWN_SEQUENCE = 4,
+  RL = 5,
+  RL_TROT = 6,
+  MPC = 7,
+  STREAM = 8,
+  RL_PILOT = 9,
+  RL_RECOVERY = 10,
+  LAYDOWN = 11,
+  EXTERNAL = 12,
+  OPENTRACK = 13,
+  RECOVERY_ACTION = 14,
+  DAMPER = 15,
+  RL_ACTION_POLICY1 = 100,
+  RL_ACTION_POLICY2 = 101,
+  RL_ACTION_POLICY3 = 102,
+  HIMLOCO_ACTION = 103,
+}
+
+table BodyActionStatus {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: BodyActionExecStatus = IDLE (id: 1);
+  mode: BodyActionMode = PASSIVE (id: 2);   // numeric, backward compatible
+  mode_str: string (id: 3);                 // string form for modern usage
+  modify_source: string (id: 4);            // who last modified this status
+}
+
+root_type BodyActionStatus;

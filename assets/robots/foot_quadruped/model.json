@@ -1,0 +1,11 @@
+{
+  "format_version": 1,
+  "robot_type": "foot_quadruped",
+  "model_id": "VbotBaboEDU",
+  "availability": "not_bundled",
+  "urdf": null,
+  "meshes": [],
+  "textures": [],
+  "model_license": null,
+  "viewer_url": "https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU"
+}

@@ -1,0 +1,6 @@
+# 请求
+---
+# 响应
+bool success                    # 是否成功
+string message                  # 响应消息
+string[] supported_emotions     # 支持的表情类型列表 

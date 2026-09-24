@@ -1,0 +1,20 @@
+# Request
+
+uint8 target_state     # Target state: 0=stop playing, 1=start playing
+uint8 mode             # Function mode: 0=MACHINE_LANGUAGE, 1=HUMAN_VOICE
+string req_id          # Request ID for trace
+bool pre_check         # If true, only perform the prepare/check phase
+
+# User Friendly Definition Here 
+uint8 MACHINE_LANGUAGE=0
+uint8 HUMAN_VOICE=1
+
+string machine_language_name  # Wave file name (only for machine language mode)
+string human_language_text    # Text to speak (only for human voice mode)
+
+---
+
+# Response
+bool success                  # True if operation succeeded
+int32 error_code             # Error code (0 for success, non-zero for errors)
+string message               # Human-readable status message

@@ -1,0 +1,35 @@
+// SLAM runtime status topic. Mirrors the ROS2 slam_msgs/msg/SlamStatus
+// fields needed by Aorta consumers such as Spatial Service.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.slam;
+
+table SlamStatus {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong = 0 (id: 1);
+
+  operation_mode: ubyte = 0 (id: 2);
+  loc_status: ubyte = 0 (id: 3);
+  odom_status: ubyte = 0 (id: 4);
+  odom_status_seq: uint = 0 (id: 5);
+  map_status: ubyte = 0 (id: 6);
+  cloud_sync_status: ubyte = 0 (id: 7);
+  cloud_sync_map_name: string (id: 8);
+
+  tracking_quality: float = 0.0 (id: 9);
+  context: string (id: 10);
+  map_id: uint = 0 (id: 11);
+  mileage: float = 0.0 (id: 12);
+  accumulated_mileage: float = 0.0 (id: 13);
+  current_map_name: string (id: 14);
+
+  num_keyframes: uint = 0 (id: 15);
+  num_landmarks: uint = 0 (id: 16);
+  process_time: float = 0.0 (id: 17);
+  cpu_usage: float = 0.0 (id: 18);
+  mem_usage: float = 0.0 (id: 19);
+  gps_align_status: ubyte = 0 (id: 20);
+}
+
+root_type SlamStatus;

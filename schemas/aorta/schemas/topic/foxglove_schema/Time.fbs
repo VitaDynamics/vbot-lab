@@ -1,0 +1,12 @@
+// Derived from the foxglove-sdk FlatBuffers schemas
+// (https://github.com/foxglove/foxglove-sdk), licensed under the MIT License.
+// Converted/adapted for Aorta. See NOTICE and docs/licensing.md.
+
+namespace foxglove;
+
+struct Time {
+  /// Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z
+  sec:uint32;
+  /// Nano-second fractions from 0 to 999,999,999 inclusive
+  nsec:uint32;
+}

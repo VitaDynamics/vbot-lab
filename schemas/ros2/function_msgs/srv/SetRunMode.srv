@@ -1,0 +1,18 @@
+uint8 target_state
+uint8 mode             
+string req_id
+bool pre_check         
+bool has_is_traction_user_param
+bool is_traction_user_param
+
+# 运行模式常量
+int32 MODE_MANUAL = 0
+int32 MODE_IDLE = 1
+int32 MODE_LOCO = 2
+int32 MODE_MPC = 3
+int32 MODE_PILOT = 4
+int32 MODE_INDOOR = 5
+---
+bool success
+string message
+int32 error_code

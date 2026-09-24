@@ -1,0 +1,59 @@
+# --- New unified fields ---
+uint8 target_state     # Target state: 0=OFF, 1=ON
+uint8 mode             # Function mode (e.g., specific low-level action pattern)
+string req_id          # Request ID for trace
+bool pre_check         # If true, only perform the prepare/check phase
+string action_path     # Optional: action/trajectory path for runtime modes
+string action_params_json  # Optional: JSON object with typed action param overrides
+
+# Mode constants aligned with vita::GlobalAction enum (common_def.h)
+uint8 PASSIVE=0
+uint8 FIXED_STAND=1
+uint8 FIXED_LAYDOWN=2
+uint8 SAFE_STOP_SEQUENCE=3
+uint8 SAFE_LAYDOWN_SEQUENCE=4  
+
+# RL
+uint8 RL=5
+uint8 RL_TROT=6
+
+# MPC
+uint8 MPC = 7
+
+# STREAM
+uint8 STREAM = 8
+
+uint8 PILOT = 9
+
+uint8 RL_RECOVERY = 10
+uint8 DAMPER = 11
+uint8 QUIET_PASSIVE = 12
+
+uint8 RL_ACTION_POLICY1 = 100
+uint8 RL_ACTION_POLICY2 = 101
+uint8 RL_ACTION_POLICY3 = 102
+uint8 RL_ACTION_POLICY4 = 103
+
+---
+# --- Unified response fields ---
+bool success            # Whether the action was successful
+string message          # Status message or error description (domain error reason, e.g. "stepping.payload_out_of_range")
+int32 error_code        # Error code (0 = success, see below)
+string error_detail     # Optional structured JSON: {module,domain,type,stage,retryable,params}
+
+# ============ Error Codes ============
+
+int32 SUCCESS=0
+
+# --- Pre-check phase ---
+int32 ERROR_PRECHECK_TIMEOUT=1001              # Pre-check timed out
+int32 ERROR_PRECHECK_INVALID_MODE=1002         # Invalid mode requested
+int32 ERROR_PRECHECK_REJECTED=1003             # Rejected by system state (emergency, concurrent action, etc.)
+int32 ERROR_PRECHECK_LOAD_TRAJECTORY_FAILED=1006  # Failed to load trajectory/CSV file
+
+# --- Execution phase ---
+int32 ERROR_REQUEST_FAILED=1004                # Request failed (pre-check rejection, transition failure, etc.)
+                                               # Use `message` field for specific reason (e.g. "stepping.payload_out_of_range")
+
+# --- Recovery phase ---
+int32 ERROR_RECOVERY_FAILED=1005               # Automatic recovery attempt failed

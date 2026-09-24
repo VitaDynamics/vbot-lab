@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "robot_type": "foot_quadruped",
+  "release_scope": "current_target",
+  "models": [],
+  "minimum_firmware": null,
+  "guide": "docs/robots/foot_quadruped/README.md",
+  "sensor_reference": "docs/hardware/quadruped-common/sensors.md",
+  "connection_reference": "docs/robots/quadruped-common/connection.md"
+}

@@ -1,0 +1,19 @@
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.speech;
+
+table VolumeControlRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  app_name: string (id: 1);
+  volume: ubyte (id: 2);
+}
+
+table VolumeControlResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  current_volume: ubyte (id: 3);
+}
+
+root_type VolumeControlRequest;

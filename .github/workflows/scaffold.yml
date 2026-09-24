@@ -1,0 +1,30 @@
+name: Scaffold checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-layout:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Validate scaffold, bilingual documentation, and links
+        run: python3 tests/check_repository.py
+      - name: Validate that schemas/ carries exactly the public interfaces
+        run: python3 tests/check_schemas.py
+      - name: Validate agent discovery, catalog, and offline tools
+        run: python3 tests/test_agent_workspace.py
+      - name: Validate recipe previews and safety guards without SDK or device access
+        run: python3 tests/test_recipes.py
+      - name: Validate family recipe previews and data interpretation
+        run: python3 tests/test_family_recipes.py
+      - name: Validate offline bundle checks without downloading dependencies
+        run: python3 tests/test_offline_build.py

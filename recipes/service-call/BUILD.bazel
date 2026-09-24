@@ -1,0 +1,21 @@
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+    deps = ["//recipes:common"],
+    python_version = "PY3",
+)
+
+filegroup(
+    name = "repository_files",
+    srcs = glob(["*.md", "*.py", "*.bazel", "*.cc", "*.h"]),
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "main_cpp",
+    visibility = ["//tests:__pkg__"],
+    srcs = ["main.cc"],
+    deps = ["//recipes:cpp_common"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)

@@ -1,0 +1,397 @@
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/user_interaction/user_interaction_context.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.rcp;
+
+enum ResourceId: byte {
+  NONE = 0,
+  LEGS = 1,
+  HEAD = 2,
+  SCREEN = 3,
+  LIGHT = 4,
+  AUDIO_OUT = 5,
+  AUDIO_IN = 6,
+  ARMS = 7,
+  SENSORS = 8,
+  NO_EFFECT = 9,
+}
+
+enum NodeLifecycle: byte {
+  UNSPECIFIED = 0,
+  NORMAL = 1,
+  DAEMON = 2,
+  BARRIER = 3,
+}
+
+enum DisplayLayer: byte {
+  UNSPECIFIED = 0,
+  AMBIENT = 1,
+  MISSION = 2,
+  INTERACTION = 3,
+  ANIMATION = 4,
+  WARNING = 5,
+  SAFETY = 6,
+}
+
+enum ConditionOp: byte {
+  EQ = 0,
+  NE = 1,
+  GT = 2,
+  LT = 3,
+  GE = 4,
+  LE = 5,
+  CONTAINS = 6,
+  STARTS_WITH = 7,
+  ENDS_WITH = 8,
+  IN = 9,
+  NOT_IN = 10,
+}
+
+enum ConditionValueKind: byte {
+  NONE = 0,
+  BOOL = 1,
+  INT64 = 2,
+  FLOAT64 = 3,
+  STRING = 4,
+  STRING_LIST = 5,
+}
+
+table ConditionValue {
+  kind: ConditionValueKind = NONE;
+  bool_value: bool = false;
+  int64_value: long = 0;
+  float64_value: double = 0.0;
+  string_value: string;
+  string_list_value: [string];
+}
+
+enum PreconditionExprKind: byte {
+  LEAF = 0,
+  ALL = 1,
+  ANY = 2,
+}
+
+table PreconditionExpr {
+  kind: PreconditionExprKind = LEAF;
+  key: string;
+  op: ConditionOp = EQ;
+  value: ConditionValue;
+  timeout_ms: int = 0;
+  all: [PreconditionExpr];
+  any: [PreconditionExpr];
+}
+
+// IMPORTANT: WIRE-COMPATIBILITY BOUNDARY
+//
+// BodyMethod intentionally preserves the published FunctionInput wire values
+// 10-13 for RL_ACTION_POLICY1-4. These values diverge from the canonical
+// 100-103 used by LowlevelAction.srv and service/locomotion/lowlevel_action.fbs.
+// Modes MUST be mapped BY NAME across this boundary, as aorta_dag_codec does.
+// Numeric passthrough is forbidden.
+enum BodyMethod: byte {
+  PASSIVE = 0,
+  FIXED_STAND = 1,
+  FIXED_LAYDOWN = 2,
+  SAFE_STOP_SEQUENCE = 3,
+  SAFE_LAYDOWN_SEQUENCE = 4,
+  RL = 5,
+  RL_TROT = 6,
+  MPC = 7,
+  STREAM = 8,
+  PILOT = 9,
+  RL_ACTION_POLICY1 = 10,
+  RL_ACTION_POLICY2 = 11,
+  RL_ACTION_POLICY3 = 12,
+  RL_ACTION_POLICY4 = 13,
+  // Distinct enum domain: LowlevelActionMode.RL_WHEEL is 13. Map by name.
+  RL_WHEEL = 14,
+}
+
+table BodyCommand {
+  method: BodyMethod = PASSIVE;
+  action_path: string;
+  pre_check: bool = false;
+}
+
+enum HeadMethod: byte {
+  ANGLE_CONTROL = 0,
+  STREAM = 1,
+}
+
+table HeadCommand {
+  method: HeadMethod = ANGLE_CONTROL;
+  pre_check: bool = false;
+  duration_ms: int = 0;
+  loop_enabled: bool = false;
+  playback_rate: float = 1.0;
+  target_angles: [float];
+  action_path: string;
+}
+
+enum LightMethod: byte {
+  FIXED_COLOR = 0,
+  GRADIENT = 1,
+  BREATHING = 2,
+  FLASHING = 3,
+  CIRCLE_AND_FLASH = 4,
+  PULSE = 5,
+}
+
+table LightCommand {
+  method: LightMethod = FIXED_COLOR;
+  red: uint = 0;
+  green: uint = 0;
+  blue: uint = 0;
+  brightness: uint = 255;
+  speed: float = 1.0;
+  duration_ms: int = 0;
+  layer: DisplayLayer = UNSPECIFIED;
+  sync: bool = false;
+}
+
+enum EmotionMethod: byte {
+  UNSPECIFIED = 0,
+  BLINK_ONCE = 1,
+  WINK_10S = 2,
+  LISTEN_10S = 3,
+  SAD_10S = 4,
+  HAPPY_10S = 5,
+  HAPPY_30S = 6,
+  CONFOUND_3S = 7,
+  TIMID_15S = 8,
+  COURAGE_15S = 9,
+  COURAGE_30S = 10,
+  FEAR_10S = 11,
+  ANGRY_10S = 12,
+  DIZZY_30S = 13,
+  SURPRISE_20S = 14,
+  ANGRY = 15,
+  BLINK_MANY = 16,
+  COURAGE = 17,
+  DIZZY = 18,
+  FEAR_COURAGE = 19,
+  HAPPY = 20,
+  LISTEN = 21,
+  SHY = 22,
+  SLEEPING = 23,
+  SLEEPY = 24,
+  SWEATY = 25,
+  TALK = 26,
+  WAKEUP = 27,
+  WINK = 28,
+  WRONGED = 29,
+  STREAM = 30,
+  DOG_BARKING = 31,
+  SAY_HI = 32,
+  HAPPY_BIRTHDAY = 33,
+  HIGH_FIVE = 34,
+  LUNGE_FORWARD = 35,
+  NEW_YEAR = 36,
+  RHYTHMIC_SWING = 37,
+  FEAR_ALT = 38,
+  COURAGE_ALT = 39,
+  HAPPY_ALT = 40,
+  DEFAULT_EMOTION = 41,
+  LONG_TALK = 42,
+}
+
+table EmotionCommand {
+  method: EmotionMethod = UNSPECIFIED;
+  emotion_id: uint = 0;
+  duration_ms: int = 0;
+  layer: DisplayLayer = UNSPECIFIED;
+  sync: bool = false;
+}
+
+enum SpeakMethod: byte {
+  MACHINE_LANGUAGE = 0,
+  HUMAN_VOICE = 1,
+}
+
+table SpeakCommand {
+  method: SpeakMethod = MACHINE_LANGUAGE;
+  text: string;
+  machine_language_name: string;
+  human_language_text: string;
+}
+
+enum VlnMethod: byte {
+  FOLLOW = 0,
+  ROAM = 1,
+  NAV_TO_POINT = 2,
+  COME_TO_ME = 3,
+  WALK = 4,
+  STOP = 5,
+  WALK_WITH_MPC = 6,
+}
+
+table VlnCommand {
+  method: VlnMethod = FOLLOW;
+  x: float = 0.0;
+  y: float = 0.0;
+  frame: string;
+  stop_distance: float = 0.0;
+}
+
+/// Composite VLN session command. Unlike VlnCommand, this owns the complete
+/// mobility session lifecycle in RCP: enter the required locomotion mode, run
+/// VLN, and restore the previous locomotion mode on exit/cancel.
+enum VlnSessionMethod: byte {
+  FOLLOW = 0,
+  ROAM = 1,
+  NAV_TO_POINT = 2,
+  COME_TO_ME = 3,
+  WALK = 4,
+  SYNC_SEMANTIC_NAV = 5,
+  ASYNC_SEMANTIC_NAV = 6,
+}
+
+table VlnSessionCommand {
+  method: VlnSessionMethod = FOLLOW;
+  x: float = 0.0;
+  y: float = 0.0;
+  frame: string;
+  stop_distance: float = 0.0;
+  prompt: string;
+}
+
+enum LocomotionMethod: byte {
+  SET_MODE = 0,
+  STAND_UP = 1,
+  LIE_DOWN = 2,
+  STOP = 3,
+}
+
+table LocomotionCommand {
+  method: LocomotionMethod = SET_MODE;
+  mode: uint = 0;
+}
+
+/// BaseActionMethod selects how a BaseActionCommand is executed.
+///
+/// MOVE_HEAD is dispatched through the same base-action command path as the
+/// locomotion methods so that callers can sequence head and body motions
+/// through a single RPC; field semantics for MOVE_HEAD reuse
+/// `angle_rad` (pitch, radians) and `x` (yaw, radians).
+enum BaseActionMethod: byte {
+  ROTATE = 0,
+  MOVE_FORWARD = 1,
+  MOVE_BACKWARD = 2,
+  MOVE_LEFT = 3,
+  MOVE_RIGHT = 4,
+  NAVIGATE_TO = 5,
+  MOVE_HEAD = 6,
+}
+
+table BaseActionCommand {
+  method: BaseActionMethod = ROTATE;
+  angle_rad: float = 0.0;
+  distance_m: float = 0.0;
+  x: float = 0.0;
+  y: float = 0.0;
+  stop_distance: float = 0.0;
+}
+
+enum NavigateMethod: byte {
+  ROTATE_IN_PLACE = 0,
+}
+
+table NavigateCommand {
+  method: NavigateMethod = ROTATE_IN_PLACE;
+  angle_rad: float = 0.0;
+}
+
+table SleepCommand {
+  duration_ms: int = 0;
+}
+
+table BarrierCommand {
+}
+
+/// Generic RCP DSL task command for task families that do not have a dedicated
+/// Aorta wire table yet. `task` carries the canonical DSL key such as
+/// "vln_session.WALK"; `args_json` carries the node args object encoded as JSON.
+table DslTaskCommand {
+  task: string;
+  args_json: string;
+}
+
+union NodeCommand {
+  BarrierCommand,
+  BodyCommand,
+  HeadCommand,
+  LightCommand,
+  EmotionCommand,
+  SpeakCommand,
+  VlnCommand,
+  LocomotionCommand,
+  BaseActionCommand,
+  NavigateCommand,
+  SleepCommand,
+  VlnSessionCommand,
+  DslTaskCommand,
+}
+
+table DagNode {
+  id: string;
+  dependencies: [string];
+  wait_time_ms: int = 0;
+  execution_timeout_ms: int = 0;
+  lifecycle: NodeLifecycle = UNSPECIFIED;
+  condition: string;
+  command: NodeCommand;
+}
+
+table DagSpec {
+  task_id: string;
+  priority: int = 0;
+  skip_batch_pre_check: bool = false;
+  requires_static: bool = false;
+  required_resources: [ResourceId];
+  optional_resources: [ResourceId];
+  preconditions: PreconditionExpr;
+  nodes: [DagNode];
+}
+
+/// A single named template argument for a DAG preset.
+///
+/// `value_json` carries any JSON-encoded value (scalar, array, or object) so
+/// that the wire schema doesn't have to grow a parallel scalar union next to
+/// `ConditionValue`. The C++ resolver parses it with `nlohmann::json` and the
+/// Rust producer encodes it with `serde_json::to_string`; numbers, booleans,
+/// strings, and arrays all flow through unchanged.
+table TemplateArg {
+  name: string (required);
+  value_json: string (required);
+}
+
+table DagPresetRef {
+  relative_path: string;
+  template_args: [TemplateArg];
+}
+
+union DagInput {
+  DagSpec,
+  DagPresetRef,
+}
+
+table FunctionInputRequest {
+  aorta_header: aorta.sys.AortaHeader;
+  request_id: string;
+  source: string;
+  // Canonical single input entry. FlatBuffers JSON uses input_type + input.
+  input: DagInput;
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext;
+}
+
+table FunctionInputResponse {
+  aorta_header: aorta.sys.AortaHeader;
+  status: aorta.services.common.ServiceStatus = SUCCESS;
+  accepted: bool = false;
+  request_id: string;
+  message: string;
+  user_interaction_context: aorta.user_interaction.common.UserInteractionContext;
+}
+
+root_type FunctionInputRequest;

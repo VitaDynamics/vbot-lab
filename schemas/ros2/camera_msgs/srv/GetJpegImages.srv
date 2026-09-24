@@ -1,0 +1,5 @@
+# Request
+JpegRequest[] request
+---
+# Response
+JpegResponse[] response

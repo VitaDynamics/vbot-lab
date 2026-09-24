@@ -1,0 +1,8 @@
+{
+  "name": "vbot-lab",
+  "dockerComposeFile": "../docker/compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "overrideCommand": false,
+  "shutdownAction": "stopCompose"
+}

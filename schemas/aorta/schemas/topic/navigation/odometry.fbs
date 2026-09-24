@@ -1,0 +1,47 @@
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.navigation;
+
+struct Point3D {
+  x: double;
+  y: double;
+  z: double;
+}
+
+struct Quaternion {
+  x: double;
+  y: double;
+  z: double;
+  w: double;
+}
+
+struct OdometryTwist {
+  linear: Point3D;
+  angular: Point3D;
+}
+
+struct Covariance36 {
+  values: [double:36];
+}
+
+table Odometry {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  sensor_timestamp_ns: ulong (id: 1);
+  frame_id: string (id: 2);
+  child_frame_id: string (id: 3);
+  pose_position: Point3D (id: 4);
+  pose_orientation: Quaternion (id: 5);
+  twist: OdometryTwist (id: 6);
+  pose_covariance: Covariance36 (id: 7);
+  twist_covariance: Covariance36 (id: 8);
+  // Optional composite poses published by the SLAM module.
+  // odom_qr and pilot_command_adapter use them instead of a two-hop ROS tf
+  // lookup. The head-in-body pose is the raw T_body_head transform;
+  // publishers populate each position/orientation pair together.
+  body_position_in_map: Point3D (id: 9);
+  body_orientation_in_map: Quaternion (id: 10);
+  head_position_in_body: Point3D (id: 11);
+  head_orientation_in_body: Quaternion (id: 12);
+}
+
+root_type Odometry;

@@ -1,0 +1,60 @@
+// GetFirmwareVersion — device firmware version query
+//
+// Aorta typed service for ROS2 `/firmware_version/motor` and
+// `/firmware_version/servo`
+// (`vbot_ros2_msgs/firmware_version_msgs/srv/GetFirmwareVersion.srv`), served by
+// the locomotion service's hardware port (one schema, two endpoints).
+// Dual-stack during the migration window. Client: the system monitor.
+// Other device domains (lidar/uwb/bms) can reuse this schema.
+//
+// ROS2 ↔ Aorta mapping: `firmware_version_msgs/DeviceType` constants →
+// `DeviceType: ubyte` (identical numeric values); `FirmwareVersion[]` →
+// `[FirmwareVersion]`; `bool success` → `status: ServiceStatus`.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.system;
+
+// Mirrors firmware_version_msgs/DeviceType.msg constants.
+enum DeviceType: ubyte {
+  MOTOR = 0,
+  SERVO = 1,
+  LIDAR = 2,
+  UWB = 3,
+  BMS = 4,
+  OTHER = 255,
+}
+
+table FirmwareVersion {
+  device_type: DeviceType = MOTOR (id: 0);
+  device_id: ushort = 0 (id: 1);
+  name: string (id: 2);
+  vendor: string (id: 3);
+  sn: string (id: 4);
+  // Version strings; may be empty.
+  sw_version: string (id: 5);
+  hw_version: string (id: 6);
+  protocol_version: string (id: 7);
+  sdk_version: string (id: 8);
+  build_meta: string (id: 9);
+  commit: string (id: 10);
+  // Vendor/device-specific extensions; parallel same-length arrays.
+  extra_keys: [string] (id: 11);
+  extra_values: [string] (id: 12);
+}
+
+table GetFirmwareVersionRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_device_type: DeviceType = MOTOR (id: 1);
+  ids: [ushort] (id: 2);  // empty = all devices
+}
+
+table GetFirmwareVersionResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  versions: [FirmwareVersion] (id: 3);
+}
+
+root_type GetFirmwareVersionRequest;

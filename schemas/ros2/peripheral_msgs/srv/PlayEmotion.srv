@@ -1,0 +1,12 @@
+# 请求
+
+uint8 target_state     # Target state: 0=OFF, 1=ON
+string req_id          # Request ID for trace
+bool pre_check         # If true, only perform the prepare/check phase
+uint8 mode             # Emotion type mapped to an integer.
+int32 duration_ms    # 播放时间，单位毫秒，-1表示播完这个序列就恢复默认表情
+---
+# 响应
+bool success         # 是否成功
+string message       # 响应消息
+int32 error_code     # Optional error code 

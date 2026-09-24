@@ -1,0 +1,25 @@
+/bazel-*
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+.DS_Store
+.idea/
+.vscode/
+/dist/
+/artifacts/
+*.whl
+*.tar.gz
+*.zip
+*.pem
+*.key
+
+# Robot session configurations and credential dictionaries. Keep workstation copies in
+# ~/.config/vbot/robots/<robot-alias>/, outside every project directory.
+edu_session*.json5
+*dictionary*.txt
+*.json5.local

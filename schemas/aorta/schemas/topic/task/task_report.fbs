@@ -1,0 +1,100 @@
+// Task Report — generic async terminal-task outcome for Agent-invoked
+// capabilities (VLN, BaseAction, Locomotion, Speech, Photo, ...).
+//
+// Generalizes the "Service = start ack, Topic = terminal outcome" pattern
+// already used by the per-capability report topics: Service only answers
+// "did the task start" (accepted/rejected); the true success/failure and
+// root cause always flow through this topic, keyed by req_id.
+//   - PUBLISHED by the owning capability module, SUBSCRIBED by RCP to
+//     resolve the pending task and forward status + reason (+ typed result
+//     context) upstream.
+//   - `VlnTaskResult` carries distance context and `LocomotionTaskResult`
+//     identifies prepare versus execution outcomes. The remaining payload
+//     arms are empty: an empty arm means "task completed, no additional
+//     structured context". Extend a capability by adding fields to its
+//     existing arm rather than by growing the union.
+//   - Relationship to the pre-existing per-capability report topics: those
+//     remain their owning capability's dedicated reports; this generic
+//     TaskReport is additive and the two coexist.
+//   - Field ids are stable; new fields MUST be appended with new ids.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.topic.task;
+
+table VlnTaskResult {
+  estimated_distance_m: float = null (id: 0);
+  max_distance_m: float = null (id: 1);
+  remaining_distance_m: float = null (id: 2);
+}
+
+// Empty result context for base actions; structured detail (e.g. odometry
+// staleness, position-not-initialized) is carried as fields added here.
+table BaseActionTaskResult {
+}
+
+// Distinguishes validate-only preparation from the action execution terminal.
+// UNKNOWN is the safe default for payloads produced before this context was
+// populated.
+enum LocomotionTaskStage: ubyte {
+  UNKNOWN = 0,
+  PREPARE = 1,
+  EXECUTE = 2,
+}
+
+table LocomotionTaskResult {
+  stage: LocomotionTaskStage = UNKNOWN (id: 0);
+  action_name: string (id: 1);
+
+  // True only when retrying the same request without external intervention is
+  // meaningful.
+  retryable: bool = false (id: 2);
+
+  // Payload-range context populated for locomotion.payload_out_of_range.
+  observed_payload_kg: float = null (id: 3);
+  allowed_payload_min_kg: float = null (id: 4);
+  allowed_payload_max_kg: float = null (id: 5);
+}
+
+// Empty result context for the voice/interact link.
+table SpeechTaskResult {
+}
+
+// Empty result context for the photo link (e.g. empty-image classification).
+table PhotoTaskResult {
+}
+
+union TaskResultPayload {
+  VlnTaskResult,
+  BaseActionTaskResult,
+  LocomotionTaskResult,
+  SpeechTaskResult,
+  PhotoTaskResult,
+}
+
+table TaskReport {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+
+  // Must exactly match the req_id from the originating Service request.
+  req_id: string (id: 1);
+
+  // Cross-capability result classification.
+  status: aorta.services.common.ServiceStatus = SUCCESS (id: 2);
+
+  // Stable, machine-readable cross-capability root cause, e.g. odom_stale,
+  // target_too_far, or locomotion.payload_out_of_range. Empty on success.
+  // Consumers may branch on status plus this code.
+  reason: string (id: 3);
+
+  // id 4 is auto-assigned by FlatBuffers to the hidden `result_type`
+  // discriminator (one less than this field's own explicit id).
+  // NONE when there is no additional structured context.
+  result: TaskResultPayload (id: 5);
+
+  // Optional concise Agent-facing diagnostic. Consumers MUST NOT branch on
+  // this free-form text; use status plus reason instead.
+  diagnostic: string (id: 6);
+}
+
+root_type TaskReport;

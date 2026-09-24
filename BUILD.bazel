@@ -1,0 +1,30 @@
+package(default_visibility = ["//visibility:public"])
+
+# Repository and offline tooling inputs, not a device SDK distribution.
+filegroup(
+    name = "repository_files",
+    srcs = glob([
+        "**/*.md",
+        "docs/**/assets/**",
+        ".devcontainer/**",
+        ".github/**",
+        ".agents/skills/**/*.md",
+        ".claude/skills/**/*.md",
+        "catalog/**/*.json",
+        "schemas/**",
+        "tools/*.py",
+        "docker/**",
+        "*.bazel",
+        "*.bazel.lock",
+        ".bazelrc",
+        ".bazelversion",
+        ".gitignore",
+    ], exclude = ["artifacts/**", ".venv/**", "dist/**"]) + [
+        "LICENSE",
+        "NOTICE",
+        "//assets/robots/foot_quadruped:repository_files",
+        "//recipes:repository_files",
+        "//packages/aorta/cpp:repository_files",
+        "//tests:repository_files",
+    ],
+)

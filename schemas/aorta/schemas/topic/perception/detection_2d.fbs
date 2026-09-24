@@ -1,0 +1,36 @@
+// Perception - 2D Object Detection Schema
+//
+// Aorta message for YOLO-style 2D object detections.
+// Mirrors vision_msgs::msg::Detection2DArray from ROS2 but in FlatBuffers.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace perception;
+
+// Bounding box in center-size format (matches ROS2 BoundingBox2D).
+// Fixed-size struct: 16 bytes, no allocation overhead.
+struct BBox2D {
+  center_x: float;
+  center_y: float;
+  width: float;
+  height: float;
+}
+
+// Single 2D object detection result.
+table Detection2D {
+  bbox: BBox2D     (id: 0);
+  class_id: string (id: 1);  // COCO class name, e.g. "person"
+  score: float     (id: 2);  // confidence [0.0, 1.0]
+}
+
+// Array of detections from a single frame.
+table Detection2DArray {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  detections: [Detection2D]           (id: 1);
+  frame_width: uint                   (id: 2);
+  frame_height: uint                  (id: 3);
+  timestamp_ns: ulong                 (id: 4);  // Sensor capture time, may differ from publish time.
+  frame_id: string                    (id: 5);  // Source frame, e.g. "stereo_camera" (was ROS2 Header.frame_id).
+}
+
+root_type Detection2DArray;

@@ -1,0 +1,30 @@
+# 请求
+# --- New unified fields ---
+uint8 target_state     # Target state: 0=OFF, 1=ON
+string req_id          # Request ID for trace
+bool pre_check         # If true, only perform the prepare/check phase
+
+# User Friendly Definition Here
+uint8 FIXEDCOLOR=0
+uint8 GRADIENT=1
+uint8 BREATHING=2
+uint8 FLASHING=3
+uint8 CIRCLEANDFLASH=4
+uint8 PULSE=5
+# Custom modes start from 8, see custom_light_modes.md for details
+uint8 OTA_PROGRESS=248
+uint8 CHARGING_PROGRESS=249
+
+uint8 mode                     # 0-5=基础模式, 8-247=自定义模式(30配色×8效果), 248=OTA进度, 249=充电进度
+uint8 red                      # 红色值 (0-255)
+uint8 green                    # 绿色值 (0-255)
+uint8 blue                     # 蓝色值 (0-255)
+uint8 brightness               # 亮度值 (0-255)
+float32 speed                  # 变化速度 (0.1-10.0, 1.0为默认); mode=249时复用为充电进度百分比(0-100)
+uint16 duration_ms             # 持续时间(毫秒), 0表示无限
+---
+# 响应
+# --- Unified response fields ---
+bool success                   # 是否成功
+string message                 # 响应消息
+int32 error_code               # Optional error code

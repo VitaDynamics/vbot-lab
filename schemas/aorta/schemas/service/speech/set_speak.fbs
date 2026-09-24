@@ -1,0 +1,48 @@
+// SetSpeak — speech playback control service
+//
+// Aorta typed service for `speech/set_speak`
+// (`vbot_ros2_msgs/function_msgs/srv/SetSpeak.srv`, ROS2 `/set_speak`), to be
+// served by the speech service. Dual-stack with the ROS2 service during the
+// migration window: one handler serves both legs, so field semantics stay
+// identical.
+//
+// ROS2 ↔ Aorta mapping notes:
+//   - `uint8 mode` + `MACHINE_LANGUAGE`/`HUMAN_VOICE` constants →
+//     `SpeakMode: ubyte` enum with identical numeric values.
+//   - `machine_language_name` / `human_language_text` are mode-specific
+//     payloads; exactly one is consumed per request, selected by `mode`
+//     (MACHINE_LANGUAGE → wave file name, HUMAN_VOICE → text).
+//   - `bool success` / `string message` / `int32 error_code` →
+//     `status: ServiceStatus` (SUCCESS ↔ `success == true`) + `message` +
+//     `error_code`, following `service/locomotion/set_run_mode.fbs`.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.speech;
+
+// Mirrors `SetSpeak.srv` MACHINE_LANGUAGE/HUMAN_VOICE constants (identical
+// numeric values).
+enum SpeakMode: ubyte {
+  MACHINE_LANGUAGE = 0,  // play a machine-language wave file
+  HUMAN_VOICE = 1,       // synthesize human-language text
+}
+
+table SetSpeakRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);  // 0=stop playing, 1=start playing
+  mode: SpeakMode = MACHINE_LANGUAGE (id: 2);
+  req_id: string (id: 3);  // RCP task-report idempotency key
+  pre_check: bool = false (id: 4);  // if true, only perform the prepare/check phase
+  machine_language_name: string (id: 5);  // wave file name; consumed only for MACHINE_LANGUAGE
+  human_language_text: string (id: 6);    // text to speak; consumed only for HUMAN_VOICE
+}
+
+table SetSpeakResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: int (id: 3);
+}
+
+root_type SetSpeakRequest;

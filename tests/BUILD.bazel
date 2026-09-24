@@ -1,0 +1,81 @@
+filegroup(
+    name = "repository_files",
+    srcs = glob(["**/*.md", "*.py", "*.sh", "*.cc", "BUILD.bazel"]),
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "offline_build_test",
+    srcs = ["test_offline_build.py"],
+    main = "test_offline_build.py",
+    data = ["//:repository_files"],
+    python_version = "PY3",
+)
+
+cc_test(
+    name = "recipe_cpp_sdk_test",
+    srcs = ["recipe_cpp_sdk_test.cc", "//recipes/rcp-task:goal.h"],
+    deps = ["//recipes:cpp_common"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)
+
+cc_test(
+    name = "recipe_cpp_decoder_test",
+    srcs = ["recipe_cpp_decoder_test.cc", "//recipes/camera:decoder.h"],
+    deps = ["//recipes:cpp_common", "@aorta_release//:ffmpeg"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)
+
+py_test(
+    name = "recipe_cpp_test",
+    srcs = ["test_cpp_recipes.py"],
+    main = "test_cpp_recipes.py",
+    data = ["//recipes/" + recipe + ":main_cpp" for recipe in [
+        "device-info", "subscribe-state", "service-call", "camera", "audio", "locomotion", "rcp-task",
+        "sensors", "perception", "system-peripherals", "slam",
+    ]],
+    python_version = "PY3",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "recipe_test",
+    srcs = ["test_recipes.py"],
+    main = "test_recipes.py",
+    deps = ["//recipes:common"],
+    data = ["//recipes:repository_files"],
+    python_version = "PY3",
+)
+
+py_test(
+    name = "family_recipe_test",
+    srcs = ["test_family_recipes.py"],
+    main = "test_family_recipes.py",
+    deps = ["//recipes:common"],
+    data = ["//recipes:repository_files"],
+    python_version = "PY3",
+)
+
+py_test(
+    name = "recipe_sdk_test",
+    srcs = ["test_recipe_sdk.py"],
+    main = "test_recipe_sdk.py",
+    deps = ["//recipes:common"],
+    data = ["//recipes:repository_files"],
+    python_version = "PY3",
+    tags = ["manual", "local"],
+)
+
+sh_test(
+    name = "repository_layout_test",
+    srcs = ["check_repository.sh"],
+    data = ["//:repository_files"],
+)
+
+sh_test(
+    name = "agent_workspace_test",
+    srcs = ["check_agent_workspace.sh"],
+    data = ["//:repository_files"],
+)

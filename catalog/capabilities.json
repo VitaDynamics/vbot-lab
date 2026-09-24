@@ -1,0 +1,386 @@
+{
+  "format_version": 1,
+  "workspace": "vbot-lab",
+  "sdk": {
+    "name": "Aorta Python SDK",
+    "integration": "integrated",
+    "version": "2026.9.23",
+    "python_import": "aorta",
+    "reference": "packages/aorta/python/README.md",
+    "release": "edu-sdk-2026.9.24",
+    "edu_messages_version": "2026.9.24",
+    "cpp": {
+      "version": "2026.9.23",
+      "abi": 12,
+      "schema_pack": "2026.9.24-v4",
+      "reference": "packages/aorta/cpp/README.md"
+    }
+  },
+  "capabilities": [
+    {
+      "id": "development.environment.check",
+      "availability": "implemented",
+      "robot_types": [],
+      "execution_location": "developer_host_or_container",
+      "interface_kind": "local_cli",
+      "reference": "docs/agents/README.md",
+      "skill": "skills/vbot-dev-setup/SKILL.md",
+      "tool": "tools/check_environment.py",
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "local_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests"
+    },
+    {
+      "id": "device.environment.check",
+      "availability": "implemented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "local_cli",
+      "reference": "docs/getting-started/device-environment.md",
+      "skill": "skills/vbot-dev-setup/SKILL.md",
+      "tool": "tools/check_device_environment.py",
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests"
+    },
+    {
+      "id": "device.application.autostart",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "local_cli",
+      "reference": "docs/guides/user-autostart.md",
+      "skill": null,
+      "tool": null,
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only"
+    },
+    {
+      "id": "device.interfaces.discover",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "local_cli",
+      "reference": "docs/interfaces/aorta-ros2.md",
+      "skill": "skills/vbot-dev-setup/SKILL.md",
+      "tool": null,
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "documentation_only"
+    },
+    {
+      "id": "robot.sensors",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "docs/interfaces/sensors.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/sensors/README.md",
+      "requires_sdk": false,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/sensors/main.py",
+          "bazel_target": "//recipes/sensors:main"
+        },
+        "cpp": {
+          "source": "recipes/sensors/main.cc",
+          "bazel_target": "//recipes/sensors:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.cameras",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "docs/interfaces/cameras.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/camera/README.md",
+      "requires_sdk": false,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/camera/main.py",
+          "bazel_target": "//recipes/camera:main"
+        },
+        "cpp": {
+          "source": "recipes/camera/main.cc",
+          "bazel_target": "//recipes/camera:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.perception",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "docs/interfaces/perception.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/perception/README.md",
+      "requires_sdk": false,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/perception/main.py",
+          "bazel_target": "//recipes/perception:main"
+        },
+        "cpp": {
+          "source": "recipes/perception/main.cc",
+          "bazel_target": "//recipes/perception:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.audio",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "docs/interfaces/audio.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/audio/README.md",
+      "requires_sdk": false,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/audio/main.py",
+          "bazel_target": "//recipes/audio:main"
+        },
+        "cpp": {
+          "source": "recipes/audio/main.cc",
+          "bazel_target": "//recipes/audio:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.locomotion",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "docs/interfaces/locomotion.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/locomotion/README.md",
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/locomotion/main.py",
+          "bazel_target": "//recipes/locomotion:main"
+        },
+        "cpp": {
+          "source": "recipes/locomotion/main.cc",
+          "bazel_target": "//recipes/locomotion:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.system-peripherals",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "docs/interfaces/system-peripherals.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/system-peripherals/README.md",
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/system-peripherals/main.py",
+          "bazel_target": "//recipes/system-peripherals:main"
+        },
+        "cpp": {
+          "source": "recipes/system-peripherals/main.cc",
+          "bazel_target": "//recipes/system-peripherals:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.rcp",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "action",
+      "reference": "docs/interfaces/rcp.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/rcp-task/README.md",
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/rcp-task/main.py",
+          "bazel_target": "//recipes/rcp-task:main"
+        },
+        "cpp": {
+          "source": "recipes/rcp-task/main.cc",
+          "bazel_target": "//recipes/rcp-task:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.slam.mapping-localization",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "service",
+      "reference": "docs/guides/mapping-localization.md",
+      "skill": null,
+      "tool": null,
+      "recipe": "recipes/slam/README.md",
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only",
+      "implementations": {
+        "python": {
+          "source": "recipes/slam/main.py",
+          "bazel_target": "//recipes/slam:main"
+        },
+        "cpp": {
+          "source": "recipes/slam/main.cc",
+          "bazel_target": "//recipes/slam:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.device-info",
+      "availability": "implemented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "service",
+      "reference": "recipes/device-info/README.md",
+      "skill": null,
+      "tool": "recipes/device-info/main.py",
+      "recipe": "recipes/device-info/README.md",
+      "requires_sdk": true,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests",
+      "implementations": {
+        "python": {
+          "source": "recipes/device-info/main.py",
+          "bazel_target": "//recipes/device-info:main"
+        },
+        "cpp": {
+          "source": "recipes/device-info/main.cc",
+          "bazel_target": "//recipes/device-info:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.state.subscribe",
+      "availability": "implemented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "recipes/subscribe-state/README.md",
+      "skill": null,
+      "tool": "recipes/subscribe-state/main.py",
+      "recipe": "recipes/subscribe-state/README.md",
+      "requires_sdk": true,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests",
+      "implementations": {
+        "python": {
+          "source": "recipes/subscribe-state/main.py",
+          "bazel_target": "//recipes/subscribe-state:main"
+        },
+        "cpp": {
+          "source": "recipes/subscribe-state/main.cc",
+          "bazel_target": "//recipes/subscribe-state:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "robot.service.call",
+      "availability": "implemented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "service",
+      "reference": "recipes/service-call/README.md",
+      "skill": null,
+      "tool": "recipes/service-call/main.py",
+      "recipe": "recipes/service-call/README.md",
+      "requires_sdk": true,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests",
+      "implementations": {
+        "python": {
+          "source": "recipes/service-call/main.py",
+          "bazel_target": "//recipes/service-call:main"
+        },
+        "cpp": {
+          "source": "recipes/service-call/main.cc",
+          "bazel_target": "//recipes/service-call:main_cpp"
+        }
+      }
+    },
+    {
+      "id": "device.agent.content",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_service",
+      "interface_kind": "http",
+      "reference": "docs/interfaces/agent/content-api.md",
+      "skill": null,
+      "tool": null,
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only"
+    },
+    {
+      "id": "device.agent.http-mcp",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "developer_tool_service",
+      "interface_kind": "http_mcp",
+      "reference": "docs/interfaces/agent/http-mcp.md",
+      "skill": null,
+      "tool": null,
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only"
+    }
+  ]
+}

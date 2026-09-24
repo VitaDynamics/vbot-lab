@@ -1,0 +1,54 @@
+Aorta Middleware
+Copyright 2026 VitaDynamics
+
+This product includes software developed at VitaDynamics.
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file in the
+root of this distribution for the full license text.
+
+================================================================================
+Third-party derived works included in this source distribution
+================================================================================
+
+1. Foxglove FlatBuffers schemas
+   Upstream project: foxglove-sdk (https://github.com/foxglove/foxglove-sdk),
+   directory `schemas/flatbuffer`.
+
+   Copyright (c) Foxglove Technologies Inc
+
+   Licensed under the MIT License. The full upstream license text is
+   reproduced verbatim at `THIRD_PARTY_LICENSES/foxglove-sdk.LICENSE`, which
+   is also staged into the exported Cargo release workspace and into each
+   released message crate that embeds one of these schemas.
+
+   The following files under `message/schemas/topic/foxglove_schema/` were
+   converted from, or adapted from, the upstream Foxglove FlatBuffers schemas.
+   They are not verbatim copies: Aorta adds an `aorta_header` field to the
+   publishable root tables and a small number of Aorta-specific extension
+   fields, and keeps the foundational geometry tables header-free.
+
+       CameraCalibration.fbs      PackedElementField.fbs   Quaternion.fbs
+       CompressedImage.fbs        Point2.fbs               RawAudio.fbs
+       CompressedVideo.fbs        Point3.fbs               RawImage.fbs
+       FrameTransform.fbs         PointCloud.fbs           Time.fbs
+       FrameTransforms.fbs        Pose.fbs                 Vector2.fbs
+       LaserScan.fbs              Log.fbs                  Vector3.fbs
+
+2. Zenoh router entry point
+   Upstream project: Eclipse zenoh (https://github.com/eclipse-zenoh/zenoh),
+   `zenohd` binary crate.
+   Copyright (c) 2023 ZettaScale Technology
+   Upstream license: EPL-2.0 OR Apache-2.0 (Apache-2.0 branch exercised here).
+
+   `tools/zenohd/src/main.rs` and `tools/zenohd/build.rs` are adapted from the
+   upstream `zenohd` sources and retain their original copyright and
+   SPDX-License-Identifier headers.
+
+The verbatim upstream MIT license text for the Foxglove work above is in
+`THIRD_PARTY_LICENSES/`. The zenoh sources retain their own license headers;
+their upstream license texts are not vendored here (see docs/licensing.md).
+
+For the complete third-party dependency inventory (627 Rust crates and the
+Bazel module closure) see `docs/sbom/`. For the project licensing policy,
+including the obligations that attach to source and to binary distributions,
+see `docs/licensing.md`.

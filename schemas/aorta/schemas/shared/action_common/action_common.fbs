@@ -1,0 +1,61 @@
+namespace aorta.action.common;
+
+/// Goal lifecycle state.
+enum ActionStatus : byte {
+  UNKNOWN = 0,
+  ACCEPTED = 1,
+  EXECUTING = 2,
+  CANCELING = 3,
+  SUCCEEDED = 4,
+  ABORTED = 5,
+  CANCELED = 6,
+}
+
+/// Reply code for action control operations.
+enum ActionReplyCode : short {
+  NONE = 0,
+
+  // Success / informational
+  OK = 1,
+  DUPLICATE_ACCEPTED = 2,
+
+  // Terminal success
+  SUCCEEDED = 100,
+  CANCELED = 101,
+
+  // Client-side rejection
+  BUSY = 200,
+  PAYLOAD_CONFLICT = 201,
+  UNAUTHORIZED = 202,
+  NOT_FOUND = 203,
+  ALREADY_TERMINAL = 204,
+  GOAL_EXPIRED = 205,
+
+  // Server-side failure
+  HANDLER_ERROR = 300,
+  HANDLER_PANIC = 301,
+  HANDLER_COMPLETED_WITHOUT_RESULT = 302,
+  CONTEXT_DROPPED = 303,
+  SERVER_CRASH = 304,
+
+  // Infrastructure
+  CONFLICT = 400,
+}
+
+/// Descriptor record for a registered action server.
+table ActionInfo {
+  /// Fully qualified action name (for example, "rcp/execute_task").
+  action_name: string;
+
+  /// Hex-encoded hash of the action BFBS.
+  schema_hash_hex: string;
+
+  supports_cancel: bool = true;
+  max_concurrency: uint;
+  result_ttl_ms: ulong = 60000;
+  dedup_ttl_ms: ulong = 300000;
+  server_node_name: string;
+  server_epoch: string;
+}
+
+root_type ActionInfo;

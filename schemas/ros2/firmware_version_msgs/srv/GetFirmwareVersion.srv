@@ -1,0 +1,9 @@
+# Request
+uint8 target_device_type     # 目标设备类型, use firmware_version_msgs/DeviceType constants
+uint16[] ids                 # 为空=全部
+
+---
+# Response
+bool success
+string message
+firmware_version_msgs/FirmwareVersion[] versions

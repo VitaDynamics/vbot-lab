@@ -1,0 +1,42 @@
+// Locomotion Status
+//
+// Shared Aorta topic schema for /locomotion/status.
+// Mirrors the ROS2 software_msgs/LocomotionStatus semantics,
+// exposing posture and motion state to downstream LLM consumers
+// for idle-detection (standing check).
+//
+// Design notes:
+//   - Field IDs are stable; new fields MUST be appended with new IDs.
+//   - Field order mirrors upstream LocomotionStatus.msg.
+//   - Enum numeric values mirror software_msgs/msg/LocomotionStatus constants.
+//   - namespace "locomotion" avoids collision with other message namespaces.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace locomotion;
+
+enum Posture: ubyte {
+  UNKNOWN = 0,
+  STANDING = 1,
+  LYING = 2,
+  TRANSITIONING = 3,
+}
+
+enum Motion: ubyte {
+  IDLE = 0,
+  RECOVERING = 1,
+  EMERGENCY = 2,
+}
+
+// Root table; codegen appends Msg suffix -> LocomotionStatusMsg.
+table LocomotionStatus {
+  aorta_header:    aorta.sys.AortaHeader (id: 0);
+  heartbeat_seq:   ulong = 0             (id: 1);
+  posture:         Posture = UNKNOWN      (id: 2);
+  motion:          Motion = IDLE          (id: 3);
+  current_action:  string                 (id: 4);
+  source:          string                 (id: 5);
+  stamp_ns:        ulong                  (id: 6);
+}
+
+root_type LocomotionStatus;

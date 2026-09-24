@@ -1,0 +1,7 @@
+exports_files(["repositories.bzl"])
+
+filegroup(
+    name = "repository_files",
+    srcs = glob(["*.md", "*.bzl", "*.bazel"]),
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,30 @@
+// DisplayImgs — display image sequence service
+//
+// Aorta typed service for ROS2 `/display_node/display_imgs`
+// (`vbot_ros2_msgs/peripheral_msgs/srv/DisplayImgs.srv`).
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.peripheral;
+
+table ShowImg {
+  width: uint = 0 (id: 0);
+  height: uint = 0 (id: 1);
+  data: [ubyte] (id: 2);
+  encoding: string (id: 3);
+}
+
+table DisplayImgsRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  images: [ShowImg] (id: 1);
+  duration_ms: [uint] (id: 2);
+}
+
+table DisplayImgsResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+}
+
+root_type DisplayImgsRequest;

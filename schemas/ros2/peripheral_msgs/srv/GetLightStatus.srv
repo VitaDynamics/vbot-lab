@@ -1,0 +1,13 @@
+# 请求
+# 无参数
+---
+# 响应
+bool is_enabled                # 是否启用
+uint8 current_mode             # 当前模式
+uint8 current_red              # 当前红色值
+uint8 current_green            # 当前绿色值
+uint8 current_blue             # 当前蓝色值
+uint8 current_brightness       # 当前亮度
+float32 current_speed          # 当前速度
+bool success                   # 是否成功
+string message                 # 响应消息 

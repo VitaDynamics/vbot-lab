@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "robot_type": "foot_humanoid",
+  "release_scope": "planned",
+  "models": [],
+  "minimum_firmware": null,
+  "guide": "docs/robots/foot_humanoid/README.md",
+  "sensor_reference": null,
+  "connection_reference": null
+}

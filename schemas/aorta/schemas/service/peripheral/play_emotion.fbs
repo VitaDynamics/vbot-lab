@@ -1,0 +1,27 @@
+// PlayEmotion — display emotion playback service
+//
+// Aorta typed service for ROS2 `/display_node/play_emotion`
+// (`vbot_ros2_msgs/peripheral_msgs/srv/PlayEmotion.srv`).
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.peripheral;
+
+table PlayEmotionRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);  // 0=OFF, 1=ON
+  req_id: string (id: 2);
+  pre_check: bool = false (id: 3);
+  mode: ubyte = 0 (id: 4);
+  duration_ms: int = 0 (id: 5);     // -1=play sequence then restore default
+}
+
+table PlayEmotionResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: int = 0 (id: 3);
+}
+
+root_type PlayEmotionRequest;

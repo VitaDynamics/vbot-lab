@@ -1,0 +1,14 @@
+// EarModulation — light ear modulation topic
+//
+// Aorta topic equivalent for ROS2 `/light/ear_modulation`.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.peripheral;
+
+table EarModulation {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  value: float = 0.0 (id: 1);  // [0.0, 1.0]
+}
+
+root_type EarModulation;

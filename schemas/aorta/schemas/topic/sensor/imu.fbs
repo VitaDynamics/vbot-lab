@@ -1,0 +1,29 @@
+// Sensor - Imu
+//
+// Mirrors ROS2 sensor_msgs/msg/Imu. ROS Header is represented as timestamp +
+// frame_id; covariance arrays are row-major 3x3 matrices.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/topic/foxglove_schema/Quaternion.fbs";
+include "schemas/topic/foxglove_schema/Time.fbs";
+include "schemas/topic/foxglove_schema/Vector3.fbs";
+
+namespace aorta.topic.sensor;
+
+table Imu {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  timestamp: foxglove.Time (id: 1);
+  frame_id: string (id: 2);
+  seq: uint = 0 (id: 3);
+
+  orientation: foxglove.Quaternion (id: 4);
+  orientation_covariance: [double] (id: 5);
+
+  angular_velocity: foxglove.Vector3 (id: 6);
+  angular_velocity_covariance: [double] (id: 7);
+
+  linear_acceleration: foxglove.Vector3 (id: 8);
+  linear_acceleration_covariance: [double] (id: 9);
+}
+
+root_type Imu;

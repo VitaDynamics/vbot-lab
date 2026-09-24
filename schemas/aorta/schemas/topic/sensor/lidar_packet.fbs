@@ -1,0 +1,21 @@
+// Sensor - LidarPacket
+//
+// Carries one raw LiDAR protocol packet. Mirrors the lidar vendor driver's ROS
+// packet message shape: ROS Header is represented as timestamp + frame_id, and
+// packet bytes are kept opaque so model-specific packet formats stay in the
+// driver layer.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/topic/foxglove_schema/Time.fbs";
+
+namespace aorta.topic.sensor;
+
+table LidarPacket {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  timestamp: foxglove.Time (id: 1);
+  frame_id: string (id: 2);
+  seq: uint = 0 (id: 3);
+  data: [ubyte] (id: 4);
+}
+
+root_type LidarPacket;

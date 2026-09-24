@@ -1,0 +1,64 @@
+// LowlevelAction — locomotion low-level action entry point
+//
+// Aorta typed service for ROS2 `/sm/action/lowlevel`
+// (`vbot_ros2_msgs/software_msgs/srv/LowlevelAction.srv`), served by the
+// locomotion service. Dual-stack during the migration window. Clients: rcp
+// (body/animation tasks), base_action.
+//
+// ROS2 ↔ Aorta mapping notes:
+//   - `uint8 mode` + its ROS2-side action-mode constants →
+//     `LowlevelActionMode: ubyte`, identical numeric values (incl. the 100+
+//     RL action policies).
+//   - `action_params_json` stays a JSON string: it is a deliberate typed-
+//     override passthrough owned by the action runtime; restructuring it is
+//     out of migration scope.
+//   - `bool success` → `status: ServiceStatus`; `error_code` numeric domain
+//     preserved (0=SUCCESS, 1001..1006 precheck/execution/recovery codes per
+//     the srv); `error_detail` preserves the srv's structured JSON detail.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.locomotion;
+
+// Mirrors LowlevelAction.srv mode constants (identical numeric values).
+enum LowlevelActionMode: ubyte {
+  PASSIVE = 0,
+  FIXED_STAND = 1,
+  FIXED_LAYDOWN = 2,
+  SAFE_STOP_SEQUENCE = 3,
+  SAFE_LAYDOWN_SEQUENCE = 4,
+  RL = 5,
+  RL_TROT = 6,
+  MPC = 7,
+  STREAM = 8,
+  PILOT = 9,
+  RL_RECOVERY = 10,
+  DAMPER = 11,
+  QUIET_PASSIVE = 12,
+  RL_WHEEL = 13,
+  RL_ACTION_POLICY1 = 100,
+  RL_ACTION_POLICY2 = 101,
+  RL_ACTION_POLICY3 = 102,
+  RL_ACTION_POLICY4 = 103,
+}
+
+table LowlevelActionRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);            // 0=OFF 1=ON
+  mode: LowlevelActionMode = PASSIVE (id: 2);
+  req_id: string (id: 3);                     // request trace id
+  pre_check: bool = false (id: 4);            // prepare/check phase only
+  action_path: string (id: 5);                // action/trajectory path for runtime modes
+  action_params_json: string (id: 6);         // JSON object with typed action param overrides
+}
+
+table LowlevelActionResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);                    // domain error reason, e.g. "stepping.payload_out_of_range"
+  error_code: int (id: 3);                    // 0=SUCCESS; 1001..1006 per LowlevelAction.srv
+  error_detail: string (id: 4);               // structured JSON failure detail
+}
+
+root_type LowlevelActionRequest;

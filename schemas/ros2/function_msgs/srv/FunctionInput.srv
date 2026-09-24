@@ -1,0 +1,10 @@
+# Request: source and dag json for function statemachine input
+string source
+string dag
+string request_id
+
+---
+# Response: success is a bool and reponse string is optional
+bool[] success
+string response
+string request_id 

@@ -1,0 +1,3 @@
+# The default Python toolchain uses PATH; activate the SDK venv for live runs.
+common --enable_bzlmod
+test --test_output=errors

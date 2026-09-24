@@ -1,0 +1,33 @@
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.stereo;
+
+table JpegRequestItem {
+  channel_id: uint;
+  width: uint;
+  height: uint;
+  quality: ubyte;
+  undistort: bool = false;
+}
+
+table JpegResponseItem {
+  status: aorta.services.common.ServiceStatus (id: 0);
+  width: uint (id: 1);
+  height: uint (id: 2);
+  data: [ubyte] (id: 3);
+  capture_timestamp_ns: ulong (id: 4);
+  frame_id: string (id: 5);
+}
+
+table GetJpegImagesRequest {
+  aorta_header: aorta.sys.AortaHeader;
+  request: [JpegRequestItem];
+}
+
+table GetJpegImagesResponse {
+  aorta_header: aorta.sys.AortaHeader;
+  response: [JpegResponseItem];
+}
+
+root_type GetJpegImagesRequest;

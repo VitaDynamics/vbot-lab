@@ -1,0 +1,35 @@
+// Sensor - DiagnosticStatus
+//
+// Mirrors ROS2 diagnostic_msgs/msg/DiagnosticArray for LiDAR diagnostics.
+// ROS Header is represented as timestamp + frame_id + seq.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/topic/foxglove_schema/Time.fbs";
+
+namespace aorta.topic.sensor;
+
+// Mirrors diagnostic_msgs/msg/KeyValue.
+table DiagnosticKeyValue {
+  key: string (id: 0);
+  value: string (id: 1);
+}
+
+// Mirrors diagnostic_msgs/msg/DiagnosticStatus.
+// level uses ROS DiagnosticStatus constants: OK=0, WARN=1, ERROR=2, STALE=3.
+table DiagnosticStatus {
+  level: ubyte = 0 (id: 0);
+  name: string (id: 1);
+  message: string (id: 2);
+  hardware_id: string (id: 3);
+  values: [DiagnosticKeyValue] (id: 4);
+}
+
+table DiagnosticArray {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  timestamp: foxglove.Time (id: 1);
+  frame_id: string (id: 2);
+  seq: uint = 0 (id: 3);
+  status: [DiagnosticStatus] (id: 4);
+}
+
+root_type DiagnosticArray;
