@@ -10,9 +10,36 @@ Docker, or Bazel on the robot.
 To inspect robot geometry, joints or URDF files without a live robot connection,
 use [Vbot Viewer](vbot-viewer.md) instead. It is a model tool, not a live topic viewer.
 
+Choose the connection mode before starting the bridge:
+
+| Connection mode | Bridge listens on the robot | Foxglove connects on the computer |
+| --- | --- | --- |
+| Wired, direct | `192.168.126.2:8765` | `ws://192.168.126.2:8765` |
+| Wi-Fi, through an SSH tunnel | `127.0.0.1:8765` | `ws://127.0.0.1:8765` after starting the tunnel |
+
+The robot's Wi-Fi IP is the **SSH entry address**. It is not necessarily an interface
+address in the device shell running the bridge; do not substitute it for `--host`.
+The tunnel carries the WebSocket connection through SSH without exposing a separate
+WebSocket port on the Wi-Fi network.
+
 ## 1. Connect and prepare the device shell
 
-First follow [device connection and SSH login](../robots/quadruped-common/connection.md).
+Establish SSH access as `vbot`. For a wired connection, follow
+[device connection and SSH login](../robots/quadruped-common/connection.md).
+For Wi-Fi, the robot must already be connected and its assigned IP reachable from your
+computer. Reuse working public-key access, or complete the linked public-key setup first.
+In a **computer terminal**, replace the placeholder with the robot's actual Wi-Fi IP:
+
+```bash
+ROBOT_SSH_TARGET='vbot@<robot-wifi-ip>'
+ssh "$ROBOT_SSH_TARGET"
+```
+
+If you already use an SSH alias for this robot's `vbot` account, set `ROBOT_SSH_TARGET`
+to that alias instead, both here and in the tunnel terminal below. Use the same SSH
+destination for the shell and tunnel. If login fails, resolve connectivity, authentication
+or host-key errors before continuing; do not disable host-key checking.
+
 Run the following in that **device SSH shell**, not on the host or in the development container:
 
 ```bash
@@ -26,7 +53,7 @@ test -r "$ZENOH_SESSION_CONFIG_URI"
 Expect `vbot`, a resolved bridge executable, and a successful readability check.
 If any check fails, stop and check the installed device tools; do not change permissions.
 PATH locates the executable; ZENOH_SESSION_CONFIG_URI selects the delivered EDU session.
-The launch command also supplies that same path explicitly through `--zenoh-config`.
+The topic-list commands also supply that same path explicitly through `--zenoh-config`.
 ROS setup files, RMW_IMPLEMENTATION, ROS_DOMAIN_ID and ROS_LOCALHOST_ONLY are not needed
 for this native bridge. For persistent shell setup, see [device environment](../getting-started/device-environment.md).
 Non-interactive launchers must export the environment themselves rather than assume
@@ -34,11 +61,37 @@ that an interactive `.bashrc` was loaded.
 
 ## 2. Start the bridge
 
-Both commands below include audio, ASR, and camera streams. Obtain permission from people
-whose audio/video will be accessed before starting. The bridge subscribes even with no
-viewer connected. Keep the terminal open while viewing.
+Choose one of the following launch methods; do not start multiple bridges on the same
+port. The bridge subscribes even with no viewer connected. Keep this device terminal open
+while viewing.
 
-### With the published configuration
+### Wi-Fi: listen on loopback
+
+In the device shell prepared above, start with a small, read-only selection:
+
+```bash
+aorta-foxglove-bridge \
+  --group default \
+  --zenoh-config /opt/vita/aorta/edu/edu_session.json5 \
+  --host 127.0.0.1 \
+  --port 8765 \
+  --server-name edu-vbot \
+  --include bms_state \
+  --include imu_raw \
+  --blacklist-full 'aorta/*/ctx/**' \
+  --blacklist-full 'aorta/*/sys/telemetry/**' \
+  --ctx-snapshot-interval-ms 0
+```
+
+This selects battery and IMU topics, excludes context/telemetry channels and disables
+context snapshots; it does not subscribe to audio or camera topics. Keep the bridge
+running and create the SSH tunnel in section 3. No system service or network-rule changes
+are needed for this workflow.
+
+### Wired: with the published configuration
+
+This configuration and the full topic list below include audio, ASR, and camera streams.
+Obtain permission from people whose audio/video will be accessed before starting either.
 
 Robot software with the EDU router publishes `/opt/vita/aorta/edu/foxglove_bridge.yaml`.
 It selects every robot topic EDU programs can read, plus every topic your own EDU programs
@@ -55,7 +108,7 @@ aorta-foxglove-bridge \
 A topic appears in Foxglove after its first message. If the file is missing, the robot
 software has no EDU router; use the topic list below.
 
-### With a topic list
+### Wired: with a topic list
 
 Name only the topics you need to reduce device and network load, especially for video
 variants and LiDAR. Remove the audio, ASR, and camera entries when they are not needed.
@@ -117,10 +170,11 @@ aorta-foxglove-bridge \
 
 - `--group default` selects the Aorta group.
 - `--host` is the robot's local listening address, not the computer's address.
-  Use `192.168.126.2` for the documented wired connection; for another connection,
-  replace it with an address actually assigned to the robot and reachable from the computer.
+  Use `192.168.126.2` for the documented wired connection and `127.0.0.1` for the SSH
+  tunnel. The Wi-Fi SSH entry IP is not a replacement for either listening address.
 - `--port 8765` is the WebSocket port. If occupied, choose an unused port and update
-  the viewer URL; do not stop an unrelated process.
+  the direct viewer URL or the tunnel's remote destination port as appropriate;
+  do not stop an unrelated process.
 - `--server-name edu-vbot` is a display name; replace it with a recognizable name.
 - Repeated `--include` values are topic suffixes without a leading slash, for example
   `imu_raw` for Aorta `/imu_raw`. They select published-topic streams, not ROS topic
@@ -136,14 +190,60 @@ A configured topic may be idle; inclusion does not start a producer or guarantee
 
 ## 3. Connect from Foxglove
 
+### Wired, direct connection
+
 On the computer, open a **Foxglove WebSocket** connection to `ws://192.168.126.2:8765`.
-Use the listening address and port from the previous step. Do not use the computer's
-`localhost` for a bridge running on the robot.
+Without a tunnel, use the bridge's reachable device address, not the computer's `localhost`.
+
+### Wi-Fi, through an SSH tunnel
+
+Leave the bridge running in the first terminal. Open a **second terminal on the same
+computer as Foxglove**, not inside the device SSH shell or a development container.
+Replace the placeholder with the same Wi-Fi IP used for the first login, or reuse the
+same SSH alias:
+
+```bash
+ROBOT_SSH_TARGET='vbot@<robot-wifi-ip>'
+ssh -N -T -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:8765:127.0.0.1:8765 "$ROBOT_SSH_TARGET"
+```
+
+The first `127.0.0.1:8765` is the computer's local listener. The second is the robot's
+loopback address and bridge port, reached from the SSH server. `-N -T` opens no remote
+shell and requests no terminal; it does not launch the bridge. A quiet terminal that
+keeps running is expected. Keep both terminals open.
+
+In Foxglove, choose **Foxglove WebSocket** and connect to `ws://127.0.0.1:8765`.
+`ws://localhost:8765` also works when `localhost` resolves to IPv4 loopback; use the
+explicit IPv4 URL if it resolves to `::1` instead. Do not connect to the Wi-Fi IP's
+8765 port for this workflow.
+
+If port 8765 is already used **on the computer**, choose another local port:
+
+```bash
+ssh -N -T -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:18765:127.0.0.1:8765 "$ROBOT_SSH_TARGET"
+```
+
+Then connect Foxglove to `ws://127.0.0.1:18765`; the device bridge still uses 8765.
+If the **device** port changes, update `--port` and the final port in `-L` together.
+Bind the local forward to `127.0.0.1`, not `0.0.0.0`, to keep it local to your computer.
+`ExitOnForwardFailure` detects failure to establish the forwarding listener; it does
+not prove that the remote bridge is running or that topics are producing data.
+
+### Check incoming messages
 
 Select an available channel in Raw Messages to inspect its decoded fields, then choose
 a suitable plotting or visualization panel. Channel discovery and actual message arrival
 are separate: check changing values/timestamps. Image rendering also depends on the
 message schema and supported encoding; the H.265 streams are compressed video, not raw RGB.
+For the small Wi-Fi selection, use `aorta/default/pub/bms_state` and
+`aorta/default/pub/imu_raw`. Expect decoded battery fields and updating IMU timestamps;
+an open connection or a channel name alone is not sufficient. To view additional topics,
+stop the bridge and adjust its includes using the topic list above, keeping
+`--host 127.0.0.1` for the tunnel. Obtain permission before adding audio or camera streams.
+The published configuration can also be used through the tunnel by changing its launch
+command to `--host 127.0.0.1`; it selects all topics described in section 2.
 
 ### Topic naming in Foxglove
 
@@ -183,16 +283,21 @@ type; it is not the topic name. A missing Schema does not rename the channel.
 
 ## 4. Stop and troubleshoot
 
-Press Ctrl+C in the bridge's device terminal to stop it. This foreground procedure does
-not configure autostart or modify system services.
+Disconnect Foxglove, then press Ctrl+C in the tunnel terminal, if used, and in the
+bridge's device terminal. Stopping the tunnel does not stop the bridge, and stopping
+the bridge does not close the tunnel. This foreground procedure does not configure
+autostart or modify system services.
 
 | Symptom | Next check |
 | --- | --- |
 | Executable not found | Device tool availability and PATH in the same shell |
 | Session/configuration error | Readable EDU session path and matching explicit configuration |
-| Cannot bind address | The address belongs to the robot's current network interface |
-| Address already in use | Choose an unused port and update the viewer URL |
+| Cannot bind address | For wired access, check the device interface address; for a tunnel, use `--host 127.0.0.1`, not the Wi-Fi entry IP |
+| Address already in use | Determine whether the computer or device port is occupied, then adjust the matching port and URL; do not stop unrelated processes |
 | Computer cannot connect | Device IP, cable/network route, chosen port and bridge process |
+| SSH tunnel reports `connect failed: Connection refused` | The bridge is running in the same SSH destination and listening on the loopback address/port at the right of `-L` |
+| SSH tunnel reports `administratively prohibited` | The selected SSH endpoint's forwarding policy; stop and contact support rather than changing device permissions or SSH service settings |
+| Tunnel stays open but Foxglove cannot connect | Use the local forwarded port on the same computer, try `127.0.0.1` instead of `localhost`, and confirm the remote bridge is still running |
 | Channel appears but has no samples | Producer activity and interface prerequisites; do not issue motion commands merely to generate data |
 | Raw messages arrive but a panel is empty | Message schema, encoding and panel support |
 | High load or delayed display | Remove unused includes and avoid simultaneous video variants; reconnect with a smaller topic set |

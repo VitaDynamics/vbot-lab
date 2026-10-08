@@ -578,17 +578,19 @@ class RepositoryChecks(unittest.TestCase):
         for suffix in (".md", ".zh-CN.md"):
             page = (REPO_ROOT / f"docs/guides/foxglove{suffix}").read_text()
             scripts = re.findall(r"```bash\n(.*?)```", page, re.S)
-            self.assertEqual(len(scripts), 3)
             variants.append(scripts)
             for script in scripts:
                 result = subprocess.run(["bash", "-n"], input=script, text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
-            published = scripts[1]
+            launches = [script for script in scripts if script.startswith("aorta-foxglove-bridge ")]
+            self.assertEqual(len(launches), 3)
+            published = next(script for script in launches if "--config " in script)
             for required in ("--config /opt/vita/aorta/edu/foxglove_bridge.yaml",
                              "--host 192.168.126.2", "--port 8765"):
                 self.assertIn(required, published)
             self.assertNotIn("--include", published)
-            launch = scripts[2]
+            launch = next(script for script in launches
+                          if "--include " in script and "--host 192.168.126.2" in script)
             topics = re.findall(r"--include ([^\s\\]+)", launch)
             self.assertEqual(len(topics), 46)
             self.assertEqual(len(set(topics)), 46)
@@ -596,9 +598,57 @@ class RepositoryChecks(unittest.TestCase):
             for required in ("--group default", "--host 192.168.126.2", "--port 8765",
                              "--zenoh-config /opt/vita/aorta/edu/edu_session.json5"):
                 self.assertIn(required, launch)
-            self.assertIn("export ZENOH_SESSION_CONFIG_URI=/opt/vita/aorta/edu/edu_session.json5", scripts[0])
+            setup = next(script for script in scripts if script.startswith("whoami\n"))
+            self.assertIn("export ZENOH_SESSION_CONFIG_URI=/opt/vita/aorta/edu/edu_session.json5", setup)
             self.assertIn("ws://192.168.126.2:8765", page)
         self.assertEqual(variants[0], variants[1])
+
+    def test_foxglove_wifi_tunnel_addresses_and_offline_commands(self):
+        for suffix in (".md", ".zh-CN.md"):
+            page = (REPO_ROOT / f"docs/guides/foxglove{suffix}").read_text()
+            scripts = re.findall(r"```bash\n(.*?)```", page, re.S)
+            login = next(script for script in scripts if '\nssh "$ROBOT_SSH_TARGET"\n' in script)
+            setup = next(script for script in scripts if script.startswith("whoami\n"))
+            launch = next(script for script in scripts if "--host 127.0.0.1" in script)
+            self.assertLess(scripts.index(login), scripts.index(setup))
+            self.assertLess(scripts.index(setup), scripts.index(launch))
+            self.assertIn("ROBOT_SSH_TARGET='vbot@<robot-wifi-ip>'", login)
+            self.assertEqual(re.findall(r"--include ([^\s\\]+)", launch), ["bms_state", "imu_raw"])
+            for required in ("--group default", "--port 8765",
+                             "--zenoh-config /opt/vita/aorta/edu/edu_session.json5",
+                             "--blacklist-full 'aorta/*/ctx/**'",
+                             "--blacklist-full 'aorta/*/sys/telemetry/**'",
+                             "--ctx-snapshot-interval-ms 0"):
+                self.assertIn(required, launch)
+            tunnels = [script for script in scripts if "ssh -N -T " in script]
+            self.assertEqual(len(tunnels), 2)
+            # Stub SSH: inspect expansion and argument boundaries, never connect.
+            stub = '''ROBOT_SSH_TARGET='vbot@<robot-wifi-ip>'
+ssh() { printf '%s\\n' "$@"; }
+'''
+            for script, local_port in zip(tunnels, (8765, 18765)):
+                self.assertLess(scripts.index(launch), scripts.index(script))
+                result = subprocess.run(["bash", "--noprofile", "--norc", "-c", stub + script],
+                                        env={"PATH": "/usr/bin"}, capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout.splitlines(), [
+                    "-N", "-T", "-o", "ExitOnForwardFailure=yes", "-L",
+                    f"127.0.0.1:{local_port}:127.0.0.1:8765", "vbot@<robot-wifi-ip>",
+                ])
+                self.assertIn(f"ws://127.0.0.1:{local_port}", page)
+            for value in ("ws://localhost:8765", "aorta/default/pub/bms_state",
+                          "aorta/default/pub/imu_raw", "connect failed: Connection refused",
+                          "administratively prohibited", "Ctrl+C"):
+                self.assertIn(value, page)
+            self.assertNotIn("StrictHostKeyChecking=no", page)
+            connection = (REPO_ROOT / f"docs/robots/quadruped-common/connection{suffix}").read_text()
+            self.assertIn(f"../../guides/foxglove{suffix}", document_links(connection))
+            guide_index = (REPO_ROOT / f"docs/guides/README{suffix}").read_text()
+            self.assertIn("Wi-Fi", guide_index)
+        self.assertNotIn("Do not use the computer's\n`localhost` for a bridge running on the robot.",
+                         (REPO_ROOT / "docs/guides/foxglove.md").read_text())
+        self.assertNotIn("bridge 在机器人上运行时，不要填写电脑的 `localhost`",
+                         (REPO_ROOT / "docs/guides/foxglove.zh-CN.md").read_text())
 
     def test_mapping_workflow_commands_match_and_use_json(self):
         documents = [(REPO_ROOT / f"docs/guides/mapping-localization{suffix}").read_text()

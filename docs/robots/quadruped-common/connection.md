@@ -184,5 +184,9 @@ Continue with the [development environment](../../getting-started/README.md),
 their documented execution environment and endpoint instead of substituting this address.
 A successful SSH login does not by itself verify SDK or API availability.
 
+For Foxglove viewing over Wi-Fi, use the robot's reachable Wi-Fi IP as the SSH entry
+and forward the bridge through a local tunnel. Follow [Foxglove live viewing](../../guides/foxglove.md)
+for the device-side listener, computer-side forwarding command and local WebSocket URL.
+
 Return to the [four-legged EDU guide](../foot_quadruped/README.md) or the
 [four-wheeled robot-dog reference](../wheel_quadruped/README.md).

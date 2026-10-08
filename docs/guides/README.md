@@ -6,7 +6,7 @@ For invocation choices and field mappings, see [direct services versus RCP](cont
 
 - [Agent integration](agent-integration.md): HTTP MCP connection, device Skill / AGENTS.md API injection, and troubleshooting.
 - [RCP DAG authoring](rcp-dag.md): complete Goal examples, preset calls and custom graphs; [preset catalog](rcp-presets.md), [command fields](../interfaces/rcp-commands.md), and independent [device resources](../resources/README.md).
-- [Foxglove live viewing](foxglove.md): device shell prerequisites, Aorta bridge startup, topic selection and WebSocket connection.
+- [Foxglove live viewing](foxglove.md): device shell prerequisites, Aorta bridge startup, topic selection, wired WebSocket access and Wi-Fi access through an SSH tunnel.
 - [Vbot Viewer](vbot-viewer.md): robot-model inspection, URDF editing/checks, local variants and export; no robot connection required for viewing.
 - [Mapping and localization](mapping-localization.md): Aorta interface checks, odometry, map creation/saving, localization, and completion criteria.
 - [User-program autostart](user-autostart.md): launch programs as vbot after reboot, configure the boot entry, check logs, and disable startup.
