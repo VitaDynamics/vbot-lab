@@ -33,6 +33,6 @@
     "meshes/vita_logo.STL"
   ],
   "textures": [],
-  "model_license": null,
+  "model_license": "Apache-2.0",
   "viewer_url": "https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU"
 }

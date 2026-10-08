@@ -26,7 +26,13 @@ package named `VbotBaboEDU`. Expected result: the loader resolves every mesh and
 Model poses, joint limits, inertials and meshes are descriptions for visualization and
 simulation, not robot commands or hardware measurements. These files are a snapshot; the
 [online model](https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU) can change independently
-(see the [Viewer guide](../../../docs/guides/vbot-viewer.md)). `model_license` is not declared yet.
+(see the [Viewer guide](../../../docs/guides/vbot-viewer.md)).
+
+## License
+
+The URDF files and STL meshes in this directory are provided by VitaDynamics under
+[Apache-2.0](../../../LICENSE), as recorded in `model.json`. Retain the applicable
+license and [NOTICE](../../../NOTICE) when redistributing these resources.
 
 For device development, use the [four-legged EDU guide](../../../docs/robots/foot_quadruped/README.md).
 For model questions or suggestions, see [Community & Support](../../../docs/community/README.md).
