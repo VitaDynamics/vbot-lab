@@ -164,5 +164,9 @@ timeout 10s ssh -i ~/.ssh/id_ed25519 \
 `192.168.126.2` 是电脑连接设备的 SSH 地址；调用其他接口时，请遵循各接口文档规定的
 执行环境与地址，不要直接替换为此地址。SSH 登录成功不等于 SDK 或 API 已验证可用。
 
+通过 Wi-Fi 使用 Foxglove 时，以电脑可访问的机器人 Wi-Fi IP 作为 SSH 入口，
+通过本地隧道转发 bridge。设备端监听、电脑端转发命令和本地 WebSocket 地址见
+[Foxglove 实时查看](../../guides/foxglove.zh-CN.md)。
+
 返回[四足 EDU 指南](../foot_quadruped/README.zh-CN.md)或
 [四轮机器狗参考](../wheel_quadruped/README.zh-CN.md)。

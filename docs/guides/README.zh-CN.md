@@ -6,7 +6,7 @@
 
 - [Agent 接入](agent-integration.zh-CN.md)：HTTP MCP 连接、设备端 Skill／AGENTS.md API 注入及排障。
 - [RCP DAG 编写](rcp-dag.zh-CN.md)：完整 Goal 示例、预设调用与自定义图；配套[预设目录](rcp-presets.zh-CN.md)、[节点字段参考](../interfaces/rcp-commands.zh-CN.md)与独立的[设备资源](../resources/README.zh-CN.md)。
-- [Foxglove 实时查看](foxglove.zh-CN.md)：设备 shell 前置、Aorta bridge 启动、topic 选择与 WebSocket 连接。
+- [Foxglove 实时查看](foxglove.zh-CN.md)：设备 shell 前置、Aorta bridge 启动、topic 选择、有线 WebSocket 直连与 Wi-Fi SSH 隧道连接。
 - [Vbot Viewer](vbot-viewer.zh-CN.md)：查看机器人模型、编辑／校验 URDF、保存本地变体并导出；查看时无需连接机器人。
 - [建图与定位](mapping-localization.zh-CN.md)：Aorta 接口检查、里程计、建图与保存、定位及完成条件。
 - [用户程序自启动](user-autostart.zh-CN.md)：重启后以 vbot 身份启动程序、配置开机入口、查看日志及停用。
