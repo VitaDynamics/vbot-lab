@@ -6,6 +6,7 @@ Before submitting a change, describe the developer problem it solves,
 the affected features, validation, and compatibility impact.
 
 See [CI and repository collaboration](.github/WORKFLOWS.md) for the current automated checks.
+Participation follows the [Code of conduct](CODE_OF_CONDUCT.md).
 
 For usage questions, application discussions and feature ideas, start with
 [Community & Support](docs/community/README.md). Use repository issues/PRs for concrete
@@ -31,6 +32,13 @@ The repository administrators are the maintenance team. They triage issues, revi
 contributions and coordinate compatibility changes. [CODEOWNERS](.github/CODEOWNERS)
 lists the reviewers for all repository paths; update it when administrator membership changes.
 Review routing does not grant repository permissions or replace configured merge requirements.
+
+Create a topic branch and open a PR against `main`; do not push directly to `main`.
+Merge requires approval from another listed maintainer, passing `repository-layout`
+checks against the current base, and resolved review discussions. New reviewable commits
+require renewed approval. Maintainers merge with **Squash and merge**; administrators
+follow the same protection rules. See the [collaboration workflow](.github/WORKFLOWS.md)
+for the checks and version-tag policy.
 
 Report security concerns privately using [Security](SECURITY.md), not a public issue or PR.
 

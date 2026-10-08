@@ -16,7 +16,8 @@ from urllib.parse import unquote, urlsplit
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = (
     "README.md", "AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md",
-    "LICENSE", "NOTICE",
+    "LICENSE", "NOTICE", "CODE_OF_CONDUCT.md", ".github/CODEOWNERS",
+    ".github/ISSUE_TEMPLATE/bug_report.md", ".github/ISSUE_TEMPLATE/documentation.md",
     "MODULE.bazel", "MODULE.bazel.lock", "BUILD.bazel", ".bazelrc", ".bazelversion",
     "docs/README.md", "docs/overview/README.md", "docs/getting-started/README.md",
     "docs/hardware/README.md", "docs/hardware/sensors.md",
@@ -98,8 +99,8 @@ def translation_path(path):
 def language_navigation(path):
     target = translation_path(path)
     link = target.name
-    # PR template links must also work after GitHub inserts them into a PR body.
-    if path.name.startswith("pull_request_template."):
+    # Template links must also work after GitHub inserts them into an issue or PR.
+    if path.name.startswith("pull_request_template.") or path.parent.name == "ISSUE_TEMPLATE":
         link = "https://github.com/VitaDynamics/vbot-lab/blob/main/" + target.relative_to(REPO_ROOT).as_posix()
     if path.name.endswith(".zh-CN.md"):
         return f'<p align="center"><a href="{link}">English</a> | 中文</p>'
@@ -114,6 +115,64 @@ def document_links(content):
 
 
 class RepositoryChecks(unittest.TestCase):
+    def test_collaboration_templates_and_code_of_conduct(self):
+        for suffix in (".md", ".zh-CN.md"):
+            conduct = (REPO_ROOT / f"CODE_OF_CONDUCT{suffix}").read_text()
+            self.assertIn("mailto:vbot-edu@vbot.cn", document_links(conduct))
+            self.assertIn(f"SECURITY{suffix}", document_links(conduct))
+            contributing = (REPO_ROOT / f"CONTRIBUTING{suffix}").read_text()
+            self.assertIn(f"CODE_OF_CONDUCT{suffix}", document_links(contributing))
+            for name in ("bug_report", "documentation"):
+                path = REPO_ROOT / f".github/ISSUE_TEMPLATE/{name}{suffix}"
+                body = path.read_text()
+                frontmatter = re.match(r"\A---\n(.*?)\n---\n", body, re.S)
+                self.assertIsNotNone(frontmatter)
+                # These templates intentionally use only simple scalar YAML metadata.
+                metadata = dict(line.split(": ", 1) for line in frontmatter[1].splitlines())
+                self.assertEqual(set(metadata), {"name", "about", "title", "labels", "assignees"})
+                self.assertTrue(metadata["name"].strip())
+                self.assertTrue(metadata["about"].strip())
+                self.assertIn("mailto:vbot-edu@vbot.cn", document_links(body))
+                self.assertTrue(any(link.startswith("https://forum.vbot.cn/")
+                                    for link in document_links(body)))
+                self.assertEqual(len(re.findall(r"^- \[ \]", body, re.M)), 3)
+                self.assertIn(language_navigation(path), body)
+
+    def test_collaboration_checks_and_merge_instructions(self):
+        workflow = (REPO_ROOT / ".github/workflows/scaffold.yml").read_text()
+        self.assertIn("permissions:\n  contents: read\n", workflow)
+        self.assertIn("persist-credentials: false", workflow)
+        self.assertIn("  repository-layout:", workflow)
+        self.assertIn("runs-on: ubuntu-22.04", workflow)
+        self.assertNotIn("pull_request_target", workflow)
+        self.assertNotIn("secrets.", workflow)
+        self.assertNotIn("self-hosted", workflow)
+        actions = re.findall(r"uses:\s+(\S+)", workflow)
+        self.assertTrue(actions)
+        for action in actions:
+            self.assertRegex(action, r"^[\w./-]+@[0-9a-f]{40}$")
+        commands = re.findall(r"run:\s+(python3 tests/\S+\.py)", workflow)
+        self.assertEqual(len(commands), 6)
+        for suffix in (".md", ".zh-CN.md"):
+            guide = (REPO_ROOT / f".github/WORKFLOWS{suffix}").read_text()
+            self.assertEqual(re.findall(r"^python3 tests/\S+\.py$", guide, re.M), commands)
+            for value in ("repository-layout", "Squash and merge", "`main`", "`V*`", "`edu-sdk-*`"):
+                self.assertIn(value, guide)
+            self.assertIn("CODEOWNERS", document_links(guide))
+
+    def test_model_and_mounting_resource_licenses(self):
+        notice = (REPO_ROOT / "NOTICE").read_text()
+        for directory in ("assets/robots/foot_quadruped/",
+                          "docs/hardware/quadruped-common/assets/back-mounting/"):
+            self.assertIn(directory, notice)
+        for suffix in (".md", ".zh-CN.md"):
+            for name in ("assets/robots/foot_quadruped/README",
+                         "docs/hardware/quadruped-common/back-mounting"):
+                content = (REPO_ROOT / f"{name}{suffix}").read_text()
+                self.assertIn("Apache-2.0", content)
+                self.assertIn("../../../LICENSE", document_links(content))
+                self.assertIn("../../../NOTICE", document_links(content))
+
     def test_security_contact_and_maintainer_routing(self):
         for suffix in (".md", ".zh-CN.md"):
             security = (REPO_ROOT / f"SECURITY{suffix}").read_text()
@@ -257,7 +316,7 @@ class RepositoryChecks(unittest.TestCase):
         self.assertEqual(metadata["model_id"], "VbotBaboEDU")
         self.assertEqual(metadata["availability"], "bundled")
         self.assertEqual(metadata["urdf"], "urdf/VbotBaboEDU.urdf")
-        self.assertIsNone(metadata["model_license"])
+        self.assertEqual(metadata["model_license"], "Apache-2.0")
         self.assertEqual(metadata["textures"], [])
         self.assertEqual(metadata["viewer_url"], "https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU")
         self.assertFalse((model / "vbot_babo_edu").exists())

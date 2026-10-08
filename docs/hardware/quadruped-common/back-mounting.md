@@ -29,6 +29,10 @@ file availability, see [robot models](../../../assets/robots/README.md).
 The engineering drawings retain their original annotations; the tables below
 explain the key dimensions and Chinese installation callouts in English.
 
+The PDF drawings, STEP model and JPEG installation illustration linked above are
+provided by VitaDynamics under [Apache-2.0](../../../LICENSE). Retain the applicable
+license and [NOTICE](../../../NOTICE) when redistributing them.
+
 ## Dimensions at a glance
 
 All dimensions below are in **mm**. Use the PDF's dimension lines to identify the

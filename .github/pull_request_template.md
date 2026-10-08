@@ -11,3 +11,5 @@
 - [ ] English and Chinese documents are updated together, with matching commands and working links
 - [ ] Shared reports and examples follow the security guidance
 - [ ] Planned features are not described as released or device-verified
+- [ ] Changed live examples were run on a supported robot through every published language and execution path, or this PR changes no live examples
+- [ ] I have the right to contribute these files and retained applicable license and attribution notices

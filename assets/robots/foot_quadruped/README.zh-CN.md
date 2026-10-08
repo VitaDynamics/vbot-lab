@@ -23,7 +23,13 @@
 
 模型姿态、关节限位、惯性参数与网格用于可视化和仿真，属于描述数据，不是机器人控制指令或硬件实测值。
 这些文件是快照，[在线模型](https://vbot-viewer.vitarobot.cc/?model=VbotBaboEDU)可能独立更新
-（参见 [Viewer 指南](../../../docs/guides/vbot-viewer.zh-CN.md)）。`model_license` 尚未声明。
+（参见 [Viewer 指南](../../../docs/guides/vbot-viewer.zh-CN.md)）。
+
+## 许可
+
+本目录的 URDF 文件和 STL 网格由 VitaDynamics 按 [Apache-2.0](../../../LICENSE) 提供，
+`model.json` 中记录了对应许可。再分发这些资源时，请保留适用的许可证和
+[NOTICE](../../../NOTICE)。
 
 设备开发见[四足 EDU 指南](../../../docs/robots/foot_quadruped/README.zh-CN.md)。
 模型问题与建议可按[社区与支持](../../../docs/community/README.zh-CN.md)反馈。
