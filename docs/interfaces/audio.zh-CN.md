@@ -2,6 +2,9 @@
 
 <p align="center"><a href="audio.md">English</a> | 中文</p>
 
+尚未发布的自定义 PCM 播放与语音策略扩展，见[PCM 播放与语音策略](audio-playback-control.zh-CN.md)。
+它们不属于下文的只读输入接口，也不表示每个 V1.6.0 构建都已支持。
+
 本功能域统一包含音频帧、UWB 输入结束、识别文本与语音事件。
 
 Python SDK 实现见 [audio Recipe](../../recipes/audio/README.zh-CN.md)，包含源码、Bazel 目标、离线预览与显式设备运行。接口语义以下文为准。

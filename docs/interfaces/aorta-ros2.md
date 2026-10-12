@@ -25,6 +25,11 @@ see [Mapping and localization](../guides/mapping-localization.md).
 
 ## Use by interface family
 
+The unreleased `/audio/play_pcm` command topic and `/speech_control` service
+are documented in [PCM playback and speech policy](audio-playback-control.md).
+Their candidate mappings require a coordinated Schema, ACL and Bridge update;
+the released topic counts below do not include these additions.
+
 Each family explains purpose, data meaning, reading flow, and recovery. Select a family for
 the task, then inspect only the routes it needs; individual topics are not separate
 capability-check entries.

@@ -22,6 +22,10 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 
 ## 按功能域使用
 
+尚未发布的 `/audio/play_pcm` 写入 topic 和 `/speech_control` service，见
+[PCM 播放与语音策略](audio-playback-control.zh-CN.md)。候选映射需要配套更新 Schema、ACL
+及 Bridge；下文的已发布 topic 数量不包含这两项扩展。
+
 每个功能域统一说明用途、数据含义、读取流程与异常处理。按任务选择一个入口，
 再只检查需要的具体路由，不将每条 topic 拆成独立能力检查项。
 

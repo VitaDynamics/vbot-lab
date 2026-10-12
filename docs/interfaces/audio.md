@@ -4,6 +4,10 @@
 
 This family groups audio frames, UWB input completion, recognized text, and voice events.
 
+For the unreleased custom PCM playback and speech-policy additions, see
+[PCM playback and speech policy](audio-playback-control.md). They are not part
+of the read-only input routes below or a guarantee of every V1.6.0 build.
+
 For a Python SDK implementation, see the [audio Recipe](../../recipes/audio/README.md): source, Bazel target, offline preview and explicit device execution. The interface semantics below remain authoritative.
 Choose the representation your application needs: use recognized text for a text-triggered
 application, and audio frames only when implementing your own audio processing.
