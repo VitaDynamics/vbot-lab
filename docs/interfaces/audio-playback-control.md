@@ -79,7 +79,7 @@ empty frame or a synthetic zero/marker frame. A gap may split playback into
 separate sessions. Playback can interact with the robot's existing audio
 arbitration and interrupt another channel.
 
-This topic is not a playback Action: it has no per-request acceptance, result,
+This topic is not a playback Action: it has no per-request acknowledgement, result,
 cancel or end-of-speaker acknowledgement. Publisher success is not proof that
 all audio was played. `/uwb/audio_done` concerns input transfer and does not
 confirm this playback. Do not automatically replay the whole clip after an
