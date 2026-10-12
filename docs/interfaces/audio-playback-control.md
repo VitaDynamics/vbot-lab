@@ -11,6 +11,11 @@ does not establish support. No minimum released firmware or SDK version is
 assigned yet. The checked-in [Schema snapshot](../../schemas/README.md) remains
 the published release snapshot until the matching artifacts are released.
 
+The upstream interface-definition and naming changes have been merged. That
+source milestone does not publish new bindings or establish firmware support:
+the matching public Schema pack/bindings, Bridge bundle and application build
+must still be released together.
+
 | Function | Aorta route | Primitive / developer direction | Aorta type | Candidate ROS 2 mapping |
 | --- | --- | --- | --- | --- |
 | Play user-provided PCM | `/audio/play_pcm` | pub/sub — publish only | `aorta.topic.audio.PcmPlayback` | `/audio/play_pcm`, `aorta_msgs/msg/PcmPlayback` |

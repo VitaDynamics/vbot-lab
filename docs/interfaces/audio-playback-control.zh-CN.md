@@ -9,6 +9,9 @@
 Bridge 包。仅凭 V1.6.0 版本号不能判断已支持；目前尚未指定最低已发布固件或 SDK
 版本。[已入库的 Schema](../../schemas/README.zh-CN.md) 仍保持已发布快照，待配套产物发布后同步。
 
+上游接口定义与命名变更已经合入。这是源码进展，不代表新绑定已发布或固件已经支持；
+仍需配套发布公开 Schema 包／绑定、Bridge 包与机器人应用构建。
+
 | 功能 | Aorta 路由 | 原语／开发者方向 | Aorta 类型 | 候选 ROS 2 映射 |
 | --- | --- | --- | --- | --- |
 | 播放用户提供的 PCM | `/audio/play_pcm` | pub/sub — 仅发布 | `aorta.topic.audio.PcmPlayback` | `/audio/play_pcm`，`aorta_msgs/msg/PcmPlayback` |
