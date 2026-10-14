@@ -4,20 +4,21 @@
 
 The Aorta Python SDK is distributed as [vbot-lab release](https://github.com/VitaDynamics/vbot-lab/releases)
 assets. SDK packages must currently be downloaded from GitHub Releases; cloning this
-repository does not install them. Downloading requires network access, and installation
-also needs access to PyPI for dependencies missing from the release. This page installs
+repository does not install them. Downloading requires network access; the four required
+wheels in `edu-sdk-2026.10.14` install locally without contacting PyPI. This page installs
 the SDK, connects an EDU client to the robot, and receives live robot state. Check the
 [compatibility matrix](../../../docs/compatibility.md) for the supported robot software
 image, and the release's `EDU_SDK_MANIFEST.json` for the version pairing.
 
-Install the Python wheels from [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24).
+Install the Python wheels from [edu-sdk-2026.10.14](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14).
 The release manifest, not identical version numbers, defines the pairing:
 
 | Distribution | Version | Purpose |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.9.23` | `import aorta`; Python API and platform-specific native runtime |
-| `aorta-msgs` | `2026.9.23` | Base generated messages and schema metadata |
-| `vbot-edu-msgs` | `2026.9.24` | EDU generated messages and schema metadata |
+| `aorta-sdk` | `2026.10.12` | `import aorta`; Python API and platform-specific native runtime |
+| `aorta-msgs` | `2026.10.12` | Base generated messages and schema metadata |
+| `vbot-edu-msgs` | `2026.10.13` | EDU generated messages and schema metadata |
+| `flatbuffers` | `25.9.23` | Runtime for generated FlatBuffers messages |
 
 The Aorta and EDU wheels carry their `LICENSE` and `NOTICE` under `.dist-info/licenses/`.
 The FlatBuffers wheel from PyPI carries no license file, so the release attaches its upstream
@@ -30,35 +31,37 @@ See [compatibility](../../../docs/compatibility.md).
 
 ## 1. Choose the release wheels
 
-From `edu-sdk-2026.9.24`, download these three wheels for the selected platform,
-plus `SHA256SUMS` and `EDU_SDK_MANIFEST.json`:
+From `edu-sdk-2026.10.14`, download these four wheels for the selected platform,
+plus `SHA256SUMS`, `EDU_SDK_MANIFEST.json` and `flatbuffers-25.9.23.LICENSE`:
 
 | Wheel | Role |
 | --- | --- |
 | `aorta_sdk-<ver>-py3-none-<platform>.whl` | SDK package and native core for one platform |
 | `aorta_msgs-<ver>-py3-none-any.whl` | Aorta message types |
 | `vbot_edu_msgs-<ver>-py3-none-any.whl` | EDU message types and generated schema helpers |
+| `flatbuffers-25.9.23-py2.py3-none-any.whl` | FlatBuffers runtime dependency |
 
 Choose the `aorta_sdk` wheel for the machine — `linux_aarch64` (S100), `linux_x86_64`, or
 `macosx_11_0_arm64`. Python 3.10 or newer is required. The `linux_*` tags are broad: those
 two wheels are Ubuntu/glibc builds.
 
-`vbot_edu_msgs` also needs `flatbuffers`. The release attaches the `flatbuffers` 25.12.19
-wheel as well, so the four wheels install without network access; the commands below take
-`flatbuffers==25.12.19` from PyPI instead. `EDU_SDK_MANIFEST.json` records every wheel
+`vbot_edu_msgs` also needs `flatbuffers`. The release attaches the `flatbuffers` 25.9.23
+wheel as well, so the commands below install all four downloaded wheels without package-index
+access. `EDU_SDK_MANIFEST.json` records every wheel
 version under `pairing.wheels`.
 
-## 2. Install with network access
+## 2. Install the downloaded wheels
 
-Keep binaries out of Git. Put the three matching wheels, `SHA256SUMS`, and
-`EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.9.24/`. In the environment that
-will run Python, ensure Python 3.10+, venv support, and access to PyPI are available.
-From the parent of `artifacts/`, run on Linux:
+Keep binaries out of Git. Put the four matching wheels, `SHA256SUMS`, and
+`EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.10.14/`. In the environment that
+will run Python, ensure Python 3.10+ and venv support are available.
+For application development use the [development container](../../../docker/README.md).
+From the parent of `artifacts/`, run on Linux; stop if any command fails:
 
 ```bash
 uname -m
 python3 --version
-cd artifacts/edu-sdk-2026.9.24
+cd artifacts/edu-sdk-2026.10.14
 sha256sum --ignore-missing -c SHA256SUMS
 cd ../..
 python3 -m venv .venv
@@ -66,28 +69,28 @@ python3 -m venv .venv
 unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 SDK_PLATFORM=linux_x86_64
-python -m pip install \
-  "artifacts/edu-sdk-2026.9.24/aorta_sdk-2026.9.23-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.9.24/aorta_msgs-2026.9.23-py3-none-any.whl \
-  artifacts/edu-sdk-2026.9.24/vbot_edu_msgs-2026.9.24-py3-none-any.whl \
-  "flatbuffers==25.12.19"
+python -m pip install --no-index \
+  "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl
 python -m pip check
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; print("SDK imports OK")'
 ```
 
 Set `SDK_PLATFORM=linux_aarch64` **instead** on an ARM64 robot. For macOS arm64 use
-`macosx_11_0_arm64` and an available SHA-256 verifier. Check that all three SDK wheel checksums
+`macosx_11_0_arm64` and an available SHA-256 verifier. Check that all four wheel checksums
 passed; missing files are ignored by the command above, not installed implicitly.
 If Python, venv support, or native dependencies are unavailable, resolve that environment
 first. Do not copy a workstation venv or x86_64 native libraries to the robot.
 
-This command installs the three SDK packages from local Release downloads and fetches
-FlatBuffers from PyPI. Do not add `--no-index` unless all required dependencies have
-already been prepared locally. A failed download or missing dependency must be resolved
-before continuing; cached packages are not evidence of a complete offline release.
+This command installs the three SDK packages and FlatBuffers from the same Release's
+local downloads. `--no-index` prevents fallback to a package index. If a file is missing
+or its checksum fails, obtain the matching Release asset before continuing.
+Keep the attached FlatBuffers license when redistributing the wheel.
 
 For a robot without Internet access, follow [Python deployment](../../../docs/development/python-deployment.md):
-first download the ARM64 SDK wheels and missing dependencies on a connected workstation,
+first download all four required wheels for the ARM64 device on a connected workstation,
 then transfer the complete wheelhouse. Only the installation stage on that prepared
 device can run offline; the initial download/preparation still requires a network.
 
@@ -328,7 +331,7 @@ bulk message-vector extraction; include its architecture-matching wheel in the w
 
 From the workstation/container checkout root, Bazel 7.6.1 builds the Python entry points. A build does not
 install wheels or package a cross-platform runtime. Select the interpreter containing
-the matching wheel trio explicitly:
+the four matching wheels explicitly:
 
 ```bash
 bazel build //recipes/...

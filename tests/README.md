@@ -10,8 +10,9 @@ python3 tests/check_schemas.py
 python3 tests/test_agent_workspace.py
 python3 tests/test_recipes.py
 python3 tests/test_family_recipes.py
+python3 tests/test_release.py
 bazel build //:repository_files //recipes/...
-bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:recipe_test
+bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:recipe_test //tests:release_configuration_test
 ```
 
 ## Repository and documentation
@@ -33,8 +34,8 @@ Documented SSH / HTTP commands are inspected as text or syntax, never executed a
 Skill discovery aliases are excluded from duplicate document traversal; canonical `skills/`
 documents are checked once.
 
-Every tracked text file is checked for private network addresses, workstation paths, device
-host names and private repository names, and no session configuration, credential dictionary
+Every tracked text file is checked for sensitive network addresses, workstation paths, device
+host names and non-distributable identifiers, and no session configuration, credential dictionary
 or key file may be tracked. `tests/check_schemas.py` checks that `schemas/ros2/` holds exactly
 the definitions the public routes in `routes.json` use, plus the types they reference and the
 constant holders that document their values, and that `MANIFEST.json` matches the tree.
@@ -63,6 +64,16 @@ selection in Codex / Claude Code. They are not run by the deterministic test sui
 The offline suite does not launch harness sessions, SDK applications, containers, or device programs.
 
 Ordinary external PRs must not trigger real-device tests.
+
+## Release configuration
+
+`test_release.py` checks the [release configuration](../catalog/release.md) against
+robot profiles, capability metadata, Recipe version guards, the C++ ABI import,
+generated Schema metadata, SDK guides, Compose and Bazel. It also covers unfilled
+fields, iteration branch/tag pairing, invalid inputs, published-manifest comparisons
+and file-hash failures using local synthetic fixtures. It does not download assets,
+pull images, verify live devices or publish anything; a consistent draft is allowed
+in ordinary CI. Use `--require-complete` explicitly to reject unfilled release fields.
 
 ## Recipes and release SDK
 

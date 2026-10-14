@@ -4,14 +4,14 @@
 
 - 构建标识：`foot_quadruped`。
 - EDU 范围：当前唯一纳入发布范围的设备类型。
-- 适配机器人应用版本：`V1.6.0`。
+- 适配机器人应用版本：`V1.6.0-10`。
 - 已有指南：连接、shell 配置、硬件、SLAM 及 Agent 接口。已有 Python／C++ 示例程序，组件可用性见兼容矩阵。
 
 ## 开发入口
 
 - [Vbot Viewer](../../guides/vbot-viewer.zh-CN.md)与[模型资源](../../../assets/robots/foot_quadruped/README.zh-CN.md)：可在线查看模型，也可在本地加载随仓库提供的 URDF 与网格。
 
-- [两类机器狗共用的有线连接与 SSH 登录指南](../quadruped-common/connection.zh-CN.md)：连接转接头、设置电脑网卡，并使用 `vbot` 账户登录。
+- [两类机器狗共用的有线／Wi-Fi 连接与 SSH 登录指南](../quadruped-common/connection.zh-CN.md)：通过网线连接，或用手机 App 配网并从路由器查询设备 IP，再使用 `vbot` 账户登录。
 - [设备 shell 配置](../../getting-started/device-environment.zh-CN.md)与 [Aorta／ROS 2 兼容接口](../../interfaces/aorta-ros2.zh-CN.md)：SSH 登录后，在设备终端配置 `vbot` 环境并检查 CLI 访问，无需等待 SDK 接入。
 - [两类机器狗共用的传感器规格](../../hardware/quadruped-common/sensors.zh-CN.md)。
 - [两类机器狗共用的背部安装尺寸与机械臂转接板](../../hardware/quadruped-common/back-mounting.zh-CN.md)：结构尺寸、CAD 文件与紧固件参考。

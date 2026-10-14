@@ -5,7 +5,7 @@
 通过[能力索引](../../catalog/README.zh-CN.md)选择相关接口并检查发布范围。
 能力索引引用本章节的契约，不证明设备在线可用。
 
-接口参考统一适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0**，
+接口参考统一适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-10**，
 组件配套与配置限制见[兼容矩阵](../compatibility.zh-CN.md)。
 
 ## Agent 扩展接口

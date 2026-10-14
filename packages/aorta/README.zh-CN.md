@@ -23,23 +23,23 @@ SDK 的包名、导入路径及 API 契约仍沿用 Aorta。
 `linux_aarch64`、`linux_x86_64` 或 `macosx_11_0_arm64`——以及 `aorta_msgs`、
 `vbot_edu_msgs`。SDK 下载需要联网。
 
-`vbot_edu_msgs` 还依赖 `flatbuffers`；`edu-sdk-2026.9.24` Release 附带 `flatbuffers`
-25.12.19 wheel。按 [Aorta Python SDK 指南](python/README.zh-CN.md)在专用 venv 中安装
-SDK wheel，`flatbuffers==25.12.19` 可从 PyPI 或 Release 获取。
+`vbot_edu_msgs` 还依赖 `flatbuffers`；`edu-sdk-2026.10.14` Release 附带 `flatbuffers`
+25.9.23 wheel。按 [Aorta Python SDK 指南](python/README.zh-CN.md)在专用 venv 中安装
+同一 Release 的全部四个 wheel，安装时不访问包索引。
 该指南还介绍了无互联网设备的依赖准备、连接方式与可运行示例。
 
 ### C++
 
 Bazel 示例、配套版本、运行库部署及可选相机解码见 [C++ 指南](cpp/README.zh-CN.md)。
 
-将 `aorta-cpp-sdk-<ver>-abi12-ubuntu22.04-<arch>.tar.zst` 与
+将 `aorta-cpp-sdk-<ver>-abi13-ubuntu22.04-<arch>.tar.zst` 与
 `aorta-edu-schema-pack-<ver>-v4.tar.zst` 分别解压到各自目录；配置时将
 `CMAKE_PREFIX_PATH` 指向 SDK 的 `share/cmake` 目录，并把 schema pack 的 `include/`
 目录加入头文件搜索路径：
 
 ```bash
 mkdir -p sdk pack
-tar --zstd -xf aorta-cpp-sdk-<ver>-abi12-ubuntu22.04-<arch>.tar.zst -C sdk
+tar --zstd -xf aorta-cpp-sdk-<ver>-abi13-ubuntu22.04-<arch>.tar.zst -C sdk
 tar --zstd -xf aorta-edu-schema-pack-<ver>-v4.tar.zst -C pack
 ```
 
@@ -53,7 +53,7 @@ tar --zstd -xf aorta-edu-schema-pack-<ver>-v4.tar.zst -C pack
 cmake_minimum_required(VERSION 3.16)
 project(edu_bms_roundtrip LANGUAGES CXX)
 
-find_package(Aorta 12 CONFIG REQUIRED)
+find_package(Aorta 13 CONFIG REQUIRED)
 
 add_executable(edu_bms_publisher publisher.cc)
 target_compile_features(edu_bms_publisher PRIVATE cxx_std_17)
@@ -66,8 +66,8 @@ target_include_directories(edu_bms_subscriber PRIVATE "${EDU_SCHEMA_INCLUDE}")
 target_link_libraries(edu_bms_subscriber PRIVATE Aorta::cpp)
 ```
 
-`12` 请求压缩包名与版本文件所标注的 Core ABI 代际。从 Aorta 2026.9.23 起，不带版本号的
-`find_package(Aorta CONFIG REQUIRED)` 同样可用；更早的压缩包必须保留 `12`。
+`13` 选择当前压缩包与版本文件标注的 Core ABI 代际。
+本版本也支持不带版本号的 `find_package(Aorta CONFIG REQUIRED)`。
 
 `publisher.cc`：
 
@@ -152,7 +152,7 @@ cmake --build build -j2
 LD_LIBRARY_PATH="$PWD/sdk/lib" ldd build/edu_bms_subscriber
 ```
 
-`ldd` 必须从解压出的 `sdk/lib` 解析到 `libaorta_core.so.12` 与 `libaorta_cpp.so`。
+`ldd` 必须从解压出的 `sdk/lib` 解析到 `libaorta_core.so.13` 与 `libaorta_cpp.so`。
 每次运行二进制时都要设置 `LD_LIBRARY_PATH="<sdk>/lib"`，以便加载器找到这两个库。
 
 配合 [Aorta Python SDK](python/README.zh-CN.md#5-无机器人开发)中的本地路由器与客户端
@@ -172,7 +172,7 @@ RECEIVED sensor_timestamp_ns=987654321 voltage_mv=49500
 ```
 
 在机器人上使用随设备交付的会话配置。S100 镜像自带 GCC 11.4 但没有 CMake，因此请在工作站
-构建 aarch64 二进制，并把可执行文件连同 `libaorta_core.so.12`、`libaorta_cpp.so` 复制到
+构建 aarch64 二进制，并把可执行文件连同 `libaorta_core.so.13`、`libaorta_cpp.so` 复制到
 机器人上的用户目录：
 
 ```bash

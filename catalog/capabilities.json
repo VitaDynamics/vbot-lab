@@ -4,15 +4,15 @@
   "sdk": {
     "name": "Aorta Python SDK",
     "integration": "integrated",
-    "version": "2026.9.23",
+    "version": "2026.10.12",
     "python_import": "aorta",
     "reference": "packages/aorta/python/README.md",
-    "release": "edu-sdk-2026.9.24",
-    "edu_messages_version": "2026.9.24",
+    "release": "edu-sdk-2026.10.14",
+    "edu_messages_version": "2026.10.13",
     "cpp": {
-      "version": "2026.9.23",
-      "abi": 12,
-      "schema_pack": "2026.9.24-v4",
+      "version": "2026.10.12",
+      "abi": 13,
+      "schema_pack": "2026.10.13-v4",
       "reference": "packages/aorta/cpp/README.md"
     }
   },
@@ -163,7 +163,7 @@
       "tool": null,
       "recipe": "recipes/audio/README.md",
       "requires_sdk": false,
-      "effect": "device_read_only",
+      "effect": "depends_on_operation",
       "minimum_firmware": null,
       "verification": "documentation_only",
       "implementations": {

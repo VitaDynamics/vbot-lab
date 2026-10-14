@@ -9,7 +9,7 @@
 VBOT Lab 汇集面向任务的 Skills、能力索引、Aorta Python SDK、接口定义和参考程序，
 用于开发机器人应用。
 
-当前适配的机器人应用版本：**V1.6.0**，适用于 `foot_quadruped` EDU。
+当前适配的机器人应用版本：**V1.6.0-10**，适用于 `foot_quadruped` EDU。
 SDK 与平台配套见[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 ## 与 Agent 开始开发
@@ -60,7 +60,8 @@ bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:r
 详见[开发工具](tools/README.zh-CN.md)。
 
 环境搭建见[容器指南](docker/README.zh-CN.md)和[编辑器集成](.devcontainer/README.zh-CN.md)。
-连接机器狗时使用保留接线图的[共用有线连接指南](docs/robots/quadruped-common/connection.zh-CN.md)。
+连接机器狗时使用[共用有线／Wi-Fi 连接指南](docs/robots/quadruped-common/connection.zh-CN.md)，
+其中保留有线接线图，并补充手机 App 配网与路由器 IP 查询步骤。
 连接及设备操作属于单独明确请求的步骤。
 
 登录后按[设备 shell 配置与检查](docs/getting-started/device-environment.zh-CN.md)使用 Aorta

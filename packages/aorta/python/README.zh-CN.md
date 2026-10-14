@@ -4,18 +4,19 @@
 
 Aorta Python SDK 通过 [vbot-lab Release](https://github.com/VitaDynamics/vbot-lab/releases)
 附件分发。目前 SDK 安装包需要从 GitHub Releases 下载，克隆仓库不会自动安装 SDK。
-下载需要联网，安装时也需要访问 PyPI 获取 Release 中缺失的依赖。本页说明如何安装 SDK、让 EDU 客户端连接机器人并
+下载需要联网；`edu-sdk-2026.10.14` 的四个必需 wheel 可在本地安装，无需访问 PyPI。本页说明如何安装 SDK、让 EDU 客户端连接机器人并
 接收实时状态。支持的机器人镜像见[兼容矩阵](../../../docs/compatibility.zh-CN.md)，
 版本配对见 Release 内的 `EDU_SDK_MANIFEST.json`。
 
-从 [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)
+从 [edu-sdk-2026.10.14](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14)
 安装 Python wheel。版本配套以发布清单为准，而不是要求各包版本号相同：
 
 | 发行包 | 版本 | 用途 |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.9.23` | `import aorta`；Python API 与平台相关的原生运行库 |
-| `aorta-msgs` | `2026.9.23` | 基础消息的生成代码与 Schema 元数据 |
-| `vbot-edu-msgs` | `2026.9.24` | EDU 消息的生成代码与 Schema 元数据 |
+| `aorta-sdk` | `2026.10.12` | `import aorta`；Python API 与平台相关的原生运行库 |
+| `aorta-msgs` | `2026.10.12` | 基础消息的生成代码与 Schema 元数据 |
+| `vbot-edu-msgs` | `2026.10.13` | EDU 消息的生成代码与 Schema 元数据 |
+| `flatbuffers` | `25.9.23` | 生成的 FlatBuffers 消息所需运行库 |
 
 Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 `NOTICE`。
 PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上游许可证文本
@@ -27,33 +28,35 @@ PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上�
 
 ## 1. 选择 Release wheel
 
-从 `edu-sdk-2026.9.24` 下载所选平台的以下三个 wheel，
-以及 `SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`：
+从 `edu-sdk-2026.10.14` 下载所选平台的以下四个 wheel，
+以及 `SHA256SUMS`、`EDU_SDK_MANIFEST.json` 与 `flatbuffers-25.9.23.LICENSE`：
 
 | Wheel | 用途 |
 | --- | --- |
 | `aorta_sdk-<ver>-py3-none-<platform>.whl` | 对应平台的 SDK 包与原生运行库 |
 | `aorta_msgs-<ver>-py3-none-any.whl` | Aorta 消息类型 |
 | `vbot_edu_msgs-<ver>-py3-none-any.whl` | EDU 消息类型与生成的 schema 辅助模块 |
+| `flatbuffers-25.9.23-py2.py3-none-any.whl` | FlatBuffers 运行时依赖 |
 
 按机器选择 `aorta_sdk` wheel——`linux_aarch64`（S100）、`linux_x86_64` 或
 `macosx_11_0_arm64`。需要 Python 3.10 或更高版本。`linux_*` 标签范围较宽：这两个 wheel
 是 Ubuntu/glibc 构建。
 
-`vbot_edu_msgs` 还依赖 `flatbuffers`。Release 同时附带 `flatbuffers` 25.12.19 wheel，
-四个 wheel 可以离线安装；下方命令改为从 PyPI 获取 `flatbuffers==25.12.19`。
+`vbot_edu_msgs` 还依赖 `flatbuffers`。Release 同时附带 `flatbuffers` 25.9.23 wheel，
+下方命令直接安装全部四个已下载 wheel，不访问包索引。
 `EDU_SDK_MANIFEST.json` 的 `pairing.wheels` 记录所有 wheel 的版本。
 
-## 2. 联网安装
+## 2. 安装已下载的 wheel
 
-不要把二进制加入 Git。将三个配套 wheel、`SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`
-放到 `artifacts/edu-sdk-2026.9.24/`。在实际运行 Python 的环境中，确保 Python 3.10+、
-venv 支持和 PyPI 网络访问可用。从 `artifacts/` 的上一级目录运行以下 Linux 示例：
+不要把二进制加入 Git。将四个配套 wheel、`SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`
+放到 `artifacts/edu-sdk-2026.10.14/`。在实际运行 Python 的环境中，确保 Python 3.10+、
+venv 支持可用。应用开发使用[开发容器](../../../docker/README.zh-CN.md)。
+从 `artifacts/` 的上一级目录运行以下 Linux 示例；任一命令失败都应停止：
 
 ```bash
 uname -m
 python3 --version
-cd artifacts/edu-sdk-2026.9.24
+cd artifacts/edu-sdk-2026.10.14
 sha256sum --ignore-missing -c SHA256SUMS
 cd ../..
 python3 -m venv .venv
@@ -61,26 +64,26 @@ python3 -m venv .venv
 unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 SDK_PLATFORM=linux_x86_64
-python -m pip install \
-  "artifacts/edu-sdk-2026.9.24/aorta_sdk-2026.9.23-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.9.24/aorta_msgs-2026.9.23-py3-none-any.whl \
-  artifacts/edu-sdk-2026.9.24/vbot_edu_msgs-2026.9.24-py3-none-any.whl \
-  "flatbuffers==25.12.19"
+python -m pip install --no-index \
+  "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl
 python -m pip check
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; print("SDK imports OK")'
 ```
 
 ARM64 机器人上应将变量**改为** `SDK_PLATFORM=linux_aarch64`。macOS arm64 使用
-`macosx_11_0_arm64` 和可用的 SHA-256 校验工具。确认三个 SDK wheel 的校验均通过；
+`macosx_11_0_arm64` 和可用的 SHA-256 校验工具。确认四个 wheel 的校验均通过；
 上面的命令会跳过未下载的文件，不会自动安装它们。缺少 Python、venv 或原生依赖时，
 先解决运行环境问题。不要把工作站的 venv 或 x86_64 原生库直接复制到机器人。
 
-该命令从本地 Release 下载文件安装三个 SDK 包，并从 PyPI 获取 FlatBuffers。
-除非已经在本地准备齐全部依赖，否则不要加 `--no-index`。下载失败或依赖缺失时，
-应先解决问题再继续；已有缓存不能证明 Release 提供了完整离线安装包。
+该命令从同一个 Release 的本地下载文件安装三个 SDK 包与 FlatBuffers。
+`--no-index` 禁止回退到包索引。缺少文件或校验失败时，先取得配套 Release 附件再继续。
+重新分发 wheel 时保留附带的 FlatBuffers 许可证。
 
 设备无法访问互联网时，按 [Python 部署指南](../../../docs/development/python-deployment.zh-CN.md)
-先在联网开发机下载 ARM64 SDK wheel 和缺失依赖，再传输完整 wheelhouse。
+先在联网开发机下载 ARM64 设备所需的全部四个 wheel，再传输完整 wheelhouse。
 只有准备齐全后的设备安装阶段可以离线执行，首次下载／准备仍需要网络。
 
 生成模块保留 Schema 命名空间，例如 `foxglove.CompressedVideo`、
@@ -306,7 +309,7 @@ PUBSUB BMS OK (987654321, 49500)
 请将匹配架构的 wheel 一并放入 wheelhouse。
 
 在开发机／开发容器的仓库根目录使用 Bazel 7.6.1 构建 Python 入口。构建不会安装 wheel，也不会打包跨平台
-运行库。显式选择已安装配套 wheel 的解释器：
+运行库。显式选择已安装四个配套 wheel 的解释器：
 
 ```bash
 bazel build //recipes/...

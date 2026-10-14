@@ -1,0 +1,36 @@
+// Speech policy service on /speech_control.
+// Request types: 1=query recognition, 2=query chat, 3=set recognition,
+// 4=set chat, 5=query continuous listening, 6=set continuous listening;
+// 7/8=action on/off, 9/10=avatar on/off, 11/12=navigation on/off,
+// 13/14=low-power voice suppression on/off, 15/16=RTC session on/off,
+// 17=proactive-interaction request state.
+// Mode notifications affect speech policy, not robot motion or power state.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.speech;
+
+table SpeechControlRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  /// Request type from the service contract above (1..17).
+  request_type: ubyte = 0 (id: 1);
+  /// Switch state (true=enable, false=disable).
+  enable: bool = false (id: 2);
+  /// Type 3: nonzero mode takes precedence over enable. With mode 0,
+  /// enable=false selects off; enable=true selects local mode 1.
+  /// Modes: 0=off, 1=local speech service, 2=cloud ASR.
+  mode: ubyte = 0 (id: 3);
+}
+
+table SpeechControlResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  cmd_recognition_status: bool = false (id: 3);
+  cmd_recognition_mode: ubyte = 0 (id: 4);
+  chat_function_status: bool = false (id: 5);
+  continuous_cmd_status: bool = false (id: 6);
+}
+
+root_type SpeechControlRequest;

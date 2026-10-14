@@ -21,7 +21,7 @@
 - 通用章节：[快速开始](../getting-started/README.zh-CN.md)、
   [开发流程](../development/README.zh-CN.md)、[接口参考](../interfaces/README.zh-CN.md)
   及[功能指南](../guides/README.zh-CN.md)。公共流程在此维护，不按设备类型重复复制。
-- 机器狗共用内容：[有线连接与 SSH 登录指南](quadruped-common/connection.zh-CN.md)
+- 机器狗共用内容：[有线／Wi-Fi 连接与 SSH 登录指南](quadruped-common/connection.zh-CN.md)
   在 `docs/robots/quadruped-common/` 维护，两类机器狗指南均链接至此；
   不适用于双足机器人，也不改变各类型的 EDU 发布状态。
 - 机型专属内容：放在 `docs/robots/<robot_type>/`，用于连接差异、设备前置条件、

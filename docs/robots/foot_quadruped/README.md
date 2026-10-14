@@ -4,7 +4,7 @@
 
 - Build identifier: `foot_quadruped`.
 - EDU scope: the only robot type in the current release scope.
-- Supported robot application version: `V1.6.0`.
+- Supported robot application version: `V1.6.0-10`.
 - Available guides: connection, shell setup, hardware, SLAM, and Agent interfaces.
   Python/C++ Recipes are available; see the compatibility matrix for component availability.
 
@@ -12,7 +12,7 @@
 
 - [Vbot Viewer](../../guides/vbot-viewer.md) and [model resources](../../../assets/robots/foot_quadruped/README.md): inspect the online model; or load the bundled URDF and meshes locally.
 
-- [Wired connection and SSH login shared by both robot-dog types](../quadruped-common/connection.md): connect the adapter, configure the computer's network interface, and log in with the `vbot` account.
+- [Wired / Wi-Fi connection and SSH login shared by both robot-dog types](../quadruped-common/connection.md): connect over Ethernet or use the mobile app to join Wi-Fi, find the device IP in the router, and log in with the `vbot` account.
 - [Device shell setup](../../getting-started/device-environment.md) and [Aorta / ROS 2 compatibility](../../interfaces/aorta-ros2.md): after SSH login, configure the `vbot` environment in the device terminal and check CLI access without waiting for SDK integration.
 - [Sensor specifications shared by the two robot-dog types](../../hardware/quadruped-common/sensors.md).
 - [Back mounting and arm adapter plate shared by both robot-dog types](../../hardware/quadruped-common/back-mounting.md): mechanical dimensions, CAD files and fastener reference.

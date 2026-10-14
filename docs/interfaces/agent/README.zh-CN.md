@@ -31,7 +31,7 @@ Skills 与 `AGENTS.md` 提供指令，不授予额外的操作系统权限。
 
 ## 版本兼容性
 
-这些 API 适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0**。
+这些 API 适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-10**。
 接入前请查看[兼容矩阵](../../compatibility.zh-CN.md)，并确认设备运行时可用。
 通过[接入指南](../../guides/agent-integration.zh-CN.md)检查 API 响应、内容路径及新 Turn 中的行为。
 在自己的工作区保留源内容及备份，升级固件前阅读对应版本说明。

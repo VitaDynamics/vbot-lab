@@ -5,6 +5,14 @@ filegroup(
 )
 
 py_test(
+    name = "release_configuration_test",
+    srcs = ["test_release.py"],
+    main = "test_release.py",
+    data = ["//:repository_files"],
+    python_version = "PY3",
+)
+
+py_test(
     name = "offline_build_test",
     srcs = ["test_offline_build.py"],
     main = "test_offline_build.py",

@@ -2,6 +2,13 @@
 
 <p align="center">English | <a href="CHANGELOG.zh-CN.md">中文</a></p>
 
+## Unreleased
+
+- Target robot application `V1.6.0-10` and align SDK guides and version guards with Aorta `2026.10.12`, C++ ABI 13, EDU Schema `2026.10.13-v4`, and the `edu-sdk-2026.10.14` asset pairing.
+- Document `/audio/play_pcm` speaker input and `/speech_control` policy queries/changes, including fields, ROS 2 mappings and operation boundaries.
+- Add a machine-readable component pairing configuration and offline consistency checks.
+- Keep `main` for formal releases; prepare iterations within the `V1.6.0` version family on `pre_release/V1.6.0.X`, with tags such as `V1.6.0.10`. Other version families use their own iteration branches.
+
 ## V1.6.0
 
 Source snapshot for robot application `V1.6.0`. SDK artifacts remain available through

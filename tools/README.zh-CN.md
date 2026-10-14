@@ -62,6 +62,9 @@ python3 tools/check_device_environment.py
 
 ## 验证与后续工具
 
+`check_release.py` 比较[发布配置](../catalog/release.zh-CN.md)与仓库中的组件版本，
+并可选地核对已下载的 manifest 和附件校验值。工具离线、只读，不发布或批准版本。
+
 ```bash
 python3 tests/check_repository.py
 python3 tests/test_agent_workspace.py

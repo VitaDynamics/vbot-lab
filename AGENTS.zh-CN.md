@@ -11,7 +11,7 @@
 | 检查或搭建开发环境 | [vbot-dev-setup](skills/vbot-dev-setup/SKILL.zh-CN.md)，再查阅[环境指南](docs/getting-started/README.zh-CN.md) |
 | 配置 vbot 设备 shell 或检查 Aorta／ROS 2 访问 | [设备环境](docs/getting-started/device-environment.zh-CN.md)、[vbot-dev-setup](skills/vbot-dev-setup/SKILL.zh-CN.md)与[接口范围](docs/interfaces/aorta-ros2.zh-CN.md) |
 | 查找开放能力、选择接口 | [能力索引](catalog/README.zh-CN.md)，再读取对应接口文档 |
-| 选择应用／SDK 版本或核对兼容性 | [版本与兼容性](docs/compatibility.zh-CN.md)，再查阅所链接的 SDK 指南 |
+| 选择应用／SDK 版本或核对兼容性 | [版本与兼容性](docs/compatibility.zh-CN.md)、[发布配置](catalog/release.zh-CN.md)，再查阅所链接的 SDK 指南 |
 | 读取硬件遥测或相机数据 | [传感器](docs/interfaces/sensors.zh-CN.md)或[相机](docs/interfaces/cameras.zh-CN.md)，只选择所需数据流 |
 | 检测人体、见人问候或使用人体关键点 | [感知接口](docs/interfaces/perception.zh-CN.md)|
 | 接收音频、识别文本或语音事件 | [audio](docs/interfaces/audio.zh-CN.md)，统一音频帧、ASR、语音事件与 UWB 输入结束 |
@@ -36,7 +36,7 @@
 ## 事实与范围
 
 - 当前 EDU 发布对象为 `foot_quadruped`。其他设备类型处于规划阶段，共用硬件或连接指南不改变这一范围。
-- 当前适配的机器人应用版本为 `V1.6.0`，由设备配置的 `application_version` 记录。它与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断更早或后续应用版本兼容。
+- 当前适配的机器人应用版本为 `V1.6.0-10`，由设备配置的 `application_version` 记录。它与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断更早或后续应用版本兼容。
 - 能力目录是索引，不是在线可用性证明。未知固件／SDK 版本、路由与 ROS2 映射应保持未知，不得猜测。
 - 使用 Python SDK 指南指定的发布版 wheel 配套与已入库的开放 Schema，保留 Aorta 包名与 API。Recipes 提供离线预览及显式设备执行，构建成功不代表在线兼容。
 - 设备 Aorta CLI 访问与 SDK 接入独立。ROS 2 使用设备本机 bridge 子集，遵循已整理的映射与限制，不凭同名推测。
@@ -64,5 +64,11 @@
 保留接口契约、使用限制、完成条件与排障步骤。
 主体统一使用 `VBOT EDU robots`／`VBOT EDU 机器人`，保持大小写。
 调整结构或共用设备文档前，阅读[贡献说明](CONTRIBUTING.zh-CN.md)。
+VBOT Lab 版本迭代在选定的 `pre_release/V<major>.<minor>.<patch>.X` 分支准备，
+每个分支只对应一个版本族，不作为所有后续版本的共用分支。
+迭代分支允许在用户确认后直接提交和推送，不要求 PR。
+`main` 只保存正式版本；未明确要求时，不创建正式发布提升 PR，也不发布版本。
+参阅[协作流程](.github/WORKFLOWS.zh-CN.md)。
 运行 `python3 tests/check_repository.py`、`python3 tests/test_agent_workspace.py`
-及适用的 Bazel 目标进行验证。未收到请求时不提交或发布。
+及适用的 Bazel 目标进行验证。先保留本地未提交修改供审阅，
+仅在用户确认修改并要求同步后，再提交和推送。

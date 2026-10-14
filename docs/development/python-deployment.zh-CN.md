@@ -14,18 +14,17 @@ ARM64 wheel，最后在设备上创建 venv。此 Python 部署流程不要求�
 完整仓库。使用配套依赖包时，按[离线 Bazel 指南](offline-build.zh-CN.md)替换构建入口。
 
 按 [SDK 指南](../../packages/aorta/python/README.zh-CN.md)，从
-[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)
-将匹配的 Linux aarch64 SDK、aorta-msgs 和 vbot-edu-msgs wheel 下载到 `artifacts/wheelhouse/`。
-Release 同时附带 `flatbuffers` 25.12.19 通用 wheel；下面开头的命令改为在开发机联网从 PyPI
-下载同一 wheel，不会把 ARM64 SDK 安装进开发机的 Python 环境。
-打包前依据 Release 的 `SHA256SUMS` 核对全部文件（FlatBuffers 文件也可依据可信发行来源的
-校验值核对）。
+[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14)
+将匹配的 Linux aarch64 SDK、aorta-msgs、vbot-edu-msgs 和 FlatBuffers wheel，以及
+`SHA256SUMS` 下载到 `artifacts/wheelhouse/`。
+Release 附带 `flatbuffers` 25.9.23 通用 wheel，基础 SDK 准备无需从 PyPI 下载。
+Release 附件下载仍需联网；暂存文件不会把 ARM64 SDK 安装进开发机的 Python 环境。
+打包前依据同一个 Release 的 `SHA256SUMS` 核对全部文件。
 下面四个文件都必须具备；下载或校验失败就停止，设备端不下载缺失依赖。
 
 ```bash
 mkdir -p artifacts/wheelhouse
-python3 -m pip download --only-binary=:all: --no-deps \
-  --dest artifacts/wheelhouse "flatbuffers==25.12.19"
+(cd artifacts/wheelhouse && sha256sum --ignore-missing -c SHA256SUMS)
 RECIPE=subscribe-state
 bazel build "//recipes/$RECIPE:main"
 bazel run "//recipes/$RECIPE:main" -- --help
@@ -35,10 +34,10 @@ mkdir "$PACKAGE_DIR/wheelhouse"
 tar -czf "$PACKAGE_DIR/python-recipe.tar.gz" \
   LICENSE NOTICE recipes/__init__.py recipes/common.py recipes/observe.py \
   "recipes/$RECIPE/main.py"
-cp artifacts/wheelhouse/aorta_sdk-2026.9.23-py3-none-linux_aarch64.whl \
-  artifacts/wheelhouse/aorta_msgs-2026.9.23-py3-none-any.whl \
-  artifacts/wheelhouse/vbot_edu_msgs-2026.9.24-py3-none-any.whl \
-  artifacts/wheelhouse/flatbuffers-25.12.19-py2.py3-none-any.whl \
+cp artifacts/wheelhouse/aorta_sdk-2026.10.12-py3-none-linux_aarch64.whl \
+  artifacts/wheelhouse/aorta_msgs-2026.10.12-py3-none-any.whl \
+  artifacts/wheelhouse/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
+  artifacts/wheelhouse/flatbuffers-25.9.23-py2.py3-none-any.whl \
   "$PACKAGE_DIR/wheelhouse/"
 (cd "$PACKAGE_DIR" && sha256sum python-recipe.tar.gz wheelhouse/*.whl > SHA256SUMS)
 ```
@@ -85,8 +84,8 @@ unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 python3 -m venv .venv
 .venv/bin/python -m pip install --no-index --find-links wheelhouse \
-  aorta-sdk==2026.9.23 aorta-msgs==2026.9.23 \
-  vbot-edu-msgs==2026.9.24 flatbuffers==25.12.19
+  aorta-sdk==2026.10.12 aorta-msgs==2026.10.12 \
+  vbot-edu-msgs==2026.10.13 flatbuffers==25.9.23
 .venv/bin/python -m pip check
 .venv/bin/python -c 'import aorta; from locomotion.LocomotionStatus import LocomotionStatus; print("SDK imports OK")'
 ```

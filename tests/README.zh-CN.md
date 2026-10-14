@@ -10,8 +10,9 @@ python3 tests/check_schemas.py
 python3 tests/test_agent_workspace.py
 python3 tests/test_recipes.py
 python3 tests/test_family_recipes.py
+python3 tests/test_release.py
 bazel build //:repository_files //recipes/...
-bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:recipe_test
+bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:recipe_test //tests:release_configuration_test
 ```
 
 ## 仓库与文档
@@ -33,8 +34,8 @@ Viewer／社区导航与 Issue 入口链接在本地检查；模型检查核对�
 共用背部安装参考检查附件完整性、两类机器狗的导航，以及双语尺寸／紧固件数据一致性，
 不依赖 PDF 或 CAD 运行库。
 
-所有纳入版本控制的文本文件都会检查是否含有私有网络地址、工作站路径、设备主机名和私有
-仓库名；会话配置、凭据字典和密钥文件不得纳入版本控制。`tests/check_schemas.py` 检查
+所有纳入版本控制的文本文件都会检查是否含有敏感网络地址、工作站路径、设备主机名和
+不可分发的标识；会话配置、凭据字典和密钥文件不得纳入版本控制。`tests/check_schemas.py` 检查
 `schemas/ros2/` 恰好包含 `routes.json` 中公开路由使用的定义、它们引用的类型以及说明取值的
 常量定义，并检查 `MANIFEST.json` 与目录内容一致。
 
@@ -62,6 +63,14 @@ CI 运行仓库、工作区和不依赖 SDK 的 Recipe Python 测试，不运行
 离线套件不启动 harness 会话、SDK 应用、容器或设备程序。
 
 普通外部 PR 不得触发实机测试。
+
+## 发布配置
+
+`test_release.py` 将[发布配置](../catalog/release.zh-CN.md)与设备配置、能力元数据、
+Recipe 版本约束、C++ ABI 导入、生成的 Schema 元数据、SDK 指南、Compose 和 Bazel 比较。
+还覆盖未填写字段、迭代分支／tag 配套、错误输入、发布 manifest 比较及本地模拟附件的
+校验失败处理。不下载附件、拉取镜像、检查在线设备或执行发布；普通 CI 允许一致的草案配置。
+显式使用 `--require-complete` 才会拒绝尚未填写的发布字段。
 
 ## Recipes 与发布版 SDK
 

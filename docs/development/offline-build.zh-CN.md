@@ -22,16 +22,16 @@
 - 可选图像解码：Python 需要兼容的 `av==16.1.0` 和 `numpy==2.2.6` wheel；C++ 需要 FFmpeg 开发库和运行库。
   Bazel 不会安装这些依赖。
 
-SDK 制品需要先联网从 GitHub Releases 下载。`edu-sdk-2026.9.24` Release 在 SDK wheel
-旁附带 `flatbuffers` 25.12.19 wheel；[Python 部署指南](python-deployment.zh-CN.md)
-也说明了如何从 PyPI 获取。同时准备所需的可选依赖。下方命令以已备齐、已校验的
+SDK 制品需要先联网从 GitHub Releases 下载。`edu-sdk-2026.10.14` Release 在 SDK wheel
+旁附带 `flatbuffers` 25.9.23 wheel；[Python 部署指南](python-deployment.zh-CN.md)
+说明了如何暂存全部四个 Release wheel。另行准备所需的可选依赖。下方命令以已备齐、已校验的
 wheelhouse 为前提。
 
 把全部 wheel 集中到 wheelhouse 后，再执行不访问包索引的安装：
 
 ```bash
 python -m pip install --no-index --find-links artifacts/wheelhouse \
-  aorta-sdk==2026.9.23 aorta-msgs==2026.9.23 vbot-edu-msgs==2026.9.24 flatbuffers==25.12.19
+  aorta-sdk==2026.10.12 aorta-msgs==2026.10.12 vbot-edu-msgs==2026.10.13 flatbuffers==25.9.23
 ```
 
 ## 使用依赖包构建

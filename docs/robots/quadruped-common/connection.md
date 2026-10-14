@@ -1,14 +1,17 @@
-# Robot-dog wired connection and SSH login
+# Robot-dog connection and SSH login
 
 <p align="center">English | <a href="connection.zh-CN.md">中文</a></p>
 
 Four-legged robot dogs (`foot_quadruped`) and four-wheeled robot dogs (`wheel_quadruped`)
-use the same wired connection, network settings, and SSH login procedure described here.
+use the same wired or Wi-Fi connection and SSH login procedures described here.
 It connects your computer to the robot and opens a terminal using the `vbot` account;
 it does not install an SDK, deploy an application, or start robot motion.
 These instructions do not apply to bipedal robots (`foot_humanoid`).
 The current EDU release scope remains `foot_quadruped` only; a shared connection procedure
 does not establish firmware, SDK, or API availability for `wheel_quadruped`.
+
+Choose one connection method: complete wired steps 1–2, or use the wireless procedure
+below. Then follow the shared SSH and public-key instructions in steps 3–4.
 
 ## 1. Connect the Ethernet cable
 
@@ -47,6 +50,39 @@ If you use a different computer address, choose an unused host address in the sa
 Only change the interface connected to the robot, not an unrelated Wi-Fi or other
 network interface. If a VPN or another interface already uses this subnet, resolve
 the routing conflict before connecting.
+
+## Wireless connection through the mobile app
+
+Wireless access does not require the USB-C Ethernet adapter or the manual IPv4
+settings in steps 1–2.
+
+1. Power on the robot and wait for startup. Use the mobile app's Wi-Fi configuration
+   flow to connect the robot to your router's Wi-Fi network.
+2. Connect your computer to the same router's local network, over Wi-Fi or Ethernet.
+3. Open the router's administration page and find the robot in its connected-device
+   or DHCP client list. Confirm the device entry and record its assigned IPv4 address.
+4. In your computer's terminal, replace `REPLACE_WITH_DEVICE_IP` below with that address
+   and log in as `vbot`:
+
+```bash
+ROBOT_WIFI_IP=REPLACE_WITH_DEVICE_IP
+ssh "vbot@$ROBOT_WIFI_IP"
+```
+
+Use the robot's IP, not the router's gateway address or your computer's IP.
+Wi-Fi does not use the fixed wired address `192.168.126.2` or require your computer
+to use `192.168.126.100`. The assigned IP may change after reconnecting or restarting;
+check the router again if the previous address stops working.
+
+The account, password, host-key and public-key instructions in steps 3–4 apply to Wi-Fi
+as well. After login, continue with the account checks in step 3. For public-key setup
+and later SSH commands, replace every wired address below with the actual Wi-Fi IP.
+An existing public key on the same `vbot` account need not be installed again;
+verify access using the Wi-Fi address.
+
+If the robot is absent from the router's client list, complete Wi-Fi setup in the app
+first. If the IP is known but SSH is unreachable, check local routing, firewall rules
+and Wi-Fi client isolation. Do not scan for another device or expose SSH to the Internet.
 
 ## 3. Verify the first SSH login
 
@@ -165,6 +201,7 @@ device operations. Advice-only requests and offline checks do not connect or ins
 | Symptom | What to check |
 | --- | --- |
 | No wired link | Robot power and startup, the USB-C adapter, the Ethernet cable, and the computer's selected interface |
+| Robot Wi-Fi IP missing or unreachable | App Wi-Fi setup, the router's current connected-device / DHCP list, the computer's local network, firewall rules and client isolation |
 | Connection timeout or no route | Computer address and subnet mask, address conflicts, VPNs, and competing routes to `192.168.126.0/24` |
 | Connection refused | Confirm the address and allow the robot to finish starting; if it persists, check device-version support |
 | Password rejected | Use the `vbot` username and the device's current password |
@@ -180,7 +217,8 @@ This software step is separate from the shared connection procedure.
 Continue with the [development environment](../../getting-started/README.md),
 [development workflow](../../development/README.md), or
 [Agent interfaces](../../interfaces/agent/README.md).
-`192.168.126.2` is the computer-to-device SSH address. For other interfaces, follow
+`192.168.126.2` is the wired computer-to-device SSH address; Wi-Fi uses the robot IP
+reported by the router. For other interfaces, follow
 their documented execution environment and endpoint instead of substituting this address.
 A successful SSH login does not by itself verify SDK or API availability.
 

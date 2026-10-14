@@ -9,7 +9,7 @@
 VBOT Lab brings together task-oriented Skills, a capability catalog, the Aorta Python SDK,
 interface definitions, and reference programs for building robot applications.
 
-Current robot application target: **V1.6.0**, for `foot_quadruped` EDU.
+Current robot application target: **V1.6.0-10**, for `foot_quadruped` EDU.
 See the [compatibility matrix](docs/compatibility.md) for SDK and platform pairing.
 
 ## Build with your Agent
@@ -61,8 +61,9 @@ access, image availability, or SDK readiness. See [Developer tools](tools/README
 
 For environment setup, use the [container guide](docker/README.md) and
 [editor integration](.devcontainer/README.md). To connect a robot dog, follow the
-[shared wired connection guide](docs/robots/quadruped-common/connection.md), including its
-connection photo. Connection and device operations are separate, explicitly requested steps.
+[shared wired / Wi-Fi connection guide](docs/robots/quadruped-common/connection.md),
+with the wired connection photo and app-based Wi-Fi setup / router IP lookup.
+Connection and device operations are separate, explicitly requested steps.
 
 After login, follow [device shell setup and checks](docs/getting-started/device-environment.md)
 for Aorta and the [ROS 2 compatibility subset](docs/interfaces/aorta-ros2.md).

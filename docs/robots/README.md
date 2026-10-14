@@ -23,7 +23,7 @@ Exact product models, firmware, SDK, and interface support belong in the
 - Shared chapters: [quickstart](../getting-started/README.md),
   [development workflow](../development/README.md), [interfaces](../interfaces/README.md),
   and [guides](../guides/README.md). Keep common procedures here rather than copying them per robot type.
-- Robot-dog shared content: keep the [wired connection and SSH login guide](quadruped-common/connection.md)
+- Robot-dog shared content: keep the [wired / Wi-Fi connection and SSH login guide](quadruped-common/connection.md)
   in `docs/robots/quadruped-common/`, with links from both robot-dog guides. This does not
   apply to bipedal robots or change either type's EDU release status.
 - Type-specific content: use `docs/robots/<robot_type>/` for connection differences,

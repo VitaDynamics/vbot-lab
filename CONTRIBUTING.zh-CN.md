@@ -14,7 +14,7 @@
 - Aorta SDK 接入放在 `packages/aorta/python/` 与 `packages/aorta/cpp/`，单项任务参考程序放在 `recipes/`，完整参考应用放在 `blueprints/`。如实说明可用状态，不将提纲或规划中的 Blueprint 展示为可运行程序。
 - Skills 仅在 `skills/` 维护一份，通过 `.agents/skills/` 与 `.claude/skills/` 软链接暴露。`CLAUDE.md` 仅薄层导入共享 `AGENTS.md`，不维护分叉的 harness 指令。发现入口使用英文 `SKILL.md`，`.zh-CN.md` 为配对译文。
 - `AGENTS.md` 保持简短并面向任务。能力范围与引用记录在 `catalog/`，结构事实保留在 Schema，行为通过接口文档解释。索引修改用离线工具测试校验，未知版本与路由不能变成隐含支持。
-- 每份文档均维护英文和简体中文。默认文件名对应英文，中文使用 `.zh-CN.md` 后缀；在同一 PR 中同步更新，并保留语言切换和同语言文档链接。
+- 每份文档均维护英文和简体中文。默认文件名对应英文，中文使用 `.zh-CN.md` 后缀；在同一项修改中同步更新，并保留语言切换和同语言文档链接。
 - 使用指南应提供完整、正确的功能流程：前置条件、命令、响应、完成条件及恢复方法。测试报告与使用说明分开。
 - 遵循[设备类型文档结构](docs/robots/README.zh-CN.md)：复用通用章节与硬件规格，隔离机型差异，同步发布范围和兼容矩阵，不把尚未发布的类型写成已支持。
 - 保留 `foot_quadruped` 与 `wheel_quadruped` 现有的共用有线连接和传感器规格，不重复维护，也不应用到 `foot_humanoid`。其他类型单独发布并记录之前，当前 EDU 范围仍为 `foot_quadruped`。
@@ -30,8 +30,12 @@
 [CODEOWNERS](.github/CODEOWNERS) 列出所有仓库路径的评审负责人；管理员成员变化时同步更新。
 评审分配不会授予仓库权限，也不替代已配置的合并要求。
 
-请创建工作分支并向 `main` 提交 PR，不要直接推送 `main`。
-合并前需要另一位列出的维护者批准、基于当前目标分支的 `repository-layout` 检查通过，
+VBOT Lab 每个版本族使用各自的 `pre_release/V<major>.<minor>.<patch>.X` 分支。
+维护者完成检查后，可以直接向对应迭代分支提交和推送，不要求 PR；
+需要评审时，也可使用以迭代分支为目标的工作分支 PR。
+`main` 仅保留正式版本；只有明确要求正式发布时，才创建正式发布提升 PR，
+日常迭代期间不提前创建。不要直接推送 `main`，也不要暗示支持尚未发布的能力。
+向 `main` 合并 PR 前，需要另一位列出的维护者批准、基于当前目标分支的 `repository-layout` 检查通过，
 并解决评审讨论。推送新的待评审提交后需要重新批准。
 维护者使用 **Squash and merge** 合并；管理员同样遵守保护规则。
 检查范围与版本 tag 规则见[协作流程](.github/WORKFLOWS.zh-CN.md)。

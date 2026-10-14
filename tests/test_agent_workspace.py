@@ -37,7 +37,7 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_unknown_versions_are_not_wildcards(self):
         self.assertEqual(self.catalog["sdk"]["integration"], "integrated")
-        self.assertEqual(self.catalog["sdk"]["version"], "2026.9.23")
+        self.assertEqual(self.catalog["sdk"]["version"], "2026.10.12")
         self.assertEqual(self.catalog["sdk"]["python_import"], "aorta")
         for robot in self.robots.values():
             self.assertEqual(robot["models"], [])
@@ -45,9 +45,9 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_application_target_is_separate_from_sdk_and_release_scope(self):
         result = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")
-        self.assertEqual(result["robot"]["application_version"], "V1.6.0")
-        self.assertEqual(result["sdk"]["version"], "2026.9.23")
-        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.9.24")
+        self.assertEqual(result["robot"]["application_version"], "V1.6.0-10")
+        self.assertEqual(result["sdk"]["version"], "2026.10.12")
+        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.14")
         self.assertIsNone(result["robot"]["minimum_firmware"])
         self.assertEqual(result["capabilities"][0]["decision"], "requires_device_verification")
         self.assertFalse(result["device_contacted"])
@@ -57,7 +57,7 @@ class AgentWorkspaceTests(unittest.TestCase):
             self.assertEqual(planned["capabilities"][0]["decision"], "blocked_release")
 
     def test_application_target_rejects_invalid_versions_and_ranges(self):
-        for value in (True, 1.6, [], "", "v1.6.0", "V1.6", "V1.6.0+", ">=V1.6.0"):
+        for value in (True, 1.6, [], "", "v1.6.0", "V1.6", "V1.6.0-10+", ">=V1.6.0-10"):
             robots = deepcopy(self.robots)
             robots["foot_quadruped"]["application_version"] = value
             with self.subTest(value=value), self.assertRaises(CatalogError):
@@ -99,7 +99,7 @@ class AgentWorkspaceTests(unittest.TestCase):
                          "blocked_integration")
 
     def test_python_and_cpp_implementations_are_indexed(self):
-        self.assertEqual(self.catalog["sdk"]["cpp"]["abi"], 12)
+        self.assertEqual(self.catalog["sdk"]["cpp"]["abi"], 13)
         for entry in self.catalog["capabilities"]:
             if entry.get("recipe"):
                 self.assertEqual(set(entry["implementations"]), {"python", "cpp"})
@@ -182,7 +182,7 @@ class AgentWorkspaceTests(unittest.TestCase):
             self.assertEqual(query_catalog(ROOT, robot, capability)["capabilities"][0]["decision"],
                              "blocked_release")
 
-    def test_read_only_families_are_documented_as_single_capabilities(self):
+    def test_interface_families_are_documented_as_single_capabilities(self):
         references = {
             "robot.sensors": "docs/interfaces/sensors.md",
             "robot.cameras": "docs/interfaces/cameras.md",
@@ -203,7 +203,7 @@ class AgentWorkspaceTests(unittest.TestCase):
                 self.assertEqual(entry["availability"], "documented")
                 self.assertEqual(entry["verification"], "documentation_only")
                 self.assertEqual(entry["interface_kind"], "pub_sub")
-                self.assertEqual(entry["effect"], "device_read_only")
+                self.assertEqual(entry["effect"], "depends_on_operation" if capability == "robot.audio" else "device_read_only")
                 self.assertEqual(entry["execution_location"], "device_shell")
                 self.assertFalse(entry["requires_sdk"])
                 self.assertIsNone(entry["minimum_firmware"])

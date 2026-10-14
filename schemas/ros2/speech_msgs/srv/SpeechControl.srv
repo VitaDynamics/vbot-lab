@@ -1,0 +1,41 @@
+# Speech Control Service
+# 语音控制服务
+
+# Request fields
+# 请求字段
+uint8 REQUEST_QUERY_CMD_RECOGNITION = 1    # 查询命令词识别开关状态
+uint8 REQUEST_QUERY_CHAT_FUNCTION = 2      # 查询闲聊功能开关状态
+uint8 REQUEST_SET_CMD_RECOGNITION = 3      # 设置命令词识别开关
+uint8 REQUEST_SET_CHAT_FUNCTION = 4        # 设置闲聊功能开关
+uint8 REQUEST_QUERY_CONTINUOUS_CMD = 5     # 查询命令词连续识别开关状态
+uint8 REQUEST_SET_CONTINUOUS_CMD = 6       # 设置命令词连续识别开关
+uint8 NOTIFY_ACTION_ON = 7                 # 通知进入动作模式
+uint8 NOTIFY_ACTION_OFF = 8                # 通知退出动作模式
+uint8 NOTIFY_AVATAR_ON = 9                 # 通知进入Avatar模式
+uint8 NOTIFY_AVATAR_OFF = 10               # 通知退出Avatar模式
+uint8 NOTIFY_NAVIGATION_ON = 11            # 通知进入领航模式
+uint8 NOTIFY_NAVIGATION_OFF = 12           # 通知退出领航模式
+uint8 NOTIFY_LOW_POWER_VOICE_DISABLE_ON = 13   # 通知进入低功耗语音禁用模式
+uint8 NOTIFY_LOW_POWER_VOICE_DISABLE_OFF = 14  # 通知退出低功耗语音禁用模式
+uint8 NOTIFY_RTC_ON = 15                  # 通知RTC语音会话开始
+uint8 NOTIFY_RTC_OFF = 16                 # 通知RTC语音会话结束
+uint8 NOTIFY_PROACTIVE_INTERACTION_STATE = 17  # 同步主动交互请求态（复用视觉识别交互开关）
+
+uint8 request_type                           # 请求类型
+bool enable                                 # 开关状态 (true=开启, false=关闭)
+
+uint8 CMD_RECOGNITION_MODE_OFF = 0
+uint8 CMD_RECOGNITION_MODE_SPEECH_SERVICE = 1
+uint8 CMD_RECOGNITION_MODE_DOUBAO_ASR = 2
+uint8 mode 0                                # 命令词识别模式 (0=off, 1=speech_service, 2=doubao_asr)
+                                            # REQUEST_SET_CMD_RECOGNITION 时优先使用此字段
+
+---
+# Response fields
+# 响应字段
+bool success                                # 操作是否成功
+string message                              # 响应消息
+bool cmd_recognition_status                 # 命令词识别当前状态 (向后兼容, mode!=0 时为true)
+uint8 cmd_recognition_mode                  # 命令词识别模式 (0=off, 1=speech_service, 2=doubao_asr)
+bool chat_function_status                   # 闲聊功能当前状态
+bool continuous_cmd_status                  # 命令词连续识别当前状态

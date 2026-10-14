@@ -2,7 +2,7 @@ name: Scaffold checks
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'pre_release/**']
   pull_request:
 
 permissions:
@@ -28,3 +28,5 @@ jobs:
         run: python3 tests/test_family_recipes.py
       - name: Validate offline bundle checks without downloading dependencies
         run: python3 tests/test_offline_build.py
+      - name: Validate release configuration and component pairing offline
+        run: python3 tests/test_release.py

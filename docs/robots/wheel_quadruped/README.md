@@ -6,11 +6,11 @@
 - EDU scope: reserved for a future release; outside the current EDU release scope.
 - Guide status: shared connection and hardware references available; the complete EDU development guide is not released.
 
-## Wired connection and SSH login
+## Wired / Wi-Fi connection and SSH login
 
 This type uses the same connection method as `foot_quadruped`. Follow the
-[shared connection guide](../quadruped-common/connection.md) for the adapter connection,
-computer network settings, and `vbot` SSH login.
+[shared connection guide](../quadruped-common/connection.md) for wired network setup
+or mobile-app Wi-Fi setup, router IP lookup, and `vbot` SSH login.
 Sharing this procedure does not expand the current EDU release scope or establish
 firmware, SDK, or API compatibility.
 

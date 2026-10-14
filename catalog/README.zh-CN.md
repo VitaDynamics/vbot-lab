@@ -5,6 +5,8 @@
 工作流与接口的本地索引，不是设备发现服务。
 通过 [capabilities.json](capabilities.json)定位工作流、接口、SDK 要求、Recipe 和验证边界，
 无需读取所有文档。
+源码、应用、SDK、Schema 与镜像的配套关系见
+[发布配置](release.zh-CN.md)和 [release.json](release.json)。
 
 ## 查询能力索引
 
@@ -58,7 +60,7 @@ JSON 可由 Python 标准库直接校验。所有路径相对于仓库根目录�
 
 SDK 元数据分别记录接入状态和版本。设备配置区分当前发布对象与规划类型；
 `models` 为空表示尚未登记具体型号。硬件适用性不代表软件支持。
-设备配置的 `application_version` 记录应用适配版本：`foot_quadruped` 为 `V1.6.0`，
+设备配置的 `application_version` 记录应用适配版本：`foot_quadruped` 为 `V1.6.0-10`，
 尚未发布的类型为 `null`；查询结果在 `robot` 中返回该字段。
 它不是 SDK 或系统镜像版本，也不表示“此版本及以上均支持”。
 `minimum_firmware` 是独立的可选最低版本约束；`null` 不取消已声明的应用适配版本，
@@ -83,7 +85,7 @@ SDK 元数据分别记录接入状态和版本。设备配置区分当前发布�
 - [Skills](../skills/README.zh-CN.md)：Coding Agent 工作流，不是设备运行时内容。
 
 不手动向索引复制 topic、字段、单位或 HTTP 路由列表；这些内容保留在所引用的 Schema／契约来源中，
-接入后再从这些来源生成结构索引。应用适配版本为 `V1.6.0`，选定设备后检查已安装应用及运行时可用性。
+接入后再从这些来源生成结构索引。应用适配版本为 `V1.6.0-10`，选定设备后检查已安装应用及运行时可用性。
 
 相机、音频、运控与 RCP 保持按接口族归类，`recipe` 字段指向对应 SDK 示例，不拆分成每个 Topic 的独立检查。
 接口族的 CLI 文档仍可独立于 SDK 使用（`requires_sdk=false`）；在线运行所链接的 Python Recipe 则需要配套 wheel。

@@ -17,20 +17,20 @@ the package includes only its main.py and shared Python modules, not every recip
 the complete repository. Build through [offline Bazel](offline-build.md) when using
 the packaged dependency bundle.
 
-Download the matching Linux aarch64 SDK, aorta-msgs and vbot-edu-msgs wheels from
-[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)
+Download the matching Linux aarch64 SDK, aorta-msgs, vbot-edu-msgs and FlatBuffers wheels,
+plus `SHA256SUMS`, from
+[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14)
 into `artifacts/wheelhouse/`, following the [SDK guide](../../packages/aorta/python/README.md).
-The release also attaches the `flatbuffers` 25.12.19 universal wheel; the first commands
-below download the same wheel from PyPI on the workstation instead. They require network
-access and do not install an ARM64 SDK into the workstation's Python environment.
-Verify every file against the release `SHA256SUMS` (or the FlatBuffers file against its
-trusted distribution checksum) before packaging. All four files below are required;
+The release includes the `flatbuffers` 25.9.23 universal wheel, so basic SDK preparation
+does not require a PyPI download. Downloading Release assets still requires network
+access; staging them does not install an ARM64 SDK into the workstation's Python environment.
+Verify every file against the same release's `SHA256SUMS` before packaging.
+All four files below are required;
 if a download or checksum check fails, stop. Do not fetch missing dependencies on the robot.
 
 ```bash
 mkdir -p artifacts/wheelhouse
-python3 -m pip download --only-binary=:all: --no-deps \
-  --dest artifacts/wheelhouse "flatbuffers==25.12.19"
+(cd artifacts/wheelhouse && sha256sum --ignore-missing -c SHA256SUMS)
 RECIPE=subscribe-state
 bazel build "//recipes/$RECIPE:main"
 bazel run "//recipes/$RECIPE:main" -- --help
@@ -40,10 +40,10 @@ mkdir "$PACKAGE_DIR/wheelhouse"
 tar -czf "$PACKAGE_DIR/python-recipe.tar.gz" \
   LICENSE NOTICE recipes/__init__.py recipes/common.py recipes/observe.py \
   "recipes/$RECIPE/main.py"
-cp artifacts/wheelhouse/aorta_sdk-2026.9.23-py3-none-linux_aarch64.whl \
-  artifacts/wheelhouse/aorta_msgs-2026.9.23-py3-none-any.whl \
-  artifacts/wheelhouse/vbot_edu_msgs-2026.9.24-py3-none-any.whl \
-  artifacts/wheelhouse/flatbuffers-25.12.19-py2.py3-none-any.whl \
+cp artifacts/wheelhouse/aorta_sdk-2026.10.12-py3-none-linux_aarch64.whl \
+  artifacts/wheelhouse/aorta_msgs-2026.10.12-py3-none-any.whl \
+  artifacts/wheelhouse/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
+  artifacts/wheelhouse/flatbuffers-25.9.23-py2.py3-none-any.whl \
   "$PACKAGE_DIR/wheelhouse/"
 (cd "$PACKAGE_DIR" && sha256sum python-recipe.tar.gz wheelhouse/*.whl > SHA256SUMS)
 ```
@@ -96,8 +96,8 @@ unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 python3 -m venv .venv
 .venv/bin/python -m pip install --no-index --find-links wheelhouse \
-  aorta-sdk==2026.9.23 aorta-msgs==2026.9.23 \
-  vbot-edu-msgs==2026.9.24 flatbuffers==25.12.19
+  aorta-sdk==2026.10.12 aorta-msgs==2026.10.12 \
+  vbot-edu-msgs==2026.10.13 flatbuffers==25.9.23
 .venv/bin/python -m pip check
 .venv/bin/python -c 'import aorta; from locomotion.LocomotionStatus import LocomotionStatus; print("SDK imports OK")'
 ```

@@ -64,7 +64,7 @@ def validate_catalog(root, catalog, robots):
         application_version = robot.get("application_version")
         require(application_version is None or (
             isinstance(application_version, str)
-            and re.fullmatch(r"V\d+\.\d+\.\d+", application_version) is not None),
+            and re.fullmatch(r"V\d+\.\d+\.\d+(?:-\d+)?", application_version) is not None),
             "Invalid robot application version")
         require(isinstance(robot.get("models"), list) and all(
             isinstance(model, str) and model for model in robot["models"]), "Invalid model list")
