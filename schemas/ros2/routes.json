@@ -19,6 +19,37 @@
   ],
   "routes": [
     {
+      "id": "audio.play_pcm",
+      "row": 57,
+      "kind": "topic",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/audio/play_pcm",
+        "schema": "aorta/schemas/topic/audio/pcm_playback.fbs",
+        "types": {
+          "message": "aorta.topic.audio.PcmPlayback"
+        }
+      },
+      "ros": {
+        "name": "/audio/play_pcm",
+        "type": "aorta_msgs/msg/PcmPlayback"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": 100,
+        "zero_on_deadman": false,
+        "rate_per_second": 100.0,
+        "burst": 5,
+        "max_request_bytes": 4096
+      }
+    },
+    {
       "id": "audio.raw_audio_dump",
       "row": 52,
       "kind": "topic",
@@ -1509,6 +1540,42 @@
         "rate_per_second": 5.0,
         "burst": 10,
         "max_request_bytes": 1048576
+      }
+    },
+    {
+      "id": "speech.speech_control",
+      "row": 58,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/speech_control",
+        "schema": "aorta/schemas/service/speech/speech_control.fbs",
+        "types": {
+          "request": "aorta.services.speech.SpeechControlRequest",
+          "response": "aorta.services.speech.SpeechControlResponse"
+        }
+      },
+      "ros": {
+        "name": "/speech_control",
+        "type": "speech_msgs/srv/SpeechControl"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096
       }
     },
     {

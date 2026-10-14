@@ -12,7 +12,7 @@ relevant references; this repository is not a device runtime.
 | Check or set up the developer environment | [vbot-dev-setup](skills/vbot-dev-setup/SKILL.md), then [environment guide](docs/getting-started/README.md) |
 | Configure the vbot device shell or check Aorta / ROS 2 access | [device environment](docs/getting-started/device-environment.md), [vbot-dev-setup](skills/vbot-dev-setup/SKILL.md), and [interface scope](docs/interfaces/aorta-ros2.md) |
 | Find supported capabilities or select an interface | [catalog](catalog/README.md), then the referenced interface document |
-| Select application / SDK versions or check compatibility | [Versions and compatibility](docs/compatibility.md), then the linked SDK guide |
+| Select application / SDK versions or check compatibility | [Versions and compatibility](docs/compatibility.md), [release configuration](catalog/release.md), then the linked SDK guide |
 | Read hardware telemetry or camera data | [sensors](docs/interfaces/sensors.md) or [cameras](docs/interfaces/cameras.md); select only the required streams |
 | Detect a person, greet on appearance, or use human keypoints | [perception interfaces](docs/interfaces/perception.md); start with built-in detections, not AprilTags or a new video/model pipeline |
 | Receive audio, recognized text, or voice events | [audio](docs/interfaces/audio.md); one family for frames, ASR, voice events, and UWB input completion |
@@ -37,7 +37,7 @@ Resolve a linked Skill to its physical checkout before using its relative resour
 ## Facts and scope
 
 - The current EDU release target is `foot_quadruped`. Other robot types are planned, even when hardware or connection guides are shared.
-- The supported robot application target is `V1.6.0`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
+- The supported robot application target is `V1.6.0-10`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
 - Use the capability catalog as an index, not proof of live availability. Unknown firmware / SDK versions, routes, and ROS2 mappings stay unknown; do not invent them.
 - Use the published wheel pairing in the Python SDK guide and the checked-in public Schema. Preserve Aorta package names and APIs. Recipes have offline previews and explicit device execution; building a target does not verify live compatibility.
 - Device Aorta CLI access is separate from SDK integration. ROS 2 uses a device-local bridge subset; use documented mappings and limitations, not identical-name assumptions.
@@ -67,5 +67,11 @@ or accuracy results out of usage guides.
 Retain interface contracts, operating limits, completion checks, and troubleshooting steps.
 Use `VBOT EDU robots` / `VBOT EDU 机器人` with this capitalization.
 Read [Contributing](CONTRIBUTING.md) before changing layout or shared robot documentation.
+Prepare VBOT Lab version iterations on the selected `pre_release/V<major>.<minor>.<patch>.X`
+branch for that version family; do not reuse one family branch for all later versions.
+Iteration branches allow direct commits and pushes without a PR, after user confirmation.
+Keep `main` for formal releases; do not open a release-promotion PR or publish a
+release unless explicitly requested. See [collaboration](.github/WORKFLOWS.md).
 Validate with `python3 tests/check_repository.py`, `python3 tests/test_agent_workspace.py`,
-and the applicable Bazel targets. Do not commit or publish unless requested.
+and the applicable Bazel targets. Keep changes local and uncommitted for review first;
+commit and push only after the user confirms the changes and requests synchronization.

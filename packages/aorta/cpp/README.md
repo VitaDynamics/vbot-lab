@@ -2,8 +2,8 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-Use the [edu-sdk-2026.9.24 release](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24):
-C++ SDK `2026.9.23`, ABI `12`, with EDU Schema pack `2026.9.24-v4`.
+Use the [edu-sdk-2026.10.14 release](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14):
+C++ SDK `2026.10.12`, ABI `13`, with EDU Schema pack `2026.10.13-v4`.
 The examples use C++17, Bazel 7.6.1 and the release's generated headers.
 They do not require Python wheels or local Schema generation.
 
@@ -16,17 +16,17 @@ does not configure cross-compilation. Build ARM64 programs on a prepared ARM64 b
 Check [compatibility](../../../docs/compatibility.md).
 
 Download the matching SDK archive, the EDU Schema archive and `SHA256SUMS` into
-`artifacts/edu-sdk-2026.9.24/`. From the checkout root on Linux x86_64:
+`artifacts/edu-sdk-2026.10.14/`. From the checkout root on Linux x86_64:
 
 ```bash
-cd artifacts/edu-sdk-2026.9.24
+cd artifacts/edu-sdk-2026.10.14
 sha256sum --ignore-missing -c SHA256SUMS
 mkdir cpp-sdk-x86_64 edu-schema
-tar --zstd -xf aorta-cpp-sdk-2026.9.23-abi12-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64
-tar --zstd -xf aorta-edu-schema-pack-2026.9.24-v4.tar.zst -C edu-schema
+tar --zstd -xf aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64
+tar --zstd -xf aorta-edu-schema-pack-2026.10.13-v4.tar.zst -C edu-schema
 cd ../..
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.9.24/cpp-sdk-x86_64"
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.9.24/edu-schema"
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.14/cpp-sdk-x86_64"
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema"
 ```
 
 Both selected archive checksums must pass; the checksum command skips absent assets.
@@ -135,13 +135,13 @@ bazel build "//recipes/$RECIPE:main_cpp"
 PACKAGE_DIR=$(mktemp -d /tmp/vbot-cpp-app-XXXXXX)
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta"
 cp -L "bazel-bin/recipes/$RECIPE/main_cpp" "$PACKAGE_DIR/bin/$RECIPE"
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.12" "$PACKAGE_DIR/lib/"
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/"
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/"
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
    "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
    "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
    "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/"
-file "$PACKAGE_DIR/bin/$RECIPE" "$PACKAGE_DIR/lib/libaorta_core.so.12"
+file "$PACKAGE_DIR/bin/$RECIPE" "$PACKAGE_DIR/lib/libaorta_core.so.13"
 LD_LIBRARY_PATH="$PACKAGE_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
   ldd "$PACKAGE_DIR/bin/$RECIPE"
 (cd "$PACKAGE_DIR" && find bin lib licenses -type f -exec sha256sum {} + > SHA256SUMS)

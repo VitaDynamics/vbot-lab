@@ -10,14 +10,14 @@ the SDK, connects an EDU client to the robot, and receives live robot state. Che
 [compatibility matrix](../../../docs/compatibility.md) for the supported robot software
 image, and the release's `EDU_SDK_MANIFEST.json` for the version pairing.
 
-Install the Python wheels from [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24).
+Install the Python wheels from [edu-sdk-2026.10.14](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14).
 The release manifest, not identical version numbers, defines the pairing:
 
 | Distribution | Version | Purpose |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.9.23` | `import aorta`; Python API and platform-specific native runtime |
-| `aorta-msgs` | `2026.9.23` | Base generated messages and schema metadata |
-| `vbot-edu-msgs` | `2026.9.24` | EDU generated messages and schema metadata |
+| `aorta-sdk` | `2026.10.12` | `import aorta`; Python API and platform-specific native runtime |
+| `aorta-msgs` | `2026.10.12` | Base generated messages and schema metadata |
+| `vbot-edu-msgs` | `2026.10.13` | EDU generated messages and schema metadata |
 
 The Aorta and EDU wheels carry their `LICENSE` and `NOTICE` under `.dist-info/licenses/`.
 The FlatBuffers wheel from PyPI carries no license file, so the release attaches its upstream
@@ -30,7 +30,7 @@ See [compatibility](../../../docs/compatibility.md).
 
 ## 1. Choose the release wheels
 
-From `edu-sdk-2026.9.24`, download these three wheels for the selected platform,
+From `edu-sdk-2026.10.14`, download these three wheels for the selected platform,
 plus `SHA256SUMS` and `EDU_SDK_MANIFEST.json`:
 
 | Wheel | Role |
@@ -43,22 +43,22 @@ Choose the `aorta_sdk` wheel for the machine — `linux_aarch64` (S100), `linux_
 `macosx_11_0_arm64`. Python 3.10 or newer is required. The `linux_*` tags are broad: those
 two wheels are Ubuntu/glibc builds.
 
-`vbot_edu_msgs` also needs `flatbuffers`. The release attaches the `flatbuffers` 25.12.19
+`vbot_edu_msgs` also needs `flatbuffers`. The release attaches the `flatbuffers` 25.9.23
 wheel as well, so the four wheels install without network access; the commands below take
-`flatbuffers==25.12.19` from PyPI instead. `EDU_SDK_MANIFEST.json` records every wheel
+`flatbuffers==25.9.23` from PyPI instead. `EDU_SDK_MANIFEST.json` records every wheel
 version under `pairing.wheels`.
 
 ## 2. Install with network access
 
 Keep binaries out of Git. Put the three matching wheels, `SHA256SUMS`, and
-`EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.9.24/`. In the environment that
+`EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.10.14/`. In the environment that
 will run Python, ensure Python 3.10+, venv support, and access to PyPI are available.
 From the parent of `artifacts/`, run on Linux:
 
 ```bash
 uname -m
 python3 --version
-cd artifacts/edu-sdk-2026.9.24
+cd artifacts/edu-sdk-2026.10.14
 sha256sum --ignore-missing -c SHA256SUMS
 cd ../..
 python3 -m venv .venv
@@ -67,10 +67,10 @@ unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 SDK_PLATFORM=linux_x86_64
 python -m pip install \
-  "artifacts/edu-sdk-2026.9.24/aorta_sdk-2026.9.23-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.9.24/aorta_msgs-2026.9.23-py3-none-any.whl \
-  artifacts/edu-sdk-2026.9.24/vbot_edu_msgs-2026.9.24-py3-none-any.whl \
-  "flatbuffers==25.12.19"
+  "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
+  "flatbuffers==25.9.23"
 python -m pip check
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; print("SDK imports OK")'
 ```

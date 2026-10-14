@@ -4,7 +4,7 @@
 
 - Build identifier: `foot_quadruped`.
 - EDU scope: the only robot type in the current release scope.
-- Supported robot application version: `V1.6.0`.
+- Supported robot application version: `V1.6.0-10`.
 - Available guides: connection, shell setup, hardware, SLAM, and Agent interfaces.
   Python/C++ Recipes are available; see the compatibility matrix for component availability.
 

@@ -33,7 +33,7 @@ Skills and `AGENTS.md` supply instructions; they do not grant additional OS perm
 
 ## Version compatibility
 
-These APIs target robot application **V1.6.0** on `foot_quadruped` EDU.
+These APIs target robot application **V1.6.0-10** on `foot_quadruped` EDU.
 Check the [compatibility matrix](../../compatibility.md) and the installed runtime before integration.
 Use the [integration guide](../../guides/agent-integration.md) to verify API responses,
 content paths, and behavior in a new Turn. Keep your source content and backups in your

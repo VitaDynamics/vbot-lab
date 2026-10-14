@@ -1,21 +1,23 @@
-# 音频与语音输入
+# 音频与语音
 
 <p align="center"><a href="audio.md">English</a> | 中文</p>
 
-本功能域统一包含音频帧、UWB 输入结束、识别文本与语音事件。
+本功能域统一包含音频帧、UWB 输入结束、识别文本、语音事件、扬声器 PCM 输入与语音策略控制。
 
 Python SDK 实现见 [audio Recipe](../../recipes/audio/README.zh-CN.md)，包含源码、Bazel 目标、离线预览与显式设备运行。接口语义以下文为准。
+此 Recipe 采集输入与事件，不发布 PCM 或修改语音策略。
 按应用需要选择数据表示：文本触发类应用使用识别文本，只有自行处理音频时才使用音频帧。
 
 ## 前置条件与接口
 
-当前适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0**，
+当前适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-10**，
 路由可用性须结合[兼容矩阵](../compatibility.zh-CN.md)确认。
 使用 vbot 账户登录并完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)。
 语音链路需要运行；UWB 输入还需要遥控器及其语音输入功能可用。
 仅在参与者同意后采集语音或转写内容，默认不保留或上传音频。
 
-这些接口均为 **pub/sub，只读订阅**；订阅本身不会启动录音。
+下表输出为 **pub/sub，只读订阅**；订阅本身不会启动录音。
+PCM 发布和语音策略修改属于独立操作，见下文。
 
 | 输出 | Aorta topic | Aorta 根类型 | ROS 2 topic | ROS 2 消息类型 |
 | --- | --- | --- | --- | --- |
@@ -49,15 +51,20 @@ timeout 15s aorta schema get /audio/uwb_adpcm_segment --describe
 timeout 15s aorta schema get /uwb/audio_done --describe
 timeout 15s aorta schema get /speech/asr_result --describe
 timeout 15s aorta schema get /voice/event --describe
+timeout 15s aorta schema get /audio/play_pcm --describe
+timeout 15s aorta schema get srv/speech_control --describe
 timeout 15s ros2 topic list --no-daemon -t
 timeout 15s ros2 interface show foxglove_msgs/msg/RawAudio
 timeout 15s ros2 interface show aorta_msgs/msg/AudioDoneEvent
 timeout 15s ros2 interface show aorta_msgs/msg/AsrResult
+timeout 15s ros2 interface show aorta_msgs/msg/PcmPlayback
+timeout 15s ros2 interface show speech_msgs/srv/SpeechControl
 ```
 
 这些检查只读取路由和类型信息，不获取音频载荷。遥控器空闲时两条 UWB 流都可能没有输出；
 文本和语音事件取决于语音链路的活动。
 能发现接口不表示当前正在进行语音输入。
+CLI 的 `srv/` 前缀明确选择 service 元数据，服务名仍为 `/speech_control`。
 
 ## 选择并理解输出
 
@@ -70,8 +77,78 @@ timeout 15s ros2 interface show aorta_msgs/msg/AsrResult
   ASR 事件需处理 `is_final` 和 `is_reject`，不对被拒绝或中间文本执行动作。
   用 `session_id`、`generation` 与可选交互上下文关联事件；未知事件类型忽略，不当作命令。
   同时消费最终文本与同轮 ASR 事件时需去重，避免重复触发。
-- 输入结束、最终识别与播放结束是不同事件。语音播放使用[语音 service](aorta-ros2.zh-CN.md)，
-  不是这些只读 topic。
+- 输入结束、最终识别与播放结束是不同事件。文本转语音使用[语音 service](aorta-ros2.zh-CN.md)；
+  已生成的 PCM 使用下文的播放输入，不是这些只读采集 topic。
+
+## 向扬声器发送 PCM
+
+`/audio/play_pcm` 是 **pub/sub 控制输入**：通过 Aorta 发布 `aorta.topic.audio.PcmPlayback`，
+或向同名 ROS 2 topic 发布 `aorta_msgs/msg/PcmPlayback`。
+它不是麦克风音频流、ASR 输入，也不是请求／响应 service。
+发声前需协调其他音频应用并确认播放音量。
+
+| 字段 | 必需值或含义 |
+| --- | --- |
+| `frame_sequence` | 无符号帧序号，在同一音频流内递增 |
+| `sample_rate` | `16000` Hz |
+| `bit_depth` | `16` bit |
+| `num_channels` | `1`，单声道 |
+| `num_samples` | 当前帧采样数，必须等于 `audio_data` 的长度 |
+| `audio_data` | 非空的有符号 16 位采样数组，取值 -32768 至 32767；不是编码文件或字节数组 |
+
+只发送采样，不带 WAV 文件头或数据内的开始／结束标记。第一帧有效非空数据启动播放，并可能中断正在播放的闲聊 TTS；
+停止发布后，接收端在静默超时后关闭音频流并排空已排队音频。发布消息不等于播放完成回执，
+`/uwb/audio_done` 也不确认扬声器播放完成。
+
+先准备或重采样到所需格式，再按音频节奏发送小帧，不把整段录音装入一条消息。
+例如 20 ms 为 320 个采样、640 字节采样数据，不含消息封装开销。
+ROS bridge 要求单一发布者，序列化消息不超过 4096 字节，最多每秒 100 条、突发 5 条；
+缺少输入的超时为 100 ms，不会注入零采样。这些 bridge 限制不定义直接 Aorta 发布者的所有权。
+原生格式错误、采样为空或长度不匹配的帧会丢弃。
+退出时停止生产数据并关闭 publisher，不发送自行约定的结束帧。
+
+UWB 输入为 8 kHz ADPCM，不是这里的 16 kHz PCM；应用需要转换播放时先解码和重采样，
+不要将 RawAudio 的载荷字节直接填入采样数组。仅需播报文字时，优先使用 `/speech/set_speak`，
+无需自行生成 PCM。
+
+## 查询或修改语音策略
+
+`/speech_control` 是 **service**，映射到同名 ROS 2 service，类型为
+`speech_msgs/srv/SpeechControl`。原生 Aorta 使用
+`aorta.services.speech.SpeechControlRequest` 和 `aorta.services.speech.SpeechControlResponse`。
+字段定义见 [Aorta Schema](../../schemas/aorta/schemas/service/speech/speech_control.fbs)
+及 [ROS 2 service 定义](../../schemas/ros2/speech_msgs/srv/SpeechControl.srv)。
+
+| 请求类型 | 含义 | 使用字段 |
+| --- | --- | --- |
+| 1／2／5 | 查询命令识别／闲聊／连续命令识别 | `request_type`，只读查询 |
+| 3 | 设置命令识别模式 | `mode`，并按下方规则使用 `enable` 兜底 |
+| 4／6 | 开启或关闭闲聊／连续命令识别 | `enable` |
+| 7／8 | 通知语音策略进入／退出动作模式 | `request_type` 选择开启／关闭 |
+| 9／10 | 通知语音策略进入／退出 avatar 模式 | `request_type` 选择开启／关闭 |
+| 11／12 | 通知语音策略进入／退出领航模式 | `request_type` 选择开启／关闭 |
+| 13／14 | 通知进入／退出低功耗语音抑制 | `request_type` 选择开启／关闭 |
+| 15／16 | 通知 RTC 会话开始／结束 | `request_type` 选择开启／关闭 |
+| 17 | 同步主动交互请求状态 | `enable` |
+
+类型 3 的 `mode=0` 为关闭，`mode=1` 为本地语音服务识别，`mode=2` 为云端 ASR。
+非零 mode 优先于 `enable`；mode 为 0 时，`enable=false` 选择关闭，
+`enable=true` 选择本地模式 1。不要传入 0–2 以外的 mode。
+类型 7–17 只改变语音策略状态，不会让机器人运动、选择运动模式或切换硬件功耗状态。
+
+查询的业务字段例如：
+
+```json
+{"request_type": 1, "enable": false, "mode": 0}
+```
+
+此处是业务载荷，不是序列化后的 Aorta service 封装；构建请求时遵循 SDK 的 service／header 约定。
+检查原生 `status.code` 和 `message`，或 ROS 2 `success` 和 `message`，再查看
+`cmd_recognition_status`、`cmd_recognition_mode`、`chat_function_status` 和 `continuous_cmd_status`。
+修改后再次查询，不把传输成功当作状态确认。
+低功耗语音抑制可能拒绝开关修改；动作／avatar／领航模式下不能开启闲聊。
+与当前应用协调修改，只恢复自己改变的设置，发现接口时不要发送模式通知。
+ROS bridge 最多允许一个在途请求，service 超时 5 秒，每秒 5 次、突发 10 次，请求上限 4096 字节。
 
 ## 按来源区分 ASR 结果
 

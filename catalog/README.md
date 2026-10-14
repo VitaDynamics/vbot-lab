@@ -5,6 +5,8 @@
 A local index of workflows and interfaces, not a device-discovery service.
 Use [capabilities.json](capabilities.json) to locate the relevant workflow, interface,
 SDK requirement, Recipe, and verification boundary without reading every document.
+For source, application, SDK, Schema and image pairing, see the
+[release configuration](release.md) and [release.json](release.json).
 
 ## Query the catalog
 
@@ -62,7 +64,7 @@ device's interface availability and operating prerequisites before following the
 
 SDK metadata records integration and version separately. Robot profiles distinguish the current
 release target from planned releases; empty `models` means exact models are not recorded.
-The robot profile's `application_version` is the supported application target: `V1.6.0`
+The robot profile's `application_version` is the supported application target: `V1.6.0-10`
 for `foot_quadruped`, and `null` for unreleased types. Queries return it under `robot`.
 It is not the SDK or system-image version and does not mean "this version or newer".
 `minimum_firmware` remains a separate optional lower bound; `null` does not remove the
@@ -90,7 +92,7 @@ for the human-readable matrix.
 
 Do not copy topic names, fields, units, or HTTP route lists into this index by hand.
 They remain in the referenced Schema/contract sources; generate structural indexes from those
-sources when integrated. The application target is `V1.6.0`; check the installed application
+sources when integrated. The application target is `V1.6.0-10`; check the installed application
 and runtime availability on the selected device.
 
 Cameras, audio, locomotion and RCP remain grouped by interface family; the `recipe` field links to the

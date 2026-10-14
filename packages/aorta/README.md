@@ -23,9 +23,9 @@ Python 3.10 or newer is required. Download the `aorta_sdk` wheel for the machine
 `linux_aarch64`, `linux_x86_64`, or `macosx_11_0_arm64` — plus `aorta_msgs` and
 `vbot_edu_msgs` from GitHub Releases. SDK downloads require network access.
 
-`vbot_edu_msgs` also requires `flatbuffers`; the `edu-sdk-2026.9.24` release attaches the
-`flatbuffers` 25.12.19 wheel. Follow the [Aorta Python SDK guide](python/README.md) to
-install the SDK wheels in a dedicated venv, with `flatbuffers==25.12.19` from PyPI or from
+`vbot_edu_msgs` also requires `flatbuffers`; the `edu-sdk-2026.10.14` release attaches the
+`flatbuffers` 25.9.23 wheel. Follow the [Aorta Python SDK guide](python/README.md) to
+install the SDK wheels in a dedicated venv, with `flatbuffers==25.9.23` from PyPI or from
 the release.
 That guide also covers preparing dependencies for a robot without Internet access,
 connection modes, and a runnable example.
@@ -35,12 +35,12 @@ connection modes, and a runnable example.
 For Bazel examples, pinned versions, runtime deployment and optional camera decoding,
 follow the [C++ guide](cpp/README.md). The commands below describe the archive layout.
 
-Extract `aorta-cpp-sdk-<ver>-abi12-ubuntu22.04-<arch>.tar.zst` and
+Extract `aorta-cpp-sdk-<ver>-abi13-ubuntu22.04-<arch>.tar.zst` and
 `aorta-edu-schema-pack-<ver>-v4.tar.zst` into separate directories:
 
 ```bash
 mkdir -p sdk pack
-tar --zstd -xf aorta-cpp-sdk-<ver>-abi12-ubuntu22.04-<arch>.tar.zst -C sdk
+tar --zstd -xf aorta-cpp-sdk-<ver>-abi13-ubuntu22.04-<arch>.tar.zst -C sdk
 tar --zstd -xf aorta-edu-schema-pack-<ver>-v4.tar.zst -C pack
 ```
 
@@ -55,7 +55,7 @@ target:
 cmake_minimum_required(VERSION 3.16)
 project(edu_bms_roundtrip LANGUAGES CXX)
 
-find_package(Aorta 12 CONFIG REQUIRED)
+find_package(Aorta 13 CONFIG REQUIRED)
 
 add_executable(edu_bms_publisher publisher.cc)
 target_compile_features(edu_bms_publisher PRIVATE cxx_std_17)
@@ -68,9 +68,8 @@ target_include_directories(edu_bms_subscriber PRIVATE "${EDU_SCHEMA_INCLUDE}")
 target_link_libraries(edu_bms_subscriber PRIVATE Aorta::cpp)
 ```
 
-`12` requests the Core ABI generation that the archive name and version file carry. From
-Aorta 2026.9.23 a versionless `find_package(Aorta CONFIG REQUIRED)` also works; earlier
-archives require the `12`.
+`13` selects the Core ABI generation carried by the current archive and version file.
+This release also supports a versionless `find_package(Aorta CONFIG REQUIRED)`.
 
 `publisher.cc`:
 
@@ -155,7 +154,7 @@ cmake --build build -j2
 LD_LIBRARY_PATH="$PWD/sdk/lib" ldd build/edu_bms_subscriber
 ```
 
-`ldd` must resolve `libaorta_core.so.12` and `libaorta_cpp.so` from the extracted
+`ldd` must resolve `libaorta_core.so.13` and `libaorta_cpp.so` from the extracted
 `sdk/lib` directory. Run every binary with `LD_LIBRARY_PATH="<sdk>/lib"` so the loader
 finds both libraries.
 
@@ -177,7 +176,7 @@ RECEIVED sensor_timestamp_ns=987654321 voltage_mv=49500
 
 On the robot, use the delivered session configuration. The S100 image ships GCC 11.4 but no
 CMake, so build aarch64 binaries on a workstation and copy the executable together with
-`libaorta_core.so.12` and `libaorta_cpp.so` to a user directory on the robot:
+`libaorta_core.so.13` and `libaorta_cpp.so` to a user directory on the robot:
 
 ```bash
 export ZENOH_SESSION_CONFIG_URI=/opt/vita/aorta/edu/edu_session.json5

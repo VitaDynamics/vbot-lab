@@ -63,6 +63,10 @@ scope, `.bashrc` configuration, and separate bounded live checks.
 
 ## Validation and future tools
 
+`check_release.py` compares [release configuration](../catalog/release.md) against the
+checkout's component versions and optionally checks already-downloaded manifests and
+asset hashes. It is offline, read-only and does not publish or certify a release.
+
 For packaged Bazel dependencies, see [offline builds](../docs/development/offline-build.md).
 `prepare_bazel_offline.py` explicitly prepares a bundle on a connected machine;
 `bazel_offline.py` verifies it and runs Bazel without repository downloads.

@@ -76,7 +76,7 @@ not the artifact to import into the robot runtime.
 The [content API reference](content-api.md) documents requests, responses, upload / readback
 commands, returned-path checks, and deletion / recovery boundaries. Content is managed
 by the device service; the examples do not write directly into its filesystem.
-The supported robot application version is **V1.6.0**;
+The supported robot application version is **V1.6.0-10**;
 see the [compatibility matrix](../../compatibility.md) for pairing requirements.
 
 After upload, check readback and use a matching request in a new Turn, following the

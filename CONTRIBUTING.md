@@ -16,7 +16,7 @@ code or documentation changes, and link an existing forum discussion when releva
 - Put Aorta SDK integration under `packages/aorta/python/` and `packages/aorta/cpp/`, single-task reference programs under `recipes/`, and complete reference applications under `blueprints/`. Document actual availability; outlines and planned Blueprints must not appear runnable.
 - Maintain one Skill source under `skills/`, exposed through `.agents/skills/` and `.claude/skills/` symlinks. Keep `CLAUDE.md` as a thin import of the shared `AGENTS.md`; do not maintain divergent harness instructions. Skill discovery uses English `SKILL.md`; its `.zh-CN.md` is the paired translation.
 - Keep `AGENTS.md` short and task-oriented. Record capability scope and references in `catalog/`, retain structural facts in Schema, and explain behavior in interface docs. Check catalog changes with the offline tool tests; unknown versions and routes must not become implied support.
-- Maintain every document in English and Simplified Chinese. Default filenames use English; translations use `.zh-CN.md`. Update both in the same PR and retain language navigation and same-language document links.
+- Maintain every document in English and Simplified Chinese. Default filenames use English; translations use `.zh-CN.md`. Update both in the same change and retain language navigation and same-language document links.
 - Write user guides as complete, correct usage workflows: prerequisites, commands, responses, completion conditions, and recovery. Keep test reports separate from usage instructions.
 - Follow the [robot-type documentation structure](docs/robots/README.md): reuse shared chapters and hardware specifications, isolate type-specific differences, and update the release scope and compatibility matrix without implying support for unreleased types.
 - Keep the existing shared wired connection and sensor specification for `foot_quadruped` and `wheel_quadruped`; do not duplicate them or apply them to `foot_humanoid`. Current EDU release scope remains `foot_quadruped` until separately released and documented.
@@ -33,8 +33,14 @@ contributions and coordinate compatibility changes. [CODEOWNERS](.github/CODEOWN
 lists the reviewers for all repository paths; update it when administrator membership changes.
 Review routing does not grant repository permissions or replace configured merge requirements.
 
-Create a topic branch and open a PR against `main`; do not push directly to `main`.
-Merge requires approval from another listed maintainer, passing `repository-layout`
+VBOT Lab version iterations use a separate `pre_release/V<major>.<minor>.<patch>.X`
+branch for each version family. After checks, maintainers may commit and push directly
+to that iteration branch; iteration updates do not require a PR. A topic PR targeting
+the iteration branch remains optional when review is wanted.
+`main` is reserved for formal releases. Open a release-promotion PR only when a formal
+release has been explicitly requested; do not create one during ordinary iteration work.
+Do not push directly to `main` or imply support for unreleased capabilities.
+PRs to `main` require approval from another listed maintainer, passing `repository-layout`
 checks against the current base, and resolved review discussions. New reviewable commits
 require renewed approval. Maintainers merge with **Squash and merge**; administrators
 follow the same protection rules. See the [collaboration workflow](.github/WORKFLOWS.md)

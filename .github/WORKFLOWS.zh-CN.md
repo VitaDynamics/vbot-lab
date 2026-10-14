@@ -2,7 +2,8 @@
 
 <p align="center"><a href="WORKFLOWS.md">English</a> | 中文</p>
 
-当前工作流在 GitHub 托管运行器执行无网络、无设备操作的仓库内容与离线 Agent 工作区检查。
+当前工作流在 PR 及 `main`、`pre_release/**` 推送时，在 GitHub 托管运行器执行
+无网络、无设备操作的仓库内容与离线 Agent 工作区检查。
 检出代码由 GitHub Actions 完成；检查脚本本身不请求网络。
 
 检查双语文档、Codex／Claude Code 的相对 Skill 链接、能力索引决策、本地环境工具行为，
@@ -10,7 +11,7 @@
 
 当前工作流尚不包含依赖构建和 SDK 测试。
 
-## 提交 PR 前
+## 提交代码或 PR 前
 
 在仓库根目录运行相同的离线检查：
 
@@ -21,20 +22,56 @@ python3 tests/test_agent_workspace.py
 python3 tests/test_recipes.py
 python3 tests/test_family_recipes.py
 python3 tests/test_offline_build.py
+python3 tests/test_release.py
 ```
 
-按[贡献说明](../CONTRIBUTING.zh-CN.md)，在 PR 中附上检查结果及相关构建或设备验证情况。
+按[贡献说明](../CONTRIBUTING.zh-CN.md)，为修改保留检查结果及相关构建或设备验证情况。
 新建 Issue 时使用问题报告或文档改进模板；一般使用问题优先到
 [社区与支持](../docs/community/README.zh-CN.md)交流。
 
-## 评审与合并
+[发布配置检查](../catalog/release.zh-CN.md)比较本地组件配套关系并测试不一致时的处理，
+不下载附件，也不发布 Release。
 
-1. 在工作分支修改，并向 `main` 提交 PR。
+## 迭代分支更新
+
+使用选定版本族的 `pre_release/V<major>.<minor>.<patch>.X` 分支。
+维护者完成适用检查后，可以直接提交和推送，不要求 PR；需要评审时也可使用工作分支 PR。
+保留禁止强推和删除的保护。CI 在迭代分支推送后运行，不要求每个新提交先创建 PR
+或先获得推送前的 CI 结果。
+
+## 正式发布的评审与合并
+
+1. 只有明确要求正式发布时，才向 `main` 提交 PR。
 2. 由 [CODEOWNERS](CODEOWNERS) 列出的另一位维护者批准。
    新的待评审提交会使此前批准失效；最后一次推送的变更须由推送者之外的人批准。
-3. 解决评审讨论，确保 GitHub Actions 的 `repository-layout` 检查在当前 `main` 基础上通过。
+3. 解决评审讨论，确保 GitHub Actions 的 `repository-layout` 检查在当前目标分支基础上通过。
    目标分支有新提交时，更新工作分支。
-4. 使用 **Squash and merge**。禁止直接推送、强推或删除 `main`，管理员也未配置绕过权限。
+4. 使用 **Squash and merge**。为 `main` 配置保护，禁止直接推送、强推或删除，
+   不配置管理员绕过权限。
+
+## 版本迭代与正式发布
+
+| 引用 | 用途 |
+| --- | --- |
+| `main` | 最新正式版本，不合入尚未正式发布的版本更新 |
+| `pre_release/V1.6.0.X` | `V1.6.0` 版本族的长期迭代分支，末尾 `X` 保留为字母 |
+| `V1.6.0.10` | 对应机器人应用 `V1.6.0-10` 的迭代源码 tag；后续迭代使用新的数字后缀 |
+| `edu-sdk-*` | SDK 附件 Release tag，与源码 tag 和机器人应用版本分别管理 |
+
+`V1.6.0` 的分支不作为所有后续版本的共用分支。
+例如，新版本族 `V1.6.1` 使用自己的 `pre_release/V1.6.1.X` 分支。
+
+1. 新版本族从明确的基线创建分支；切换管理方式时保留已有迭代内容。
+   后续修改可直接向该版本族的分支提交，不要求 PR。
+2. 更新[发布配置](../catalog/release.zh-CN.md)、组件配套与双语文档，
+   完成离线检查及适用的 SDK／构建／设备检查后，在检查通过的迭代提交上创建新源码 tag。
+3. 迭代 tag 不代表已批准正式发布。后续修改继续在选定的迭代分支上进行，
+   日常迭代期间不提前创建提升 PR。
+4. 只有明确要求正式发布时，才选定准确的已检查快照，填齐发布配置，提交提升至 `main` 的 PR。
+   不混入其他修改，不移动已有迭代 tag；需要补充修改时使用新 tag。
+5. 得到正式发布确认并完成维护者评审后，才通过 PR 流程更新 VBOT Lab 的 `main`，
+   并按需发布已确认的源码版本和 SDK 附件。本工作流不会自动发布版本，
+   不对 `main` 执行 reset 或强推。
 
 匹配 `V*` 和 `edu-sdk-*` 的 tag 允许新增，但不能改写或删除。
 需要修正时使用新 tag，不要让已有版本指向另一份内容。

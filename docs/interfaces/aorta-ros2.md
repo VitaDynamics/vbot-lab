@@ -8,14 +8,14 @@ robot interface. Start with the [device shell setup](../getting-started/device-e
 
 ## Version scope
 
-This reference targets robot application **V1.6.0** on `foot_quadruped` EDU.
+This reference targets robot application **V1.6.0-10** on `foot_quadruped` EDU.
 Discover the exact routes and inspect their delivered types before use; configuration
 limits are listed in the [compatibility matrix](../compatibility.md).
 Other robot types are not covered by this software scope.
 
 This page lists the public topic set and supported mappings, along with services and the
-RCP action. The topic tables contain 46 distinct Aorta routes: 43 subscription outputs
-and 3 command inputs. After discovering an output, take a bounded sample to check its
+RCP action. The topic tables contain 47 distinct Aorta routes: 43 subscription outputs
+and 4 command inputs. After discovering an output, take a bounded sample to check its
 producer; do not publish to command topics as an environment check.
 Python SDK wheel installation and checked-in Schema sources are documented separately;
 device CLI access does not require installing the Python SDK.
@@ -34,7 +34,7 @@ capability-check entries.
 | [Sensors and hardware telemetry](sensors.md) | Battery, IMU, LiDAR, UWB, GNSS, servo feedback |
 | [Cameras and AprilTags](cameras.md) | Calibration, compressed video, tag detection |
 | [Perception](perception.md) | Object detections and human keypoints |
-| [Audio](audio.md) | Audio frames, ASR text, voice events, UWB input completion |
+| [Audio](audio.md) | Audio frames, ASR text, voice events, UWB input completion, PCM playback and speech-policy service |
 | [Locomotion](locomotion.md) | State, terminal reports, joystick/velocity inputs |
 | [System and peripherals](system-peripherals.md) | System state, display, ear-light modulation |
 | [RCP](rcp.md) | Task action and trace events |
@@ -101,7 +101,7 @@ not by assuming a wildcard describes a single endpoint.
 
 ## Command topics
 
-All three routes below are **pub/sub inputs**: the application publishes; the ROS bridge
+All four routes below are **pub/sub inputs**: the application publishes; the ROS bridge
 forwards ROS → Aorta. They are not robot-state subscriptions. Before publishing, select one
 control owner, inspect the delivered type and QoS, and define cleanup and stopping behavior.
 For motion, confirm the operating mode, a supervised safe area, and a reachable stopping
@@ -112,6 +112,7 @@ control. Do not send placeholder or zero-valued test messages during discovery.
 | [Joystick control input](locomotion.md) | `/locomotion/joy` | `/joy` | pub/sub — publish | `locomotion.Joy` | `sensor_msgs/msg/Joy` |
 | [Velocity control input](locomotion.md) | `/locomotion/velocity_command` | `/vel_cmd` | pub/sub — publish | `aorta.topic.navigation.Twist` | `geometry_msgs/msg/Twist` |
 | [Ear-light brightness modulation](system-peripherals.md) | `/light/ear_modulation` | `/light/ear_modulation` | pub/sub — publish | `aorta.topic.peripheral.EarModulation` | `aorta_msgs/msg/EarModulation` |
+| [PCM speaker playback](audio.md) | `/audio/play_pcm` | `/audio/play_pcm` | pub/sub — publish | `aorta.topic.audio.PcmPlayback` | `aorta_msgs/msg/PcmPlayback` |
 
 - Joystick axes must be finite and within the normalized range [-1, 1]. Do not invent an
   axis/button mapping from the generic ROS type. The native Joy message has no ROS header;
@@ -122,6 +123,9 @@ control. Do not send placeholder or zero-valued test messages during discovery.
   It does not select an RGB color or start an effect; use the light-control or gradient
   service for those operations. When an active ROS forwarding session ends, the bridge
   restores the neutral factor `1.0`, not darkness.
+- PCM playback requires 16 kHz, signed 16-bit mono samples and a matching sample count.
+  It plays sound rather than recording or recognizing speech. See [audio](audio.md) for
+  frame format, cadence, limits and cleanup; do not publish test audio during discovery.
 - The ROS command bridge enforces single-writer ownership, input validation, and a missing-input
   timeout. Rejected frames are dropped, not silently clamped. On an active session ending,
   motion routes send their terminal zero command and stop forwarding; this is not a substitute
@@ -159,6 +163,7 @@ environment check, even when their purpose is read-only.
 | `/slam/query_map` | `/slam/query_map` | service — query map data |
 | `/volume_control` | `/volume_control` | service — query/change audio volume according to request |
 | `/speech/set_speak` | `/set_speak` | service — speech playback/control |
+| `/speech_control` | `/speech_control` | service — [query/change speech policy](audio.md), depending on request type |
 
 Firmware queries require the appropriate `target_device_type`: MOTOR=`0`, SERVO=`1`,
 LIDAR=`2`, UWB=`3`. Inspect the delivered request type before calling; an empty/default request

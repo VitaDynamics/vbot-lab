@@ -1,0 +1,120 @@
+{
+  "format_version": 1,
+  "workspace": {
+    "branch": "pre_release/V1.6.0.X",
+    "tag": null
+  },
+  "robots": {
+    "foot_quadruped": {
+      "application_version": "V1.6.0-10"
+    }
+  },
+  "sdk": {
+    "repository": "VitaDynamics/vbot-lab",
+    "release_tag": "edu-sdk-2026.10.14",
+    "aorta_version": "2026.10.12",
+    "python": {
+      "minimum_version": "3.10",
+      "wheels": {
+        "aorta_sdk": "2026.10.12",
+        "aorta_msgs": "2026.10.12",
+        "vbot_edu_msgs": "2026.10.13",
+        "flatbuffers": "25.9.23"
+      },
+      "platforms": [
+        "linux_x86_64",
+        "linux_aarch64",
+        "macosx_11_0_arm64"
+      ]
+    },
+    "cpp": {
+      "version": "2026.10.12",
+      "abi": 13,
+      "distribution": "ubuntu22.04",
+      "architectures": [
+        "x86_64",
+        "aarch64"
+      ]
+    },
+    "assets": [
+      {
+        "name": "aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-aarch64.tar.zst",
+        "sha256": "30031926d444ff45461dcbbe31bd7a5aa52f31c0bb0ef9f9d40cddedbf6b213e"
+      },
+      {
+        "name": "aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-aarch64.tar.zst.sha256",
+        "sha256": "553abb2f2ec0de6f8ca1f71a211ed04fc097d69f4692fa7476739010cd883381"
+      },
+      {
+        "name": "aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-x86_64.tar.zst",
+        "sha256": "28186a2918d0a22fe8a6cdd75cca22b712d880f0fc619d12f14ce3454856986a"
+      },
+      {
+        "name": "aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-x86_64.tar.zst.sha256",
+        "sha256": "b2383f7838e293c024dffcbf723a335a6afb6700a3592e4635ea26a1dcc3c1c7"
+      },
+      {
+        "name": "aorta-edu-schema-pack-2026.10.13-v4.tar.zst",
+        "sha256": "9e5c3fe8539f5be169e2f08b48b3a84fba58ed298cce07b74d1176cb83b31f35"
+      },
+      {
+        "name": "aorta-edu-schema-pack-2026.10.13-v4.tar.zst.sha256",
+        "sha256": "a0dc436a6769ff6ffc25f19a702f27fae4487f04d1ab5bc8245c8a96fc862c87"
+      },
+      {
+        "name": "aorta_msgs-2026.10.12-py3-none-any.whl",
+        "sha256": "236a064080055e7204e4bf20f3a9dd9e82d9f322a44a9d78cf6de0b1ac00f68a"
+      },
+      {
+        "name": "aorta_sdk-2026.10.12-py3-none-linux_aarch64.whl",
+        "sha256": "c1f7a03e023cbb50b1ec9252393f72f4713392af02e0ace7766461667760c333"
+      },
+      {
+        "name": "aorta_sdk-2026.10.12-py3-none-linux_x86_64.whl",
+        "sha256": "900d143041a422f9c3f7023aad7334c0ebcc17e0c549e0ed3a0e6f10c02b9afa"
+      },
+      {
+        "name": "aorta_sdk-2026.10.12-py3-none-macosx_11_0_arm64.whl",
+        "sha256": "ae6a27018d50378b121e5b60b5e2eda4c532e39919a533f52f2c22ac81b97cbc"
+      },
+      {
+        "name": "EDU_SDK_MANIFEST.json",
+        "sha256": "a4f8c0df656f3eeb0dcf713550820a63cd3e0b043e4f2e08fda8dd25224d1f93"
+      },
+      {
+        "name": "flatbuffers-25.9.23-py2.py3-none-any.whl",
+        "sha256": "255538574d6cb6d0a79a17ec8bc0d30985913b87513a01cce8bcdb6b4c44d0e2"
+      },
+      {
+        "name": "flatbuffers-25.9.23.LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "name": "SHA256SUMS",
+        "sha256": "4ebeaa6f23efd90b879346200bd0a0cdac4e706ab5cf0421515dfc0f45262ee8"
+      },
+      {
+        "name": "vbot_edu_msgs-2026.10.13-py3-none-any.whl",
+        "sha256": "3f7a741e3ff2b141b1fc7d37db475f3f1b2dc95b3e22c8766f7e88962a367dec"
+      },
+      {
+        "name": "vbot_edu_msgs-2026.10.13-py3-none-any.whl.sha256",
+        "sha256": "c68aa0557dcebf00bf160fa9d57cdad492d950837691362e5b50b00e1659848a"
+      }
+    ]
+  },
+  "schema": {
+    "version": "2026.10.13",
+    "pack_version": "2026.10.13-v4",
+    "asset": "aorta-edu-schema-pack-2026.10.13-v4.tar.zst",
+    "sha256": "9e5c3fe8539f5be169e2f08b48b3a84fba58ed298cce07b74d1176cb83b31f35",
+    "ros2_bridge_version": "2026.10.12"
+  },
+  "development": {
+    "bazel_version": "7.6.1",
+    "image": {
+      "reference": "crpi-0kb86kk5y2bv7o41.cn-shanghai.personal.cr.aliyuncs.com/vitarobotics/vbot-edu:dev-v0.0.1",
+      "digest": null
+    }
+  }
+}

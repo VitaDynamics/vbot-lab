@@ -39,7 +39,7 @@ cc_library(
     ctx.file("BUILD.bazel", """
 package(default_visibility = ["//visibility:public"])
 cc_import(name = "cpp", static_library = "lib/libaorta_cpp.a")
-cc_import(name = "core", shared_library = "lib/libaorta_core.so.12")
+cc_import(name = "core", shared_library = "lib/libaorta_core.so.13")
 cc_library(
     name = "sdk",
     hdrs = glob(["sdk_include/**/*.h", "sdk_include/**/*.hpp", "edu_include/**/*.h"]),

@@ -9,7 +9,7 @@
 VBOT Lab brings together task-oriented Skills, a capability catalog, the Aorta Python SDK,
 interface definitions, and reference programs for building robot applications.
 
-Current robot application target: **V1.6.0**, for `foot_quadruped` EDU.
+Current robot application target: **V1.6.0-10**, for `foot_quadruped` EDU.
 See the [compatibility matrix](docs/compatibility.md) for SDK and platform pairing.
 
 ## Build with your Agent

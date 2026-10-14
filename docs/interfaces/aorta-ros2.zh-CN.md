@@ -9,11 +9,11 @@ ROS 2 接口，并非另一套完全等价的机器人接口。请先完成[设�
 
 本参考适用于 `foot_quadruped` EDU 软件。接口是否可用取决于已安装固件，
 使用前请发现确切路由并检查交付的消息类型。
-本文统一适配机器人应用版本 **V1.6.0**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
+本文统一适配机器人应用版本 **V1.6.0-10**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
 此软件范围不覆盖其他机器人类型。
 
 本页列出开放 topic 集及受支持的映射，并整理 service 与 RCP action。
-topic 表共包含 46 个不同的 Aorta 路由：43 个订阅输出、3 个控制输入。
+topic 表共包含 47 个不同的 Aorta 路由：43 个订阅输出、4 个控制输入。
 发现输出路由后，限时获取样本检查发布者；不要通过向控制 topic 发布消息来检查环境。
 Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 设备 CLI 使用不要求安装 Python SDK。
@@ -30,7 +30,7 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 | [传感器与硬件遥测](sensors.zh-CN.md) | 电池、IMU、雷达、UWB、GNSS、舵机反馈 |
 | [相机与 AprilTag](cameras.zh-CN.md) | 标定、压缩视频、标签检测 |
 | [Perception](perception.zh-CN.md) | 目标检测与人体关键点 |
-| [Audio](audio.zh-CN.md) | 音频帧、ASR 文本、语音事件、UWB 输入结束 |
+| [Audio](audio.zh-CN.md) | 音频帧、ASR 文本、语音事件、UWB 输入结束、PCM 播放及语音策略 service |
 | [运动](locomotion.zh-CN.md) | 状态、终态报告、摇杆／速度输入 |
 | [系统与外设](system-peripherals.zh-CN.md) | 系统状态、显示、耳灯调制 |
 | [RCP](rcp.zh-CN.md) | 任务 action 与追踪事件 |
@@ -95,7 +95,7 @@ IMU、雷达、图像、地图与音频可能涉及较高带宽或隐私要求�
 
 ## 控制 topic
 
-下列三条路由均为 **pub/sub 输入**：应用发布，ROS bridge 按 ROS → Aorta 转发，
+下列四条路由均为 **pub/sub 输入**：应用发布，ROS bridge 按 ROS → Aorta 转发，
 不是机器人状态订阅。发布前明确唯一控制方、检查交付类型与 QoS，并约定清理和停止方式。
 运动操作还需确认运行模式、有人监护的安全区域以及可随时使用的停止控制。
 发现接口时不要发送占位消息或全零测试消息。
@@ -105,6 +105,7 @@ IMU、雷达、图像、地图与音频可能涉及较高带宽或隐私要求�
 | [摇杆控制输入](locomotion.zh-CN.md) | `/locomotion/joy` | `/joy` | pub/sub — 发布 | `locomotion.Joy` | `sensor_msgs/msg/Joy` |
 | [速度控制输入](locomotion.zh-CN.md) | `/locomotion/velocity_command` | `/vel_cmd` | pub/sub — 发布 | `aorta.topic.navigation.Twist` | `geometry_msgs/msg/Twist` |
 | [耳灯亮度调制](system-peripherals.zh-CN.md) | `/light/ear_modulation` | `/light/ear_modulation` | pub/sub — 发布 | `aorta.topic.peripheral.EarModulation` | `aorta_msgs/msg/EarModulation` |
+| [扬声器 PCM 播放](audio.zh-CN.md) | `/audio/play_pcm` | `/audio/play_pcm` | pub/sub — 发布 | `aorta.topic.audio.PcmPlayback` | `aorta_msgs/msg/PcmPlayback` |
 
 - 摇杆轴值必须有限，且处于归一化范围 [-1, 1]。不能从通用 ROS 类型猜测轴／按键映射。
   原生 Joy 消息没有 ROS header，ROS 时间戳与坐标系标识不会传入该消息。
@@ -113,6 +114,9 @@ IMU、雷达、图像、地图与音频可能涉及较高带宽或隐私要求�
 - 耳灯调制使用有限的 `value`，范围为 [0, 1]，乘到当前耳灯亮度上。
   它不选择 RGB 颜色，也不启动灯效；这些操作使用灯效控制或渐变 service。
   活跃的 ROS 转发会话结束时，bridge 恢复中性因子 `1.0`，不是关灯。
+- PCM 播放要求 16 kHz、有符号 16 位单声道采样及匹配的采样数。
+  它播放声音，不录音或识别语音；帧格式、节奏、限制和清理见 [audio](audio.zh-CN.md)，
+  发现接口时不要发布测试音频。
 - ROS 控制 bridge 实施单写入方占用、输入检查和输入中断超时保护。
   被拒帧直接丢弃，不自动截断数值。活跃会话结束时，运动路由发送终止零指令后停止转发；
   这不能替代机器人的正常停止控制。这些是 **bridge** 行为，不能据此认定任意直接使用
@@ -148,6 +152,7 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/slam/query_map` | `/slam/query_map` | service — 查询地图数据 |
 | `/volume_control` | `/volume_control` | service — 按请求查询／调整音量 |
 | `/speech/set_speak` | `/set_speak` | service — 语音播放／控制 |
+| `/speech_control` | `/speech_control` | service — 按请求类型[查询／修改语音策略](audio.zh-CN.md) |
 
 固件查询需要正确的 `target_device_type`：MOTOR=`0`、SERVO=`1`、LIDAR=`2`、UWB=`3`。
 调用前检查交付的请求类型，不能对所有设备类型都使用空请求／默认请求。

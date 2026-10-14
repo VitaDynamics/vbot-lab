@@ -2,7 +2,7 @@
   "format_version": 1,
   "robot_type": "foot_quadruped",
   "release_scope": "current_target",
-  "application_version": "V1.6.0",
+  "application_version": "V1.6.0-10",
   "models": [],
   "minimum_firmware": null,
   "guide": "docs/robots/foot_quadruped/README.md",

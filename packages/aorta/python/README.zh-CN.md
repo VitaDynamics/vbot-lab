@@ -8,14 +8,14 @@ Aorta Python SDK 通过 [vbot-lab Release](https://github.com/VitaDynamics/vbot-
 接收实时状态。支持的机器人镜像见[兼容矩阵](../../../docs/compatibility.zh-CN.md)，
 版本配对见 Release 内的 `EDU_SDK_MANIFEST.json`。
 
-从 [edu-sdk-2026.9.24](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.9.24)
+从 [edu-sdk-2026.10.14](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14)
 安装 Python wheel。版本配套以发布清单为准，而不是要求各包版本号相同：
 
 | 发行包 | 版本 | 用途 |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.9.23` | `import aorta`；Python API 与平台相关的原生运行库 |
-| `aorta-msgs` | `2026.9.23` | 基础消息的生成代码与 Schema 元数据 |
-| `vbot-edu-msgs` | `2026.9.24` | EDU 消息的生成代码与 Schema 元数据 |
+| `aorta-sdk` | `2026.10.12` | `import aorta`；Python API 与平台相关的原生运行库 |
+| `aorta-msgs` | `2026.10.12` | 基础消息的生成代码与 Schema 元数据 |
+| `vbot-edu-msgs` | `2026.10.13` | EDU 消息的生成代码与 Schema 元数据 |
 
 Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 `NOTICE`。
 PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上游许可证文本
@@ -27,7 +27,7 @@ PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上�
 
 ## 1. 选择 Release wheel
 
-从 `edu-sdk-2026.9.24` 下载所选平台的以下三个 wheel，
+从 `edu-sdk-2026.10.14` 下载所选平台的以下三个 wheel，
 以及 `SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`：
 
 | Wheel | 用途 |
@@ -40,20 +40,20 @@ PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上�
 `macosx_11_0_arm64`。需要 Python 3.10 或更高版本。`linux_*` 标签范围较宽：这两个 wheel
 是 Ubuntu/glibc 构建。
 
-`vbot_edu_msgs` 还依赖 `flatbuffers`。Release 同时附带 `flatbuffers` 25.12.19 wheel，
-四个 wheel 可以离线安装；下方命令改为从 PyPI 获取 `flatbuffers==25.12.19`。
+`vbot_edu_msgs` 还依赖 `flatbuffers`。Release 同时附带 `flatbuffers` 25.9.23 wheel，
+四个 wheel 可以离线安装；下方命令改为从 PyPI 获取 `flatbuffers==25.9.23`。
 `EDU_SDK_MANIFEST.json` 的 `pairing.wheels` 记录所有 wheel 的版本。
 
 ## 2. 联网安装
 
 不要把二进制加入 Git。将三个配套 wheel、`SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`
-放到 `artifacts/edu-sdk-2026.9.24/`。在实际运行 Python 的环境中，确保 Python 3.10+、
+放到 `artifacts/edu-sdk-2026.10.14/`。在实际运行 Python 的环境中，确保 Python 3.10+、
 venv 支持和 PyPI 网络访问可用。从 `artifacts/` 的上一级目录运行以下 Linux 示例：
 
 ```bash
 uname -m
 python3 --version
-cd artifacts/edu-sdk-2026.9.24
+cd artifacts/edu-sdk-2026.10.14
 sha256sum --ignore-missing -c SHA256SUMS
 cd ../..
 python3 -m venv .venv
@@ -62,10 +62,10 @@ unset PYTHONPATH
 export PYTHONNOUSERSITE=1
 SDK_PLATFORM=linux_x86_64
 python -m pip install \
-  "artifacts/edu-sdk-2026.9.24/aorta_sdk-2026.9.23-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.9.24/aorta_msgs-2026.9.23-py3-none-any.whl \
-  artifacts/edu-sdk-2026.9.24/vbot_edu_msgs-2026.9.24-py3-none-any.whl \
-  "flatbuffers==25.12.19"
+  "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
+  "flatbuffers==25.9.23"
 python -m pip check
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; print("SDK imports OK")'
 ```

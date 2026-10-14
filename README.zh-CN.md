@@ -9,7 +9,7 @@
 VBOT Lab 汇集面向任务的 Skills、能力索引、Aorta Python SDK、接口定义和参考程序，
 用于开发机器人应用。
 
-当前适配的机器人应用版本：**V1.6.0**，适用于 `foot_quadruped` EDU。
+当前适配的机器人应用版本：**V1.6.0-10**，适用于 `foot_quadruped` EDU。
 SDK 与平台配套见[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 ## 与 Agent 开始开发

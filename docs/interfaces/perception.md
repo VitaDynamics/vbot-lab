@@ -11,7 +11,7 @@ recognizes tags; it is not a person detector.
 
 ## Prerequisites and interfaces
 
-The current scope is robot application **V1.6.0** on `foot_quadruped` EDU.
+The current scope is robot application **V1.6.0-10** on `foot_quadruped` EDU.
 Check route availability against the [compatibility matrix](../compatibility.md).
 Log in with the vbot account and complete
 [device shell setup](../getting-started/device-environment.md). Camera input and the
