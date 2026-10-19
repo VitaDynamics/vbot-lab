@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="rcp.zh-CN.md">中文</a></p>
 
-This family contains the task action and its read-only trace output. Complete
+This family contains the task action, a compatibility submission service and read-only trace output. Complete
 [device shell setup](../getting-started/device-environment.md) on `foot_quadruped` EDU.
 Task execution can change device state; observing traces or inspecting the provider does
 not submit a task. See the [interface table](aorta-ros2.md) for the mapping overview.
@@ -49,6 +49,27 @@ do not apply those numbers to the ROS bridge. Cancellation is a request: wait fo
 terminal canceled state, or handle refusal / a goal that already finished. A client timeout
 or closed terminal is not task cancellation. Fetch the result within the provider's retention
 period and use `/rcp/trace` for task-event context, not as a replacement for the terminal result.
+
+## Compatibility submission service
+
+`/rcp/function_input` is a **service**, mapped to ROS `/function_input` with type
+`function_msgs/srv/FunctionInput`. Its Aorta roots are `aorta.services.rcp.FunctionInputRequest`
+and `aorta.services.rcp.FunctionInputResponse`; see the
+[Schema definition](../../schemas/aorta/schemas/service/rcp/function_input.fbs).
+
+- The request carries `request_id`, `source`, the tagged `input` (`DagSpec` or `DagPresetRef`),
+  and optional `user_interaction_context`. Use the [DAG guide](../guides/rcp-dag.md) for
+  DAG/preset fields, but build the service request, not an action goal.
+- The response carries `status`, `accepted`, `request_id` and `message`. A successful
+  response with `accepted=true` means the submission was accepted for processing, not
+  that execution or later admission checks succeeded.
+- This one-shot reply does not provide action feedback, a terminal result or a cancellation
+  handle. Keep the returned `request_id` for trace correlation; a timeout does not mean
+  nothing was submitted, so do not blindly retry.
+
+For new applications, prefer `/rcp/execute_task` so the caller can track the full task
+lifecycle. Both entries can execute motion and other device changes; discovering a
+provider is not permission to submit a default request.
 
 ## Trace topic definition and use
 

@@ -10,7 +10,7 @@ Python SDK 实现见 [audio Recipe](../../recipes/audio/README.zh-CN.md)，包�
 
 ## 前置条件与接口
 
-当前适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-10**，
+当前适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-12**，
 路由可用性须结合[兼容矩阵](../compatibility.zh-CN.md)确认。
 使用 vbot 账户登录并完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)。
 语音链路需要运行；UWB 输入还需要遥控器及其语音输入功能可用。

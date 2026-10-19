@@ -8,14 +8,15 @@ robot interface. Start with the [device shell setup](../getting-started/device-e
 
 ## Version scope
 
-This reference targets robot application **V1.6.0-10** on `foot_quadruped` EDU.
+This reference targets robot application **V1.6.0-12** on `foot_quadruped` EDU.
 Discover the exact routes and inspect their delivered types before use; configuration
 limits are listed in the [compatibility matrix](../compatibility.md).
 Other robot types are not covered by this software scope.
 
 This page lists the public topic set and supported mappings, along with services and the
-RCP action. The topic tables contain 47 distinct Aorta routes: 43 subscription outputs
-and 4 command inputs. After discovering an output, take a bounded sample to check its
+RCP action. The service table lists 22 request/reply routes. The topic tables contain
+47 distinct Aorta routes: 43 subscription outputs and 4 command inputs.
+After discovering an output, take a bounded sample to check its
 producer; do not publish to command topics as an environment check.
 Python SDK wheel installation and checked-in Schema sources are documented separately;
 device CLI access does not require installing the Python SDK.
@@ -148,6 +149,7 @@ environment check, even when their purpose is read-only.
 | `/firmware_version/servo` | `/firmware_version/servo` | service — query servo firmware |
 | `/firmware_version/lidar` | `/firmware_version/lidar` | service — query LiDAR firmware |
 | `/firmware_version/uwb` | `/firmware_version/uwb` | service — query UWB firmware |
+| `/get_jpeg_images` | `/get_jpeg_images` | service — [capture JPEG images](cameras.md); use the response's actual dimensions |
 | `/display_node/get_supported_emotions` | `/display_node/get_supported_emotions` | service — query available expressions |
 | `/display_node/play_emotion` | `/display_node/play_emotion` | service — play an expression |
 | `/display_node/display_imgs` | `/display_node/display_imgs` | service — display images |
@@ -158,6 +160,7 @@ environment check, even when their purpose is read-only.
 | `/locomotion/head_action` | `/head_action` | service — head control |
 | `/locomotion/set_run_mode` | `/locomotion/set_run_mode` | service — change run mode |
 | `/locomotion/runtime_control` | `/locomotion/runtime_control` | service — change locomotion runtime settings |
+| `/rcp/function_input` | `/function_input` | service — [compatibility DAG submission](rcp.md#compatibility-submission-service); submission reply only, not task completion |
 | `/slam/set_slam_mode` | `/slam/set_slam_mode` | service — mapping, saving, and localization modes |
 | `/slam/get_path_to_target` | `/slam/get_path_to_target` | service — request a path; not a motion command |
 | `/slam/query_map` | `/slam/query_map` | service — query map data |

@@ -1,0 +1,40 @@
+cc_library(
+    name = "model",
+    hdrs = ["health_monitor/model.h"],
+)
+
+cc_library(
+    name = "application",
+    hdrs = ["health_monitor/decoder.h", "support/cpp_common.h", "support/observe.h"],
+    deps = [":model", "@aorta_release//:sdk"],
+)
+
+cc_binary(
+    name = "main",
+    srcs = ["health_monitor/main.cc"],
+    deps = [":application"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    data = ["config.json"],
+)
+
+cc_test(
+    name = "model_test",
+    srcs = ["health_monitor/model_test.cc"],
+    deps = [":model"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+)
+
+cc_test(
+    name = "sdk_test",
+    srcs = ["health_monitor/sdk_test.cc"],
+    deps = [":application"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+)
+
+py_test(
+    name = "cli_test",
+    srcs = ["test_cli.py"],
+    main = "test_cli.py",
+    data = [":main", "config.json"],
+    python_version = "PY3",
+)

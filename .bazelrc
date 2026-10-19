@@ -1,3 +1,8 @@
 # The default Python toolchain uses PATH; activate the SDK venv for live runs.
 common --enable_bzlmod
 test --test_output=errors
+test --test_env=VBOT_DEV_CONTAINER
+
+# Explicit target selection; default builds/tests remain native to the container.
+build:arm64 --platforms=//toolchains:linux_arm64
+build:arm64 --incompatible_enable_cc_toolchain_resolution

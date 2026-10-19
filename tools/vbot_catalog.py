@@ -102,9 +102,9 @@ def validate_catalog(root, catalog, robots):
                 "Invalid capability firmware version")
         if not types:
             require(entry.get("effect") == "local_read_only" and entry.get("interface_kind") == "local_cli",
-                    "Only local inventory capabilities may omit robot types")
+                    "Only local read-only workflows may omit robot types")
         check_reference(root, entry.get("reference"))
-        for field in ("skill", "tool", "recipe"):
+        for field in ("skill", "tool", "recipe", "blueprint"):
             check_reference(root, entry.get(field), optional=True)
         implementations = entry.get("implementations", {})
         require(isinstance(implementations, dict), "Invalid implementations")
@@ -114,9 +114,13 @@ def validate_catalog(root, catalog, robots):
             check_reference(root, source)
             require(source.endswith(".py" if language == "python" else ".cc"), "Invalid implementation source")
             target = implementation.get("bazel_target")
-            expected = "//" + str(PurePosixPath(source).parent) + (":main" if language == "python" else ":main_cpp")
-            require(target == expected, "Implementation target does not match source directory")
-            check_reference(root, str(PurePosixPath(source).parent / "BUILD.bazel"))
+            # A package can own sources in subdirectories without nested BUILD files.
+            package = next((parent for parent in PurePosixPath(source).parents
+                            if (root / parent / "BUILD.bazel").is_file()), None)
+            require(package is not None, "Implementation source has no Bazel package")
+            package_name = "" if str(package) == "." else package.as_posix()
+            expected = "//" + package_name + (":main" if language == "python" else ":main_cpp")
+            require(target == expected, "Implementation target does not match owning Bazel package")
         if entry["availability"] == "implemented":
             require(entry.get("tool") is not None, "Implemented capability needs an executable entry")
         if entry["availability"] == "planned":
@@ -168,14 +172,38 @@ def query_catalog(root, robot_type=None, capability=None):
     }
 
 
+def summarize_catalog(root):
+    catalog, _robots = load_catalog(root)
+    def sources(kind):
+        return {language: sorted({
+            entry["implementations"][language]["source"]
+            for entry in catalog["capabilities"]
+            if entry.get(kind) and language in entry.get("implementations", {})
+        }) for language in ("python", "cpp")}
+    recipes, blueprints = sources("recipe"), sources("blueprint")
+    return {
+        "format_version": 1,
+        "sdk": catalog["sdk"],
+        "recipe_sources": recipes,
+        "recipe_counts": {language: len(paths) for language, paths in recipes.items()},
+        "blueprint_sources": blueprints,
+        "blueprint_counts": {language: len(paths) for language, paths in blueprints.items()},
+        "runtime_status": "not_verified",
+        "device_contacted": False,
+    }
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     parser.add_argument("--robot-type")
     parser.add_argument("--capability")
+    parser.add_argument("--summary", action="store_true", help="summarize SDK metadata and actual Recipe/Blueprint entries offline")
     args = parser.parse_args(argv)
+    if args.summary and (args.robot_type is not None or args.capability is not None):
+        parser.error("--summary cannot be combined with --robot-type or --capability")
     try:
-        result = query_catalog(args.root, args.robot_type, args.capability)
+        result = summarize_catalog(args.root) if args.summary else query_catalog(args.root, args.robot_type, args.capability)
     except CatalogError as error:
         print(json.dumps({"error": str(error), "device_contacted": False}))
         return 2

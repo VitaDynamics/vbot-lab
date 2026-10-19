@@ -9,7 +9,7 @@
 VBOT Lab 汇集面向任务的 Skills、能力索引、Aorta Python SDK、接口定义和参考程序，
 用于开发机器人应用。
 
-当前适配的机器人应用版本：**V1.6.0-10**，适用于 `foot_quadruped` EDU。
+当前适配的机器人应用版本：**V1.6.0-12**，适用于 `foot_quadruped` EDU。
 SDK 与平台配套见[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 ## 与 Agent 开始开发
@@ -31,41 +31,32 @@ Codex 通过 `.agents/skills/` 发现共享 Skills，Claude Code 使用 `.claude
 
 | 入口 | 用途 | 当前可用状态 |
 | --- | --- | --- |
-| [Skills](skills/README.zh-CN.md) | Coding Agent 任务流程 | 已提供本地环境检查 Skill 及共享发现入口 |
+| [Skills](skills/README.zh-CN.md) | Coding Agent 任务流程 | 环境搭建、Python/C++ 应用开发与分层诊断 |
 | [Capabilities & Interfaces](catalog/README.zh-CN.md) | 设备范围、接口参考与前置条件 | 能力索引可查询；在选定设备上确认接口可用性 |
-| [Recipes](recipes/README.zh-CN.md) | 可复用的单项任务程序 | 七类任务的 Python 与 C++ 示例，提供 Bazel 目标与离线预览 |
-| [VBOT Blueprints](blueprints/README.zh-CN.md) | 完整参考应用 | 规划中 |
+| [Recipes](recipes/README.zh-CN.md) | 可复用的单项任务程序 | 按能力组织的 Python 与 C++ 示例，提供 Bazel 目标与离线预览 |
+| [VBOT Blueprints](blueprints/README.zh-CN.md) | 完整参考应用 | Python／C++ 只读健康监测及独立应用模板 |
 | [Developer Guide](docs/README.zh-CN.md) | 环境、连接、硬件、接口与排障 | 已提供分章节文档，适用范围按版本注明 |
 
 [Aorta Python SDK](packages/README.zh-CN.md) 保持在 `packages/aorta/python/`，
 [开放 Schema](schemas/README.zh-CN.md) 保持在 `schemas/`；Schema 已入库，发布版 wheel 安装与运行步骤见 [Python SDK 指南](packages/aorta/python/README.zh-CN.md)。
 不提供替代 SDK API，也不猜测设备 topic。
 
-## 从本地开始
+## 运行首个应用
 
-在仓库根目录使用 Python 3.10 或更新版本：
+从[快速开始：使用 Python 读取机器人状态](docs/getting-started/README.zh-CN.md)进入。
+沿一条主路径完成：准备开发容器、构建并预览 `subscribe-state`、打包固定版本的 ARM64 依赖、
+SSH 登录、部署并收到三条解码后的 `/locomotion/status` 消息。
+每步注明执行终端、预期结果与排障入口，无需运动或音视频采集。
 
-```bash
-python3 tools/check_environment.py --profile host
-python3 tools/vbot_catalog.py --robot-type foot_quadruped
-python3 tests/check_repository.py
-python3 tests/test_agent_workspace.py
-python3 tests/test_recipes.py
-bazel build //:repository_files //recipes/...
-bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:recipe_test
-```
+已经在开发容器中时直接复用，无需在容器内安装 Docker。
+构建、预览和打包在容器内完成，部署后的程序在机器人 `vbot` shell 运行；
+仅清点或预览通过不代表在线运行成功。
 
-第一条命令清点当前机器，不探测已连接的机器人。开发容器内使用 `--profile container`。
-发现工具不代表已验证版本、Docker daemon 权限、镜像可用性或 SDK 就绪状态。
-详见[开发工具](tools/README.zh-CN.md)。
-
-环境搭建见[容器指南](docker/README.zh-CN.md)和[编辑器集成](.devcontainer/README.zh-CN.md)。
-连接机器狗时使用[共用有线／Wi-Fi 连接指南](docs/robots/quadruped-common/connection.zh-CN.md)，
-其中保留有线接线图，并补充手机 App 配网与路由器 IP 查询步骤。
-连接及设备操作属于单独明确请求的步骤。
-
-登录后按[设备 shell 配置与检查](docs/getting-started/device-environment.zh-CN.md)使用 Aorta
-及 [ROS 2 兼容子集](docs/interfaces/aorta-ros2.zh-CN.md)。设备 CLI 流程不依赖 Python SDK 安装。
+其他路径见 [C++](packages/aorta/cpp/README.zh-CN.md)、
+[有线／Wi-Fi 连接](docs/robots/quadruped-common/connection.zh-CN.md)、
+[设备 shell 配置](docs/getting-started/device-environment.zh-CN.md)、
+[编辑器集成](.devcontainer/README.zh-CN.md)或[排障](docs/troubleshooting/README.zh-CN.md)。
+仓库检查属于独立的[贡献流程](#贡献与验证)。
 
 ## 范围与安全
 
@@ -75,6 +66,7 @@ bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:r
 及[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 当前文档与示例使用 Python／C++ 和 Bazel，包含相机、运控、RCP 和语音访问。
+健康监测 Blueprint 提供两种语言实现、Python／C++ 工作区生成及设备部署流程。
 在线执行前应检查 SDK 配套关系及设备前提。
 
 开发者侧 Skills 与[设备 Agent API](docs/interfaces/agent/README.zh-CN.md)中的
@@ -94,6 +86,9 @@ HTTP MCP、Skill／AGENTS.md 注入能力分开。
 参阅[贡献说明](CONTRIBUTING.zh-CN.md)、[测试](tests/README.zh-CN.md)
 及 [Agent 工作流检查](tests/agent-scenarios/README.zh-CN.md)。
 仓库检查在本地执行，不联系设备。
+宿主机或 CI runner 运行 `python3 tools/run_checks.py --scope repository`；
+Recipe 检查、Bazel 和打包在开发容器内完成，CI 同样遵守。
+统一规则见[执行位置](docs/development/README.zh-CN.md)。
 漏洞报告方式见[安全说明](SECURITY.zh-CN.md)。
 
 ## 许可证

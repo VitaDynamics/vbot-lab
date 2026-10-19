@@ -9,10 +9,10 @@ ROS 2 接口，并非另一套完全等价的机器人接口。请先完成[设�
 
 本参考适用于 `foot_quadruped` EDU 软件。接口是否可用取决于已安装固件，
 使用前请发现确切路由并检查交付的消息类型。
-本文统一适配机器人应用版本 **V1.6.0-10**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
+本文统一适配机器人应用版本 **V1.6.0-12**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
 此软件范围不覆盖其他机器人类型。
 
-本页列出开放 topic 集及受支持的映射，并整理 service 与 RCP action。
+本页列出开放 topic 集及受支持的映射，并整理 22 个请求／响应 service 与 RCP action。
 topic 表共包含 47 个不同的 Aorta 路由：43 个订阅输出、4 个控制输入。
 发现输出路由后，限时获取样本检查发布者；不要通过向控制 topic 发布消息来检查环境。
 Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
@@ -137,6 +137,7 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/firmware_version/servo` | `/firmware_version/servo` | service — 查询舵机固件 |
 | `/firmware_version/lidar` | `/firmware_version/lidar` | service — 查询雷达固件 |
 | `/firmware_version/uwb` | `/firmware_version/uwb` | service — 查询 UWB 固件 |
+| `/get_jpeg_images` | `/get_jpeg_images` | service — [获取 JPEG 图像](cameras.zh-CN.md)，以响应的实际尺寸为准 |
 | `/display_node/get_supported_emotions` | `/display_node/get_supported_emotions` | service — 查询可用表情 |
 | `/display_node/play_emotion` | `/display_node/play_emotion` | service — 播放表情 |
 | `/display_node/display_imgs` | `/display_node/display_imgs` | service — 显示图片 |
@@ -147,6 +148,7 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/locomotion/head_action` | `/head_action` | service — 头部控制 |
 | `/locomotion/set_run_mode` | `/locomotion/set_run_mode` | service — 切换运行模式 |
 | `/locomotion/runtime_control` | `/locomotion/runtime_control` | service — 调整运动运行时设置 |
+| `/rcp/function_input` | `/function_input` | service — [兼容 DAG 提交入口](rcp.zh-CN.md#兼容提交服务)，仅返回受理结果，不是任务终态 |
 | `/slam/set_slam_mode` | `/slam/set_slam_mode` | service — 建图、保存与定位模式 |
 | `/slam/get_path_to_target` | `/slam/get_path_to_target` | service — 请求路径，不是运动命令 |
 | `/slam/query_map` | `/slam/query_map` | service — 查询地图数据 |

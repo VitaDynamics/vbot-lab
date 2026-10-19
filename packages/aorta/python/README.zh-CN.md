@@ -2,6 +2,9 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
+开发侧 SDK 安装／导入检查、本地 SDK 示例、Bazel 和打包均在配套开发容器内执行，CI 同样遵守；
+参阅[执行位置](../../../docs/development/README.zh-CN.md)。单独标明的设备部署／运行步骤仍在设备 vbot shell 中执行。
+
 Aorta Python SDK 通过 [vbot-lab Release](https://github.com/VitaDynamics/vbot-lab/releases)
 附件分发。目前 SDK 安装包需要从 GitHub Releases 下载，克隆仓库不会自动安装 SDK。
 下载需要联网；`edu-sdk-2026.10.14` 的四个必需 wheel 可在本地安装，无需访问 PyPI。本页说明如何安装 SDK、让 EDU 客户端连接机器人并
@@ -19,8 +22,8 @@ Aorta Python SDK 通过 [vbot-lab Release](https://github.com/VitaDynamics/vbot-
 | `flatbuffers` | `25.9.23` | 生成的 FlatBuffers 消息所需运行库 |
 
 Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 `NOTICE`。
-PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上游许可证文本
-`flatbuffers-<ver>.LICENSE`。
+配套 FlatBuffers wheel 在 `.dist-info/LICENSE` 中附带许可证。Release 同时提供内容一致的
+`flatbuffers-<ver>.LICENSE` 独立副本，方便与 wheel 一起重新分发。
 
 使用 Python 3.10 或更新版本。SDK wheel 提供 Linux x86_64、Linux aarch64 和 macOS arm64
 版本。检查实际运行机器的架构与原生库兼容性；工作站安装成功不代表设备固件兼容。
@@ -51,26 +54,28 @@ PyPI 的 FlatBuffers wheel 不含许可证文件，因此 release 附上其上�
 不要把二进制加入 Git。将四个配套 wheel、`SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`
 放到 `artifacts/edu-sdk-2026.10.14/`。在实际运行 Python 的环境中，确保 Python 3.10+、
 venv 支持可用。应用开发使用[开发容器](../../../docker/README.zh-CN.md)。
-从 `artifacts/` 的上一级目录运行以下 Linux 示例；任一命令失败都应停止：
+从 `artifacts/` 的上一级目录运行以下 Linux 命令链。`&&` 会在失败后跳过后续安装步骤，
+不会退出交互式 shell；处理错误后再继续：
 
 ```bash
-uname -m
-python3 --version
-cd artifacts/edu-sdk-2026.10.14
-sha256sum --ignore-missing -c SHA256SUMS
-cd ../..
-python3 -m venv .venv
-. .venv/bin/activate
-unset PYTHONPATH
-export PYTHONNOUSERSITE=1
-SDK_PLATFORM=linux_x86_64
+uname -m &&
+python3 --version &&
+cd artifacts/edu-sdk-2026.10.14 &&
+sha256sum --ignore-missing -c SHA256SUMS &&
+cd ../.. &&
+python3 -m venv .venv &&
+. .venv/bin/activate &&
+unset PYTHONPATH &&
+unset AORTA_CORE_FFI_LIB &&
+export PYTHONNOUSERSITE=1 &&
+SDK_PLATFORM=linux_x86_64 &&
 python -m pip install --no-index \
   "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
   artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
   artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl
-python -m pip check
-python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; print("SDK imports OK")'
+  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl &&
+python -m pip check &&
+python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; core = aorta.load_library(); print("SDK imports and native runtime OK; ABI", core.aorta_abi_version())'
 ```
 
 ARM64 机器人上应将变量**改为** `SDK_PLATFORM=linux_aarch64`。macOS arm64 使用
@@ -81,6 +86,10 @@ ARM64 机器人上应将变量**改为** `SDK_PLATFORM=linux_aarch64`。macOS ar
 该命令从同一个 Release 的本地下载文件安装三个 SDK 包与 FlatBuffers。
 `--no-index` 禁止回退到包索引。缺少文件或校验失败时，先取得配套 Release 附件再继续。
 重新分发 wheel 时保留附带的 FlatBuffers 许可证。
+
+检查会显式加载随 wheel 提供的原生库并执行 SDK 的 ABI 校验；仅 `import aorta` 不会触发延迟加载。
+此步骤不创建 Node 或设备会话。专用 shell 会清除 `AORTA_CORE_FFI_LIB`，避免已有的库路径覆盖设置
+选中其他运行库，而非 wheel 自带的副本。
 
 设备无法访问互联网时，按 [Python 部署指南](../../../docs/development/python-deployment.zh-CN.md)
 先在联网开发机下载 ARM64 设备所需的全部四个 wheel，再传输完整 wheelhouse。
@@ -312,8 +321,8 @@ PUBSUB BMS OK (987654321, 49500)
 运行库。显式选择已安装四个配套 wheel 的解释器：
 
 ```bash
-bazel build //recipes/...
-PATH="$PWD/.venv/bin:$PATH" bazel run //recipes/subscribe-state:main -- --help
+bazel build //recipes/... &&
+PATH="$PWD/.venv/bin:$PATH" bazel run //recipes/subscribe-state:main -- --help &&
 PATH="$PWD/.venv/bin:$PATH" bazel run //recipes/subscribe-state:main
 ```
 
@@ -356,7 +365,7 @@ union 的类型标记必须与载荷一致。完整实现见 [Recipes](../../../
 离线测试不会建立设备会话：
 
 ```bash
-bazel test //tests:recipe_test
+bazel test //tests:recipe_test &&
 bazel test --test_env=PATH="$PWD/.venv/bin:$PATH" //tests:recipe_sdk_test
 ```
 

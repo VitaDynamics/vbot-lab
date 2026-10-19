@@ -38,6 +38,6 @@ Features without a runnable implementation are marked as planned or pending inte
 
 - [Aorta Python SDK](../packages/README.md): Aorta Python SDK access and compatibility.
 - [Recipes](../recipes/README.md): single-task Python/C++ reference programs with Bazel targets.
-- [VBOT Blueprints](../blueprints/README.md): complete reference applications, currently planned.
-- [Skills](../skills/README.md): local environment-check workflow and setup instructions for Codex and Claude Code.
+- [VBOT Blueprints](../blueprints/README.md): a read-only health monitor, standalone workspace and application tests.
+- [Skills](../skills/README.md): setup, Python/C++ application development and layered diagnosis.
 - [Interface Definitions](../schemas/README.md): checked-in public Aorta Schema and versioned generated bindings.

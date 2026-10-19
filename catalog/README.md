@@ -17,6 +17,7 @@ python3 tools/vbot_catalog.py
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.state.subscribe
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability device.environment.check
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability device.application.autostart
+python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.health.monitor
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.sensors
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.cameras
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.perception
@@ -47,16 +48,17 @@ source; English Markdown references have paired `.zh-CN.md` documents for Chines
 
 | Field | Meaning |
 | --- | --- |
-| `availability` | `implemented` local entry, `documented` device contract, or `planned` integration; not live readiness |
-| `robot_types` | Scope of this capability; an empty list is only allowed for local inventory, never “all robots” |
+| `availability` | `implemented` executable source entry, `documented` device contract, or `planned` integration; not live readiness |
+| `robot_types` | Scope of this capability; an empty list is only allowed for local read-only workflows, never “all robots” |
 | `execution_location` | Developer host/container, device service, developer-owned tool service, or `device_shell` (run after device login) |
 | `interface_kind` | Communication category, including `pub_sub`, `service`, and `action`; `null` means not selected, not inferred |
 | `reference` | Authoritative behavior/interface document |
 | `skill`, `tool`, `recipe` | Corresponding checkout resources, or `null` when absent; a Recipe reference can be an outline |
-| `requires_sdk` | Whether the workflow depends on the Aorta Python SDK |
+| `blueprint` | Optional complete-application guide, separate from a single-task Recipe |
+| `requires_sdk` | Whether the workflow depends on the Aorta SDK; select Python or C++ in its guide |
 | `effect` | Local read-only, device read-only, or operation-dependent; not an authorization grant |
 | `minimum_firmware` | Known minimum version, or `null` when unknown; unknown does not mean any version |
-| `verification` | Entry check status: `local_tests` for tested local tools, `documentation_only` for documented interfaces/workflows, or `not_verified` for unchecked entries |
+| `verification` | Entry check status: `local_tests` for locally tested tools/applications, `documentation_only` for documented interfaces/workflows, or `not_verified` for unchecked entries; not live readiness |
 
 `documentation_only` entries guide you to interface instructions rather than an executable
 helper. For device entries, `requires_device_verification` means to check the selected
@@ -64,7 +66,7 @@ device's interface availability and operating prerequisites before following the
 
 SDK metadata records integration and version separately. Robot profiles distinguish the current
 release target from planned releases; empty `models` means exact models are not recorded.
-The robot profile's `application_version` is the supported application target: `V1.6.0-10`
+The robot profile's `application_version` is the supported application target: `V1.6.0-12`
 for `foot_quadruped`, and `null` for unreleased types. Queries return it under `robot`.
 It is not the SDK or system-image version and does not mean "this version or newer".
 `minimum_firmware` remains a separate optional lower bound; `null` does not remove the
@@ -79,6 +81,11 @@ for the human-readable matrix.
 
 ## Follow the source
 
+Query `robot.health.monitor` for the complete read-only Python/C++ application combining three
+telemetry streams, Python/C++ workspace creation and explicit deployment. As with interfaces,
+the catalog points to the workflow, not proof that a selected device is currently publishing.
+Its implementations fields provide both source files and their exact Bazel targets.
+
 - [Device environment](../docs/getting-started/device-environment.md): vbot shell configuration and offline inventory, independent of SDK integration.
 - [User-program autostart](../docs/guides/user-autostart.md): boot entry, explicit environment, logs, and disabling startup; configuration and application launches change device state.
 - [Aorta / ROS 2](../docs/interfaces/aorta-ros2.md): public topics, subscription/publish directions, types, service mappings, and the RCP action; not SDK recipe readiness.
@@ -87,12 +94,12 @@ for the human-readable matrix.
 - [Aorta Python SDK](../packages/aorta/python/README.md): release wheel installation documented.
 - [Schema](../schemas/README.md): checked-in field/type definitions.
 - [Interface reference](../docs/interfaces/README.md): exact documented contracts, including device Agent APIs.
-- [Recipes](../recipes/README.md): planned single-task implementations.
+- [Recipes](../recipes/README.md): executable Python/C++ single-task programs with container previews and explicit device execution.
 - [Skills](../skills/README.md): Coding Agent workflows, not device runtime content.
 
 Do not copy topic names, fields, units, or HTTP route lists into this index by hand.
 They remain in the referenced Schema/contract sources; generate structural indexes from those
-sources when integrated. The application target is `V1.6.0-10`; check the installed application
+sources when integrated. The application target is `V1.6.0-12`; check the installed application
 and runtime availability on the selected device.
 
 Cameras, audio, locomotion and RCP remain grouped by interface family; the `recipe` field links to the
@@ -102,7 +109,14 @@ without the SDK (`requires_sdk=false`); live execution of its linked Python Reci
 target does not replace route checks on the selected device.
 
 `sdk.cpp` records the C++ version, ABI, Schema pairing and setup guide.
-Recipe entries expose `implementations.python` and `implementations.cpp`, each with source
+Use `python3 tools/vbot_catalog.py --summary` from the checkout root for a summary generated
+from this catalog: SDK integration and versions, plus separate Recipe/Blueprint source lists
+and counts. Complete applications are not counted as Recipes. It never imports the SDK or
+runs applications; `runtime_status=not_verified` remains separate from repository integration.
+Recipe and Blueprint entries expose `implementations.python` and `implementations.cpp`, each with source
 and Bazel target. The existing `tool` retains the Python entry for compatibility; choose
 C++ through implementations rather than guessing its entry point. Languages share one
 interface-family entry and the same operation boundaries.
+Source files may be below the owning Bazel package directory. The loader checks the nearest
+ancestor BUILD.bazel rather than assuming a BUILD file beside every source; Bazel resolves the
+declared targets during container builds.

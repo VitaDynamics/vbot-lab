@@ -4,7 +4,9 @@
 
 Reference applications that bring device interfaces together into complete workflows for VBOT EDU robots.
 
-**Status: planned. No runnable Blueprint is available in this repository yet.**
+Start with [Read-only health monitor](health-monitor/README.md): Python/C++ source, configuration,
+synthetic business tests, a Python/C++ workspace generator and deployment steps for both languages.
+It combines state, battery and system telemetry without sending control commands.
 
 ## From interfaces to applications
 
@@ -20,8 +22,8 @@ Each published Blueprint will include:
 - Setup steps, expected results, and reproducible validation.
 - Safety preconditions, stopping procedures, and cleanup.
 
-Blueprint availability will be documented per application. The current EDU release scope
-remains `foot_quadruped`; this planned area does not add support for other robot types.
+Blueprint availability is documented per application. The current EDU release scope
+remains `foot_quadruped`; this area does not add support for other robot types.
 
 Start with [Aorta Python SDK](../packages/README.md) and the [Developer Guide](../docs/README.md).
 Return to [VBOT Lab](../README.md).

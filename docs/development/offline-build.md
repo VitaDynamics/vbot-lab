@@ -9,6 +9,13 @@ the Aorta SDK, compiler, Python interpreter, or FFmpeg.
 
 ## Prepare the build machine
 
+Use the matching development container for every command on this page, including dependency
+preparation, installation, Bazel and archive packaging. Offline operation does not permit
+host or robot builds; CI uses the same rule. See [execution locations](README.md).
+
+Run each multi-step Bash block as one `&&` command chain. A failed preparation,
+verification or build skips the rest of that block; resolve it before the next block.
+
 Obtain the release-matched bundle from your development-environment provider, or
 prepare it on a connected machine using the procedure below. No prebuilt bundle
 is attached to the current SDK release yet; the preparation tool does not
@@ -16,7 +23,7 @@ publish one. Do not assume an existing development image contains it.
 
 Prepare these items before disconnecting:
 
-- Bazel 7.6.1 and a native C++17 compiler with the matching Linux system headers/libraries.
+- Bazel 7.6.1 and a C++17 compiler with matching target headers/libraries; ARM64 device builds use the image's ARM64 GCC/G++ 11 cross-toolchain.
 - The dependency bundle for this checkout's `MODULE.bazel` and `MODULE.bazel.lock`.
 - The matching [C++ SDK and Schema pack](../../packages/aorta/cpp/README.md).
 - For Python execution, the matching [SDK wheels](../../packages/aorta/python/README.md)
@@ -47,7 +54,7 @@ as described in its guide. From the checkout root:
 python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output" \
   build //recipes/... //recipes/device-info:main_cpp //recipes/subscribe-state:main_cpp \
   //recipes/service-call:main_cpp //recipes/camera:main_cpp //recipes/audio:main_cpp \
-  //recipes/locomotion:main_cpp //recipes/rcp-task:main_cpp
+  //recipes/locomotion:main_cpp //recipes/rcp-task:main_cpp &&
 python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output" \
   run //recipes/subscribe-state:main_cpp
 ```
@@ -58,6 +65,22 @@ ambient Bazel configuration; disables WORKSPACE fallback and repository download
 and uses a dedicated output/cache directory. A missing bundle fails before Bazel
 starts. The preview above does not contact a robot. Live execution still requires
 each Recipe's device environment and explicit operation flags.
+
+For `test`, the wrapper explicitly forwards the already-checked `VBOT_DEV_CONTAINER`
+declaration to test processes, without loading `.bazelrc` or forwarding other environment
+variables. Container checks still run before Bazel starts; this does not permit host tests.
+
+For ARM64 device binaries, select the ARM64 SDK and use the explicit target option below.
+The wrapper ignores `.bazelrc`, so use `--target-platform arm64`, not `--config=arm64`:
+
+```bash
+python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output-arm64" \
+  --target-platform arm64 build //recipes/subscribe-state:main_cpp
+```
+
+Replace the Recipe target as needed. This selection only permits `build`; do not run/test
+ARM64 binaries in the AMD64 container. The toolchain definition is checked into this
+repository; use a bundle matching the updated module/lock files, not an older snapshot.
 
 The wrapper is not a network sandbox for arbitrary build rules or applications.
 It does not disable network access requested by `bazel run` programs. New targets
@@ -70,8 +93,8 @@ On a connected machine with the SDK paths and optional decoder build dependencie
 prepared, run:
 
 ```bash
-python3 tools/prepare_bazel_offline.py --output artifacts/offline/bazel
-tar -czf artifacts/bazel-offline.tar.gz -C artifacts/offline/bazel .
+python3 tools/prepare_bazel_offline.py --output artifacts/offline/bazel &&
+tar -czf artifacts/bazel-offline.tar.gz -C artifacts/offline/bazel . &&
 sha256sum artifacts/bazel-offline.tar.gz
 ```
 

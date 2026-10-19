@@ -1,0 +1,27 @@
+{
+  "format_version": 1,
+  "groups": {
+    "repository": {
+      "execution_location": "host_or_ci",
+      "checks": [
+        "tests/check_repository.py",
+        "tests/check_schemas.py",
+        "tests/test_agent_workspace.py",
+        "tests/test_offline_build.py",
+        "tests/test_release.py",
+        "tests/test_execution_policy.py"
+      ]
+    },
+    "packaging": {
+      "execution_location": "development_container",
+      "checks": ["tests/test_python_packaging.py", "tests/test_deployment_commands.py", "tests/test_applications.py"]
+    },
+    "recipes": {
+      "execution_location": "development_container",
+      "checks": [
+        "tests/test_recipes.py",
+        "tests/test_family_recipes.py"
+      ]
+    }
+  }
+}

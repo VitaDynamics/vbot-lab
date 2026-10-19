@@ -151,24 +151,29 @@ class RepositoryChecks(unittest.TestCase):
         self.assertTrue(actions)
         for action in actions:
             self.assertRegex(action, r"^[\w./-]+@[0-9a-f]{40}$")
-        commands = re.findall(r"run:\s+(python3 tests/\S+\.py)", workflow)
-        self.assertEqual(len(commands), 7)
-        self.assertIn("python3 tests/test_release.py", commands)
+        self.assertIn("python3 tools/run_checks.py --scope repository", workflow)
+        self.assertIn("docker compose -f docker/compose.yaml run --rm --no-deps -T dev python3 tools/run_checks.py --scope recipes", workflow)
+        checks = json.loads((REPO_ROOT / "catalog/checks.json").read_text())["groups"]
+        self.assertIn("tests/test_release.py", checks["repository"]["checks"])
+        self.assertNotIn("tests/test_recipes.py", checks["repository"]["checks"])
         for suffix in (".md", ".zh-CN.md"):
             guide = (REPO_ROOT / f".github/WORKFLOWS{suffix}").read_text()
-            self.assertEqual(re.findall(r"^python3 tests/\S+\.py$", guide, re.M), commands)
+            self.assertIn("python3 tools/run_checks.py --scope repository", guide)
+            self.assertIn("python3 tools/run_checks.py --scope recipes", guide)
             for value in ("repository-layout", "Squash and merge", "`main`", "`V*`", "`edu-sdk-*`"):
                 self.assertIn(value, guide)
             self.assertIn("CODEOWNERS", document_links(guide))
 
     def test_version_iterations_have_a_separate_release_boundary(self):
         workflow = (REPO_ROOT / ".github/workflows/scaffold.yml").read_text()
+        config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
         self.assertIn("branches: [main, 'pre_release/**']", workflow)
         self.assertNotIn("tags:", workflow)
         self.assertNotIn("gh release", workflow)
         for suffix in (".md", ".zh-CN.md"):
             guide = (REPO_ROOT / f".github/WORKFLOWS{suffix}").read_text()
-            for value in ("pre_release/V1.6.0.X", "V1.6.0.10", "V1.6.0-10"):
+            for value in (config["workspace"]["branch"], config["workspace"]["tag"],
+                          config["robots"]["foot_quadruped"]["application_version"]):
                 self.assertIn(value, guide)
             for name in ("AGENTS", "CONTRIBUTING", "catalog/release"):
                 document = (REPO_ROOT / f"{name}{suffix}").read_text()
@@ -262,12 +267,15 @@ class RepositoryChecks(unittest.TestCase):
 
     def test_documented_application_target_matches_catalog(self):
         profile = json.loads((REPO_ROOT / "catalog/robots/foot_quadruped.json").read_text())
-        self.assertEqual(profile["application_version"], "V1.6.0-10")
+        self.assertEqual(profile["application_version"], "V1.6.0-12")
         pages = (
             "README", "AGENTS", "catalog/README", "docs/compatibility", "recipes/README",
             "docs/robots/foot_quadruped/README", "docs/interfaces/README",
             "docs/interfaces/aorta-ros2", "docs/interfaces/audio", "docs/interfaces/perception",
             "docs/interfaces/agent/README", "docs/interfaces/agent/customization",
+            "docs/getting-started/README", "blueprints/health-monitor/README",
+            "blueprints/health-monitor/cpp/README", "templates/python-app/README",
+            "templates/cpp-app/README",
         )
         for suffix in (".md", ".zh-CN.md"):
             for name in pages:
@@ -279,6 +287,21 @@ class RepositoryChecks(unittest.TestCase):
             self.assertNotIn("v5.0.21-", matrix)
             self.assertIn("edu-sdk-2026.10.14", matrix)
             self.assertIn("2026.10.13-v4", matrix)
+
+    def test_compatibility_status_matches_available_workflows(self):
+        for suffix in (".md", ".zh-CN.md"):
+            matrix = (REPO_ROOT / f"docs/compatibility{suffix}").read_text()
+            blueprint_row = next(line for line in matrix.splitlines()
+                                 if line.startswith("| [VBOT Blueprints]"))
+            self.assertIn("Python", blueprint_row)
+            self.assertIn("C++", blueprint_row)
+            self.assertNotRegex(blueprint_row, r"(?i)planned|no runnable|规划中|无可运行")
+            for workflow in ("vbot-dev-setup", "vbot-app-dev", "vbot-diagnose"):
+                self.assertIn(f"`{workflow}`", matrix)
+                self.assertTrue((REPO_ROOT / f"skills/{workflow}/SKILL.md").is_file())
+            release = (REPO_ROOT / f"catalog/release{suffix}").read_text()
+            self.assertNotIn("The image digest has not yet been recorded", release)
+            self.assertNotIn("镜像 digest 尚未记录", release)
 
     def test_back_mounting_reference_and_drawing_integrity(self):
         directory = REPO_ROOT / "docs/hardware/quadruped-common"
@@ -800,6 +823,31 @@ ssh() { printf '%s\\n' "$@"; }
                         self.assertIn("--qos-durability transient_local", line)
                         self.assertIn("--qos-reliability reliable", line)
 
+    def test_public_service_index_matches_schema_routes(self):
+        routes = json.loads((REPO_ROOT / "schemas/ros2/routes.json").read_text())["routes"]
+        expected = {(route["aorta"]["key"], route["ros"]["name"])
+                    for route in routes if route["kind"] == "service"}
+        self.assertEqual(len(expected), 22)
+        for suffix in (".md", ".zh-CN.md"):
+            page = (REPO_ROOT / f"docs/interfaces/aorta-ros2{suffix}").read_text()
+            rows = [line.split("|")[1:-1] for line in page.splitlines()
+                    if line.startswith("|") and "| service — " in line]
+            self.assertEqual(len(rows), len(expected))
+            actual = {(row[0].strip(" `"), row[1].strip(" `")) for row in rows}
+            self.assertEqual(actual, expected)
+            for key, guide in (("/get_jpeg_images", "cameras"),
+                               ("/rcp/function_input", "rcp")):
+                row = next(row for row in rows if row[0].strip(" `") == key)
+                links = document_links(row[2])
+                self.assertEqual(len(links), 1)
+                self.assertEqual(urlsplit(links[0]).path, f"{guide}{suffix}")
+                self.assertIn(f"`{key}`", (REPO_ROOT / f"docs/interfaces/{guide}{suffix}").read_text())
+            rcp = (REPO_ROOT / f"docs/interfaces/rcp{suffix}").read_text()
+            for identifier in ("function_msgs/srv/FunctionInput",
+                               "aorta.services.rcp.FunctionInputRequest",
+                               "aorta.services.rcp.FunctionInputResponse", "accepted=true"):
+                self.assertIn(f"`{identifier}`", rcp)
+
     def test_every_public_topic_links_to_a_family_usage_guide(self):
         expected = {
             "sensors": 12, "cameras": 10, "perception": 2, "audio": 6,
@@ -1290,14 +1338,14 @@ ssh() {
             for script in scripts:
                 result = subprocess.run(["bash", "-n"], input=script, capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
-            for required in ("tar -czf", "recipes/common.py", "recipes/observe.py", "scp",
+            for required in ("tools/package_python.py", "PACKAGE_MANIFEST.json", "recipes/common.py", "recipes/observe.py", "scp",
                              "mktemp -d /userdata/vbot/apps/", "sha256sum -c SHA256SUMS",
                              "python3 -m venv .venv", "--no-index --find-links wheelhouse",
                              "python -m recipes.subscribe-state.main --execute"):
                 self.assertIn(required, page)
             self.assertNotIn("pip download", scripts[0])
-            self.assertIn("(cd artifacts/wheelhouse && sha256sum --ignore-missing -c SHA256SUMS)", scripts[0])
-            self.assertIn("artifacts/wheelhouse/flatbuffers-25.9.23-py2.py3-none-any.whl", scripts[0])
+            self.assertIn("tools/package_python.py --verify", scripts[0])
+            self.assertIn("--assets-dir artifacts/edu-sdk-2026.10.14", scripts[0])
             for recipe in (REPO_ROOT / "recipes").glob(f"*/README{suffix}"):
                 body = recipe.read_text()
                 self.assertIn(f"../../docs/development/python-deployment{suffix}", document_links(body))
@@ -1305,35 +1353,38 @@ ssh() {
                 self.assertNotIn("设备仓库根目录", body)
         self.assertEqual(blocks[0], blocks[1])
 
-    def test_quickstart_checks_out_source_tag_and_reuses_container(self):
+    def test_quickstart_checks_out_current_source_ref_and_reuses_container(self):
         config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
         tag = config["workspace"]["tag"]
-        self.assertEqual(tag, "V1.6.0.10")
+        source_ref = tag or config["workspace"]["branch"]
         for suffix in (".md", ".zh-CN.md"):
             page = (REPO_ROOT / f"docs/getting-started/README{suffix}").read_text()
             compatibility = (REPO_ROOT / f"docs/compatibility{suffix}").read_text()
             scripts = re.findall(r"```bash\n(.*?)```", page, re.S)
             self.assertEqual(scripts[0].strip().splitlines(), [
-                "git clone https://github.com/VitaDynamics/vbot-lab.git",
-                "cd vbot-lab",
-                f"git checkout {tag}",
+                "git clone https://github.com/VitaDynamics/vbot-lab.git &&",
+                "cd vbot-lab &&",
+                f"git checkout {source_ref}",
             ])
-            self.assertIn(f"git fetch origin tag {tag}", page)
-            self.assertIn("detached HEAD", page)
+            if tag:
+                self.assertIn(f"git fetch origin tag {tag}", page)
+                self.assertIn("detached HEAD", page)
+            else:
+                self.assertIn("`git fetch origin`", page)
+                self.assertNotIn("git checkout V1.6.0.10", page)
+                self.assertNotIn("git fetch origin tag V1.6.0.10", page)
             self.assertIn("git switch -c my-edu-app", page)
             self.assertNotIn("git clone --branch", page)
             self.assertNotIn("--single-branch", page)
-            self.assertNotIn("pre_release/", page)
             for script in scripts:
                 result = subprocess.run(["bash", "-n"], input=script, capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn(tag, page)
+            self.assertIn(source_ref, page)
             self.assertIn(f"../../docker/README{suffix}", document_links(page))
             self.assertIn("--profile container", page)
             self.assertNotIn("docker compose -f docker/compose.yaml pull", page)
             self.assertNotIn("run --rm dev", page)
-            self.assertNotIn("pre_release/", compatibility)
-            self.assertIn(tag, compatibility)
+            self.assertIn(source_ref, compatibility)
             self.assertNotIn("tag `V1.6.0`", compatibility)
             cpp = (REPO_ROOT / f"packages/aorta/cpp/README{suffix}").read_text()
             self.assertIn("g++ -dumpmachine", cpp)

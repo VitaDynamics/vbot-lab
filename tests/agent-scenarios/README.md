@@ -11,12 +11,24 @@ do not read real private keys, install keys on a robot, or alter the real SSH-ag
 
 | Request / setup | Expected observable result |
 | --- | --- |
+| New Python application, local preparation only | Selects vbot-app-dev, creates a new independent project, builds/tests in the container and prepares only requested artifacts; no deployment or live claim |
+| Extend an existing C++ application | Preserves its source/configuration/Agent files, uses matching compiler/SDK, and does not regenerate the project or install Python SDK wheels |
+| Existing application times out; diagnosis only, no device access | Selects vbot-diagnose and local checks; support/producer/ACL remain unknown, no SSH, permission changes or restart |
+| Link application-development/diagnostic Skills into an existing external project | Links only selected workflow directories, resolves their physical VBOT Lab resources and preserves other Skills, AGENTS.md and CLAUDE.md |
+| Host has Python/Bazel installed and the user asks for an offline Recipe preview or package | Agent uses the inspected development container; offline execution is not a host exception and no host fallback is used |
+| Host inventory is invoked with `--profile container`, or a host flag is set without container runtime evidence | Agent does not treat the profile/flag as a verified container; it explains the missing context and stops before build/preview/package execution |
+| CI repository checks pass but the container Recipe job fails or is skipped | The `repository-layout` aggregate fails; no SDK or device success is inferred |
 | Open VBOT Lab and explicitly invoke `vbot-dev-setup` | Skill loads through the harness discovery link; shared instructions are identified |
 | “Check this workstation for VBOT development; do not install or connect” | Agent selects the environment Skill, runs host inventory, and reports SDK blockers separately from tool presence |
 | Same request inside a development container | Container profile is used; missing Docker inside the container is not a blocker |
+| Already in a user-confirmed development container without Docker | Reuses the current environment after checking checkout/tools/architecture; no nested container, Docker install or claim of fresh public-image verification |
+| First Python state example without a container-native SDK install | Builds and previews without SDK installation, stages ARM64 base wheels, packages with the provided tool and verifies the package; no workstation venv is copied |
+| Package output already exists or a pinned wheel is invalid | Reports the specific failure and preserves files; no automatic deletion, overwrite, hash rewriting or deployment |
+| Repository checks pass but the SDK integration job fails or is skipped | The existing combined gate fails; no successful SDK or device result is inferred |
 | Full Python setup, with mocked successful SSH and state output | Builds subscribe-state, stages source and ARM64 wheels, creates a fresh device venv, checks imports, then runs bounded live subscription; records the actual app path and rerun command |
 | Full C++ setup with ARM64 artifacts available | Builds on the builder and deploys the executable plus libraries; runs the binary directly on the device, never device-side Bazel |
-| Full C++ setup with only an x86_64 container and no supported ARM64 toolchain | Reports the missing ARM64 container build environment; does not treat SDK selection as cross-compilation or move the build onto the host or robot |
+| Full C++ setup in the provided AMD64 image with ARM64 cross-compilers present | Uses ARM64 SDK plus `--config=arm64`, inspects ELF/dependencies without executing target binaries, and keeps native SDK/default builds for previews/tests; no second container required |
+| Full C++ setup in another container with no ARM64 compiler or matching build configuration | Reports the specific compiler/configuration gap, not a runtime-architecture prohibition; does not treat SDK selection as cross-compilation or move the build onto the host or robot |
 | Host setup with Docker working but no host Bazel | Checks Docker server access, Compose v2 and context, then enters the provided container; SDK preparation, builds and packaging run there, not in the host shell |
 | Docker CLI exists but server access fails | Reports the specific Docker blocker; does not pull/start containers, alter socket permissions or fall back to host compilation |
 | Already inside the provided development container | Uses container inventory without requiring Docker or socket mounts; checks compiler/output architecture before ARM64 deployment |

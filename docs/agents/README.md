@@ -20,6 +20,10 @@ Only `skills/<name>/SKILL.md` is maintained as the discovery source. Its `.zh-CN
 is a human-readable translation, not another installed Skill. Do not copy different instruction
 sets into each harness directory.
 
+Select vbot-dev-setup for environment setup, vbot-app-dev for creating/extending Python/C++
+applications, and vbot-diagnose for an existing application's failure. All three share the
+same discovery directories: Codex uses `$<name>`, Claude Code uses `/<name>`.
+
 Open the checkout in your agent and request a development-environment check without installing
 anything or connecting to a robot. Check that `vbot-dev-setup` appears in the harness's Skill
 selector. If not, verify the links, project trust and configuration, and restart in the checkout.
@@ -35,9 +39,14 @@ in a fresh session and record the harness/version separately.
 ## Work in your own application repository
 
 Keep a complete, version-pinned VBOT Lab checkout accessible in the same filesystem as the
-agent. Link the individual `vbot-dev-setup` directory from that checkout into your application's
+agent. Link only the individual workflow directories you need from that checkout into your application's
 `.agents/skills/` and/or `.claude/skills/`, rather than replacing either directory. Preserve other
 Skills and stop if an entry with the same name already exists.
+
+For example, link vbot-app-dev for development and vbot-diagnose for troubleshooting; keep
+vbot-dev-setup when setup is also needed. Do not replace .agents/skills or .claude/skills
+with a whole-directory link in an existing application. Adding selected Skills does not
+require changing its AGENTS.md or CLAUDE.md.
 
 The linked Skill resolves its physical location to use the matching catalog, tools, and docs.
 Do not copy just `SKILL.md`: those resources would be missing. Keep application output in your
@@ -61,11 +70,18 @@ The [Aorta / ROS 2 reference](../interfaces/aorta-ros2.md) lists available inter
 
 ## Follow a development task
 
+Repository-only checks may run on the host or CI runner. Bazel, Recipe previews, SDK checks
+and packaging run in the matching development container, including CI. An Agent on the host
+executes them through the selected container; an inventory profile or another terminal's
+interactive session does not change its execution context. See [execution locations](../development/README.md).
+
 1. Use [Skills](../../skills/README.md) to find the relevant workflow.
 2. Query the [capability catalog](../../catalog/README.md) for the device scope and references.
 3. Read the selected interface, SDK, and [Recipe](../../recipes/README.md), not every document.
 4. Run only available build/test entries and report actual results and remaining blockers.
 
-The documented SDK workflows cover Python and C++. Device Recipes include executable code; Blueprints remain planned.
+The documented SDK workflows cover Python and C++. Generate a standalone application with --language python or cpp
+from the [health-monitor Blueprint](../../blueprints/health-monitor/README.md);
+keep application files in its generated workspace, not this reference checkout.
 Device-side Skills and AGENTS.md are a separate [content API](../interfaces/agent/content-api.md),
 not these Coding Agent discovery folders. No local check grants permission to control a robot.

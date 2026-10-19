@@ -9,7 +9,7 @@
 VBOT Lab brings together task-oriented Skills, a capability catalog, the Aorta Python SDK,
 interface definitions, and reference programs for building robot applications.
 
-Current robot application target: **V1.6.0-10**, for `foot_quadruped` EDU.
+Current robot application target: **V1.6.0-12**, for `foot_quadruped` EDU.
 See the [compatibility matrix](docs/compatibility.md) for SDK and platform pairing.
 
 ## Build with your Agent
@@ -31,43 +31,33 @@ application repository, symlink requirements, and checking discovery in your har
 
 | Entry | Purpose | Current availability |
 | --- | --- | --- |
-| [Skills](skills/README.md) | Task workflows for Coding Agents | Local environment-check Skill and shared discovery links available |
+| [Skills](skills/README.md) | Task workflows for Coding Agents | Environment setup, Python/C++ application development and layered diagnosis |
 | [Capabilities & Interfaces](catalog/README.md) | Device scope, interface references, and prerequisites | Queryable catalog; check interface availability on the selected device |
-| [Recipes](recipes/README.md) | Reusable single-task programs | Seven tasks with Python and C++ examples with Bazel targets and offline previews |
-| [VBOT Blueprints](blueprints/README.md) | Complete reference applications | Planned |
+| [Recipes](recipes/README.md) | Reusable single-task programs | Python and C++ examples grouped by capability, with Bazel targets and offline previews |
+| [VBOT Blueprints](blueprints/README.md) | Complete reference applications | Python/C++ read-only health monitor and independent application templates |
 | [Developer Guide](docs/README.md) | Environment, connection, hardware, APIs, and troubleshooting | Chapters available with version-specific scope |
 
 The [Aorta Python SDK](packages/README.md) stays under `packages/aorta/python/`;
 [public Schema](schemas/README.md) stays under `schemas/`. Schema sources are checked in; release wheels and runnable examples are documented in the
 [Python SDK guide](packages/aorta/python/README.md).
 
-## Start locally
+## Run your first application
 
-From the checkout root, with Python 3.10 or later:
+Start with [Quickstart: read robot state with Python](docs/getting-started/README.md).
+It follows one path: prepare the development container, build and preview `subscribe-state`,
+package its pinned ARM64 dependencies, log in over SSH, then deploy and receive three
+decoded `/locomotion/status` samples. Each step identifies its terminal, expected result
+and troubleshooting link. No motion or audio/video capture is required.
 
-```bash
-python3 tools/check_environment.py --profile host
-python3 tools/vbot_catalog.py --robot-type foot_quadruped
-python3 tests/check_repository.py
-python3 tests/test_agent_workspace.py
-python3 tests/test_recipes.py
-bazel build //:repository_files //recipes/...
-bazel test //tests:repository_layout_test //tests:agent_workspace_test //tests:recipe_test
-```
+Already in a development container? Reuse it; no Docker installation inside it is needed.
+Build, preview and package there; run the deployed application in the robot's `vbot` shell.
+An inventory or preview alone is not a successful live run.
 
-The first command inventories this machine, not a connected robot. Use `--profile container`
-inside the development container. Tool discovery does not verify versions, Docker daemon
-access, image availability, or SDK readiness. See [Developer tools](tools/README.md).
-
-For environment setup, use the [container guide](docker/README.md) and
-[editor integration](.devcontainer/README.md). To connect a robot dog, follow the
-[shared wired / Wi-Fi connection guide](docs/robots/quadruped-common/connection.md),
-with the wired connection photo and app-based Wi-Fi setup / router IP lookup.
-Connection and device operations are separate, explicitly requested steps.
-
-After login, follow [device shell setup and checks](docs/getting-started/device-environment.md)
-for Aorta and the [ROS 2 compatibility subset](docs/interfaces/aorta-ros2.md).
-The device CLI workflow is independent of Python SDK installation.
+For other paths, see [C++](packages/aorta/cpp/README.md),
+[wired / Wi-Fi connection](docs/robots/quadruped-common/connection.md),
+[device shell setup](docs/getting-started/device-environment.md),
+[editor integration](.devcontainer/README.md), or [troubleshooting](docs/troubleshooting/README.md).
+Repository validation is a separate [contribution workflow](#contributing-and-validation).
 
 ## Scope and safety
 
@@ -76,7 +66,8 @@ The current EDU release target is `foot_quadruped`;
 Shared robot-dog hardware or connection procedures do not establish software compatibility.
 Check the [robot guides](docs/robots/README.md) and [compatibility matrix](docs/compatibility.md).
 
-The documented Python and C++ workflows use Bazel-based Recipes; Blueprints remain planned.
+The Python and C++ workflows use Bazel-based Recipes; the health-monitor Blueprint provides
+both implementations, Python/C++ workspace generation and device deployment.
 The documented Python and C++ examples include camera, locomotion, RCP and audio access.
 Check the SDK pairing and device prerequisites before live execution.
 
@@ -98,6 +89,9 @@ sanitized details so others can help and benefit from the answer.
 See [Contributing](CONTRIBUTING.md), [tests](tests/README.md), and
 [Agent workflow checks](tests/agent-scenarios/README.md).
 Repository checks run locally without contacting a device.
+On the host or CI runner, run `python3 tools/run_checks.py --scope repository`.
+Recipe checks, Bazel and packaging run in the development container, including CI.
+See [execution locations](docs/development/README.md) for the shared rule.
 See [Security](SECURITY.md) for reporting vulnerabilities.
 
 ## License

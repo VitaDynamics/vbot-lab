@@ -1,10 +1,13 @@
 services:
   dev:
-    image: ${VBOT_LAB_DEV_IMAGE:-crpi-0kb86kk5y2bv7o41.cn-shanghai.personal.cr.aliyuncs.com/vitarobotics/vbot-edu:dev-v0.0.1}
+    image: ${VBOT_LAB_DEV_IMAGE:-crpi-0kb86kk5y2bv7o41.cn-shanghai.personal.cr.aliyuncs.com/vitarobotics/vbot-edu:dev-v0.0.1@sha256:8d5081784d9e7d34463f62ae5bef2b58cf4a0a37383435379c4bfc37ec01fdcd}
+    platform: linux/amd64
     working_dir: /workspace
     command: ["/bin/bash"]
     stdin_open: true
     tty: true
+    environment:
+      VBOT_DEV_CONTAINER: "1"
     volumes:
       - ..:/workspace
       - bazel-cache:/root/.cache/bazel

@@ -13,6 +13,7 @@ For usage questions, application discussions and feature ideas, start with
 code or documentation changes, and link an existing forum discussion when relevant.
 
 - Use Bazel for Python and C++ recipes and reference applications; keep SDK APIs, Schema, code, documentation, and Skills consistent.
+- Repository-only checks may run on the host or CI runner. Bazel builds/tests, Recipe previews, SDK execution checks, dependency preparation and packaging must run in the matching development container, including CI. Follow [execution locations](docs/development/README.md); an offline operation is not automatically host-safe. Do not build, package or run development previews on a robot.
 - Put Aorta SDK integration under `packages/aorta/python/` and `packages/aorta/cpp/`, single-task reference programs under `recipes/`, and complete reference applications under `blueprints/`. Document actual availability; outlines and planned Blueprints must not appear runnable.
 - Maintain one Skill source under `skills/`, exposed through `.agents/skills/` and `.claude/skills/` symlinks. Keep `CLAUDE.md` as a thin import of the shared `AGENTS.md`; do not maintain divergent harness instructions. Skill discovery uses English `SKILL.md`; its `.zh-CN.md` is the paired translation.
 - Keep `AGENTS.md` short and task-oriented. Record capability scope and references in `catalog/`, retain structural facts in Schema, and explain behavior in interface docs. Check catalog changes with the offline tool tests; unknown versions and routes must not become implied support.
@@ -22,7 +23,7 @@ code or documentation changes, and link an existing forum discussion when releva
 - Keep the existing shared wired connection and sensor specification for `foot_quadruped` and `wheel_quadruped`; do not duplicate them or apply them to `foot_humanoid`. Current EDU release scope remains `foot_quadruped` until separately released and documented.
 - Include the dependencies needed to build Schema changes and keep generated Python bindings consistent.
 - Include reproducible steps and relevant test results; follow the [security guidance](SECURITY.md) when sharing reports.
-- Run `python3 tests/check_repository.py`, `python3 tests/test_agent_workspace.py`, and the relevant Bazel checks. Distinguish offline tests from actual harness-session and device behavior.
+- Run `python3 tools/run_checks.py --scope repository` on the host or CI runner; run `python3 tools/run_checks.py --scope recipes` and relevant Bazel checks inside the development container. Distinguish offline tests from actual harness-session and device behavior.
 - Distinguish read-only device checks from control operations; never operate robots automatically in ordinary CI.
 - Before releasing a new or modified live example, run every published language implementation and documented execution path on a supported robot using the documented account, SDK pairing, setup and deployment steps. Compilation, previews and offline tests alone do not meet this release gate. Keep verification evidence in the review record, not in public usage guides; unresolved or untested paths must not be released as runnable examples.
 

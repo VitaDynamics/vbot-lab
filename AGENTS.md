@@ -21,8 +21,7 @@ relevant references; this repository is not a device runtime.
 | Compose, execute or trace an RCP task | [DAG authoring](docs/guides/rcp-dag.md), [RCP presets](docs/guides/rcp-presets.md), then [RCP](docs/interfaces/rcp.md); distinguish preset goals from nodes and preserve resource/lifecycle constraints |
 | Select body/head trajectories, screen expressions or light modes | [Device resources](docs/resources/README.md); for RCP node fields use [NodeCommand reference](docs/interfaces/rcp-commands.md) |
 | Check odometry, build/save a map, or localize | [Mapping and localization](docs/guides/mapping-localization.md); distinguish read-only checks from mode changes |
-| Develop a Python application | [Aorta Python SDK](packages/aorta/python/README.md), [Recipes](recipes/README.md), and the selected capability |
-| Develop a C++ application | [Aorta C++ SDK](packages/aorta/cpp/README.md), [Recipes](recipes/README.md), and the selected capability; explicitly build :main_cpp |
+| Create/extend a Python or C++ application, or combine telemetry streams | [vbot-app-dev](skills/vbot-app-dev/SKILL.md), [health-monitor Blueprint](blueprints/health-monitor/README.md), then [application templates](templates/README.md); keep the selected language and existing project, and use its SDK guide and capability references |
 | Start a user program after device reboot | [User-program autostart](docs/guides/user-autostart.md); preserve existing startup commands and distinguish boot launch from crash recovery |
 | Understand a device or connect to it | [robot guides](docs/robots/README.md); confirm the user's robot type first |
 | Inspect a robot model, joints or URDF | [Vbot Viewer](docs/guides/vbot-viewer.md), then [robot models](assets/robots/README.md); read model.json availability before assuming local model files exist |
@@ -30,6 +29,7 @@ relevant references; this repository is not a device runtime.
 | Get help or prepare a feedback report | [Community & Support](docs/community/README.md); draft a minimal, sanitized report for user review, not automatic posting |
 | Author or inject device Skills / AGENTS.md | [device content API](docs/interfaces/agent/content-api.md), not developer-side Skills |
 | Modify VBOT Lab itself | [Contributing](CONTRIBUTING.md) and relevant tests |
+| Diagnose an application environment or a missing telemetry stream | [vbot-diagnose](skills/vbot-diagnose/SKILL.md), then [layered diagnostics](docs/development/diagnostics.md); explicit levels, no automatic device connection |
 
 For another application workspace, follow [Agent quickstart](docs/agents/README.md).
 Resolve a linked Skill to its physical checkout before using its relative resources.
@@ -37,7 +37,7 @@ Resolve a linked Skill to its physical checkout before using its relative resour
 ## Facts and scope
 
 - The current EDU release target is `foot_quadruped`. Other robot types are planned, even when hardware or connection guides are shared.
-- The supported robot application target is `V1.6.0-10`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
+- The supported robot application target is `V1.6.0-12`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
 - Use the capability catalog as an index, not proof of live availability. Unknown firmware / SDK versions, routes, and ROS2 mappings stay unknown; do not invent them.
 - Use the published wheel pairing in the Python SDK guide and the checked-in public Schema. Preserve Aorta package names and APIs. Recipes have offline previews and explicit device execution; building a target does not verify live compatibility.
 - Device Aorta CLI access is separate from SDK integration. ROS 2 uses a device-local bridge subset; use documented mappings and limitations, not identical-name assumptions.
@@ -47,6 +47,7 @@ Resolve a linked Skill to its physical checkout before using its relative resour
 
 ## Execution and evidence
 
+- Repository-only checks may run on the host or CI runner with `python3 tools/run_checks.py --scope repository`. Bazel builds/tests, Recipe previews, SDK execution checks, dependency preparation and packaging run only in the matching development container, including CI. Follow [execution locations](docs/development/README.md); never fall back to host or robot tooling. Inspect the image and workspace mount, then use `tools/container_context.py` and the guarded `tools/in_container.py` entry. A declared inventory profile is not container evidence.
 - Environment inventory helpers are offline and read-only. They do not install tools, pull images, access Docker, connect over SSH, or contact robot APIs. Device configuration and live read-only sampling are separate, requested steps in the device guide.
 - Prefer public-key SSH for device operations. Follow the [connection guide](docs/robots/quadruped-common/connection.md): reuse working key-based access, or guide the user through setup first, then verify non-interactive login from the environment that will run subsequent commands. Do not silently fall back to an embedded password. Installing a public key is a setup change, not part of a read-only check; never copy a private key to the robot or overwrite existing keys.
 - Use the user's selected device address or SSH alias. If SSH is unreachable or refused, stop and ask the user to connect the device or provide its actual IP. Report authentication and host-key failures separately; do not scan for another device or bypass host-key verification.

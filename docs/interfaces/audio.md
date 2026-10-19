@@ -12,7 +12,7 @@ application, and audio frames only when implementing your own audio processing.
 
 ## Prerequisites and interfaces
 
-The current scope is robot application **V1.6.0-10** on `foot_quadruped` EDU.
+The current scope is robot application **V1.6.0-12** on `foot_quadruped` EDU.
 Check route availability against the [compatibility matrix](../compatibility.md).
 Log in with the vbot account and complete
 [device shell setup](../getting-started/device-environment.md). The speech pipeline must be

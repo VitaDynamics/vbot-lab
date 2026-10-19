@@ -33,6 +33,47 @@
       "verification": "local_tests"
     },
     {
+      "id": "development.diagnostics",
+      "availability": "implemented",
+      "robot_types": [],
+      "execution_location": "developer_host_or_container",
+      "interface_kind": "local_cli",
+      "reference": "docs/development/diagnostics.md",
+      "skill": "skills/vbot-diagnose/SKILL.md",
+      "tool": "tools/diagnose.py",
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "local_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests"
+    },
+    {
+      "id": "robot.health.monitor",
+      "availability": "implemented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "blueprints/health-monitor/README.md",
+      "skill": "skills/vbot-app-dev/SKILL.md",
+      "tool": "blueprints/health-monitor/health_monitor/main.py",
+      "recipe": null,
+      "blueprint": "blueprints/health-monitor/README.md",
+      "requires_sdk": true,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests",
+      "implementations": {
+        "python": {
+          "source": "blueprints/health-monitor/health_monitor/main.py",
+          "bazel_target": "//blueprints/health-monitor:main"
+        },
+        "cpp": {
+          "source": "blueprints/health-monitor/cpp/main.cc",
+          "bazel_target": "//blueprints/health-monitor:main_cpp"
+        }
+      }
+    },
+    {
       "id": "device.environment.check",
       "availability": "implemented",
       "robot_types": ["foot_quadruped"],

@@ -5,12 +5,14 @@ from contextlib import contextmanager, redirect_stdout
 import io
 import json
 from pathlib import Path
+import struct
 import sys
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "blueprints/health-monitor"))
 from recipes.common import load_sdk
 
 
@@ -19,6 +21,150 @@ def recipe(slug):
 
 
 class ReleaseSDKTests(unittest.TestCase):
+    def monitor_messages(self):
+        from aorta.sys.AortaHeader import AortaHeaderT
+        from bms.BmsState import BmsStateT
+        from bms.Version3 import Version3T
+        from bms.TempArray16 import TempArray16T
+        from bms.VoltageArray16 import VoltageArray16T
+        from locomotion.LocomotionStatus import LocomotionStatusT
+        from sm.SmStatus import SmStatusT
+        from sm.StatePathEntry import StatePathEntryT
+        from sm.KeyValue import KeyValueT
+        header = AortaHeaderT(publisherNode="wire-test", sequence=1)
+        messages = {
+            "state": LocomotionStatusT(aortaHeader=header, heartbeatSeq=1, currentAction="idle", source="test", stampNs=1),
+            "battery": BmsStateT(aortaHeader=header, sensorTimestampNs=1, vendor="test", serialNumber="sample",
+                                 protocolVersion=Version3T(1, 2, 3), hwVersion=Version3T(), swVersion=Version3T(),
+                                 socPercent=80, voltageMv=42000, temperaturesC=TempArray16T([25] * 16),
+                                 voltagesSingleMv=VoltageArray16T([3500] * 16)),
+            "system": SmStatusT(aortaHeader=header, sensorTimestampNs=1, heartbeatSeq=1, stateName="idle",
+                                activeStatePath=[StatePathEntryT(1, "ready"), StatePathEntryT(2, "idle")],
+                                message="test", data=[KeyValueT("mode", "observe"), KeyValueT("state", "idle")]),
+        }
+        return {name: self.sdk.FlatbuffersActionCodec.serialize(value) for name, value in messages.items()}
+
+    def test_monitor_full_schema_and_legal_zero_defaults(self):
+        from health_monitor.runtime import decode
+        from health_monitor.wire import validator
+        for stream, payload in self.monitor_messages().items():
+            with self.subTest(stream=stream):
+                self.assertEqual(decode(stream, payload)[1], 1)
+        for stream, root in (("state", "locomotion.LocomotionStatus"), ("battery", "bms.BmsState"), ("system", "sm.SmStatus")):
+            value = getattr(importlib.import_module(root), root.split(".")[-1] + "T")()
+            data, stamp = decode(stream, self.sdk.FlatbuffersActionCodec.serialize(value))
+            self.assertEqual(stamp, 0)
+            self.assertEqual(data["soc_percent"] if stream == "battery" else data["heartbeat_seq"], 0)
+            self.assertTrue(validator(stream).objects)
+
+    def test_monitor_rejects_corrupt_root_table_fields_strings_and_header(self):
+        from health_monitor.runtime import decode
+        from health_monitor.wire import Buffer
+        for stream, good in self.monitor_messages().items():
+            reader = Buffer(good)
+            table = reader.table(reader.target(0))
+            root, vtable, _, size = table
+            field = reader.field(table, 1, 8, 8)
+            text = reader.target(reader.field(table, {"state": 4, "battery": 4, "system": 6}[stream]))
+            header = reader.target(reader.field(table, 0))
+            changes = ((0, "I", 0), (0, "I", len(good) + 4), (0, "I", 5), (root, "i", 0),
+                       (root, "i", 0x7fffffff), (vtable, "H", 3), (vtable + 2, "H", 3),
+                       (vtable + 6, "H", 1), (vtable + 6, "H", size - 1),
+                       (text, "I", 0xffffffff), (text + 4 + reader.integer(text), "B", 1),
+                       (header, "i", 0))
+            # Trailing alignment padding may be omitted legally. Truncate a
+            # referenced string's terminator instead of arbitrary last bytes.
+            bad_inputs = [b"", b"\0" * 8, good[:3], good[:text + 4 + reader.integer(text)]]
+            for position, kind, value in changes:
+                bad = bytearray(good)
+                struct.pack_into("<" + kind, bad, position, value)
+                bad_inputs.append(bytes(bad))
+            for index, bad in enumerate(bad_inputs):
+                with self.subTest(stream=stream, mutation=index), self.assertRaises(ValueError):
+                    decode(stream, bad)
+            self.assertIsNotNone(field)
+
+    def test_monitor_rejects_broken_vectors_and_nested_tables(self):
+        from health_monitor.runtime import decode
+        from health_monitor.wire import Buffer
+        good = self.monitor_messages()["system"]
+        reader = Buffer(good)
+        root = reader.table(reader.target(0))
+        for field in (7, 9):
+            vector = reader.target(reader.field(root, field))
+            child = reader.target(vector + 4)
+            for position, kind, value in ((vector, "I", 0xffffffff), (vector + 4, "I", 0), (child, "i", 0)):
+                bad = bytearray(good)
+                struct.pack_into("<" + kind, bad, position, value)
+                with self.subTest(field=field, position=position), self.assertRaises(ValueError):
+                    decode("system", bad)
+
+    def test_monitor_schema_failure_is_not_treated_as_a_bad_sample(self):
+        from health_monitor import runtime, wire
+        wire.validator.cache_clear()
+        try:
+            with patch.object(wire.importlib, "import_module", return_value=SimpleNamespace(ROOT_TYPE_NAME="wrong.Root")), \
+                 self.assertRaises(RuntimeError) as caught:
+                runtime.load_sdk()
+            self.assertEqual(caught.exception.stage, "sdk")
+            self.assertEqual(caught.exception.error_code, "sdk_load_failed")
+        finally:
+            wire.validator.cache_clear()
+
+    def test_monitor_verifier_budgets_are_enforced(self):
+        from health_monitor import wire
+        schema = wire.validator("state")
+        payload = self.monitor_messages()["state"]
+        for name, value in (("MAX_BYTES", 8), ("MAX_DEPTH", 0), ("MAX_OBJECTS", 0)):
+            with self.subTest(limit=name), patch.object(wire, name, value), self.assertRaises(ValueError):
+                schema.verify(payload)
+
+    def test_malformed_monitor_input_cannot_make_the_application_succeed_or_refresh_data(self):
+        from health_monitor import main as monitor_app
+        good = self.monitor_messages()
+        for initial_valid in (False, True):
+            clock = [0.0]
+            events = iter(([(*item, 0.0) for item in good.items()] if initial_valid else []) +
+                          [(stream, b"\0" * 8, 3.5) for stream in good])
+            @contextmanager
+            def subscription(_):
+                def receive(timeout):
+                    try:
+                        item = next(events)
+                    except StopIteration:
+                        clock[0] = 4.1
+                        return None
+                    clock[0] = max(clock[0] + 0.01, item[2])
+                    return item
+                yield receive
+            with self.subTest(initial_valid=initial_valid), patch.object(monitor_app, "subscription", side_effect=subscription), \
+                 patch.object(monitor_app.time, "monotonic", side_effect=lambda: clock[0]), redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(monitor_app.main(["--execute", "--duration", "4"]), 1)
+            final = json.loads(output.getvalue().splitlines()[-1])
+            self.assertFalse(final["all_streams_receiving"])
+            for value in final["streams"].values():
+                self.assertEqual(value["invalid"], 1)
+                self.assertEqual(value["samples"], int(initial_valid))
+                self.assertEqual(value["status"], "stale" if initial_valid else "waiting_data")
+
+    def test_health_monitor_decoder_matches_published_sdk_types(self):
+        from health_monitor.runtime import decode
+        from bms.BmsState import BmsStateT
+        from sm.SmStatus import SmStatusT
+        from locomotion.LocomotionStatus import LocomotionStatusT
+        pack = self.sdk.FlatbuffersActionCodec.serialize
+        cases = (("battery", BmsStateT(socPercent=75, voltageMv=42000, sensorTimestampNs=123)),
+                 ("state", LocomotionStatusT(heartbeatSeq=7, posture=2, stampNs=123)),
+                 ("system", SmStatusT(heartbeatSeq=8, stateId=4, sensorTimestampNs=123)))
+        for stream, value in cases:
+            data, timestamp = decode(stream, pack(value))
+            self.assertEqual(timestamp, 123)
+            self.assertIsInstance(data, dict)
+            if stream == "battery":
+                self.assertEqual(data, {"soc_percent": 75, "voltage_v": 42})
+            else:
+                self.assertEqual(data["heartbeat_seq"], 7 if stream == "state" else 8)
+
     @classmethod
     def setUpClass(cls):
         cls.sdk = load_sdk()

@@ -2,11 +2,11 @@
   "format_version": 1,
   "workspace": {
     "branch": "pre_release/V1.6.0.X",
-    "tag": "V1.6.0.10"
+    "tag": "V1.6.0.12"
   },
   "robots": {
     "foot_quadruped": {
-      "application_version": "V1.6.0-10"
+      "application_version": "V1.6.0-12"
     }
   },
   "sdk": {
@@ -114,7 +114,7 @@
     "bazel_version": "7.6.1",
     "image": {
       "reference": "crpi-0kb86kk5y2bv7o41.cn-shanghai.personal.cr.aliyuncs.com/vitarobotics/vbot-edu:dev-v0.0.1",
-      "digest": null
+      "digest": "sha256:8d5081784d9e7d34463f62ae5bef2b58cf4a0a37383435379c4bfc37ec01fdcd"
     }
   }
 }

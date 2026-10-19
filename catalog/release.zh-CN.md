@@ -6,7 +6,8 @@
 它是本地、机器可读的配套配置，不是发布公告或安装程序，各组件保留独立版本号。
 
 配置记录所选应用、SDK、Schema 与开发镜像引用，以及计划使用的源码分支和 tag；
-这不会创建 Git 引用，也不表示发布了新版本。镜像 digest 尚未记录。
+这不会创建 Git 引用，也不表示发布了新版本。源码 tag 为 `V1.6.0.12`，
+机器人应用为 `V1.6.0-12`，SDK Release 为 `edu-sdk-2026.10.14`。镜像 digest 已固定。
 
 ## 字段说明
 
@@ -14,9 +15,9 @@
 | --- | --- |
 | `format_version` | 整数 `1`；拒绝未知字段和重复 JSON 键 |
 | `workspace.branch` | 正式版本使用 `main`，迭代版本使用 `pre_release/V1.6.0.X` 等长期分支；`X` 保留为字母，不替换为迭代号 |
-| `workspace.tag` | 计划使用的源码 tag，准备阶段可为 `null`；迭代 tag 必须与分支版本族一致，例如 `pre_release/V1.6.0.X` 对应 `V1.6.0.10`。机器人应用和 SDK 版本仍分别管理 |
+| `workspace.tag` | 当前源码 tag：`V1.6.0.12`。迭代 tag 与分支版本族一致，并带数字迭代后缀；机器人应用和 SDK 版本分别记录 |
 | `robots` | `catalog/robots/` 中当前已开放的设备类型；分别记录准确的 `application_version`，不是最低版本 |
-| `sdk.repository`、`sdk.release_tag` | 公开 GitHub 下载仓库（`owner/name`）和 SDK Release tag；复用 SDK 时保持其原 tag |
+| `sdk.repository`、`sdk.release_tag` | 公开 GitHub 下载仓库（`owner/name`）和文档所列依赖配套的准确 SDK Release tag |
 | `sdk.aorta_version` | 与 Python、C++ SDK 配套的 Aorta 版本 |
 | `sdk.python` | 最低 Python 版本（`major.minor`）、四个 wheel 包的准确版本和可下载的 wheel 平台标签 |
 | `sdk.cpp` | 准确的 SDK 版本、正整数 ABI、发行环境标识和可下载架构；ABI 与 Bazel 的原生库导入保持一致 |
@@ -38,13 +39,14 @@ VBOT Lab 的 `main` 保存正式版本。迭代更新在选定版本族的
 `pre_release/V<major>.<minor>.<patch>.X` 分支中准备。
 每个版本族使用各自的分支；`pre_release/V1.6.0.X` 仅对应 `V1.6.0` 版本族。
 迭代更新允许直接提交和推送，不要求 PR。
-例如，机器人应用 `V1.6.0-10` 可配套源码 tag `V1.6.0.10`，对应
-`pre_release/V1.6.0.X`；准确的 SDK／Schema 配套另行记录。
+当前配套为 `pre_release/V1.6.0.X` 上的源码 tag `V1.6.0.12`，适配机器人应用
+`V1.6.0-12`。迭代 tag 属于选定的分支版本族；机器人应用版本和
+准确的 SDK／Schema 配套分别记录。
 
 在检查通过的源码提交上创建迭代 tag。仅打 tag 不会将迭代版本提升到 `main`，
 也不会创建 GitHub Release。后续迭代继续在选定分支上进行，只有明确要求正式发布时，
-才创建提升 PR。已有 tag 对应不可变的源码快照；在已打 tag 的快照之后继续修改时，
-新 tag 选定前将 `workspace.tag` 保留为 `null`，不复用或移动已有 tag。
+才创建提升 PR。已有 tag 对应不可变的源码快照；在 `workspace.tag` 中记录选定的源码 tag，
+创建 tag 是需要明确执行的发布步骤。
 评审和正式发布步骤见[协作流程](../.github/WORKFLOWS.zh-CN.md)。
 
 配置不替代[能力元数据](README.zh-CN.md)、设备配置、生成的 Schema 元数据或 SDK
@@ -99,5 +101,5 @@ python3 tools/check_release.py \
 | 硬件／模型 | 资源 manifest、设备类型适用范围、文档和授权声明 |
 | 测试预期 | 离线测试及其中与版本有关的预期；检查不会自动迁移示例或依赖 |
 
-只更新发生变化的组件；仅更新文档的源码版本可以复用既有 SDK Release。
+分别记录各组件依赖的版本号和制品。
 配置可供本地工具读取，目前没有配置自动发布。

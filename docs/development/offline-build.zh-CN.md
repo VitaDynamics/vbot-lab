@@ -8,13 +8,19 @@
 
 ## 准备构建环境
 
+本页所有命令均在配套开发容器内执行，包括依赖准备、安装、Bazel 和压缩包生成。
+离线操作不代表可以在宿主机或机器人上构建，CI 同样遵守，参阅[执行位置](README.zh-CN.md)。
+
+多步骤 Bash 命令块均通过 `&&` 串联。准备、校验或构建失败后会跳过本段后续操作，
+处理错误后再执行下一个命令块。
+
 从开发环境提供方取得配套依赖包，或按下文在联网机器上生成。
 当前 SDK 版本尚未附带预构建依赖包；准备工具不会自动发布它，
 也不要假设现有开发镜像已经包含它。
 
 断网前准备好以下内容：
 
-- Bazel 7.6.1、本机架构的 C++17 编译器及配套 Linux 系统头文件／库。
+- Bazel 7.6.1、C++17 编译器及匹配目标的头文件／库；ARM64 设备构建使用镜像中的 ARM64 GCC／G++ 11 交叉工具链。
 - 匹配当前 `MODULE.bazel` 和 `MODULE.bazel.lock` 的构建依赖包。
 - 配套的 [C++ SDK 和 Schema 包](../../packages/aorta/cpp/README.zh-CN.md)。
 - Python 执行所需的 [SDK wheel](../../packages/aorta/python/README.zh-CN.md)
@@ -44,7 +50,7 @@ python -m pip install --no-index --find-links artifacts/wheelhouse \
 python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output" \
   build //recipes/... //recipes/device-info:main_cpp //recipes/subscribe-state:main_cpp \
   //recipes/service-call:main_cpp //recipes/camera:main_cpp //recipes/audio:main_cpp \
-  //recipes/locomotion:main_cpp //recipes/rcp-task:main_cpp
+  //recipes/locomotion:main_cpp //recipes/rcp-task:main_cpp &&
 python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output" \
   run //recipes/subscribe-state:main_cpp
 ```
@@ -53,6 +59,20 @@ python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output" 
 模块／锁文件哈希及 Bazel 版本；忽略环境中的 Bazel 配置，关闭 WORKSPACE 回退
 和仓库下载，使用独立的输出／缓存目录。缺少依赖包时会在启动 Bazel 前报错。
 上面的预览不会访问机器人；在线执行仍需满足各 Recipe 的设备环境和显式操作参数。
+
+执行 `test` 时，入口会将已通过容器检查的 `VBOT_DEV_CONTAINER` 声明显式传给测试进程，
+不加载 `.bazelrc`，也不因此转发其他环境变量。容器检查仍在启动 Bazel 前进行，不允许宿主机测试。
+
+ARM64 设备程序应选择 ARM64 SDK 并使用下方显式目标参数。
+离线入口忽略 `.bazelrc`，所以使用 `--target-platform arm64`，而非 `--config=arm64`：
+
+```bash
+python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output-arm64" \
+  --target-platform arm64 build //recipes/subscribe-state:main_cpp
+```
+
+按需替换 Recipe 目标。该选项仅允许 `build`，不在 AMD64 容器内运行／测试 ARM64 程序。
+工具链定义已在仓库内；使用与更新后模块／锁文件配套的依赖包，不使用旧快照。
 
 该入口不是任意构建规则或应用程序的网络沙箱，不会禁止 `bazel run` 启动的程序
 使用网络。新增目标或构建配置可能需要重新生成依赖包。不要把工作站的 SDK 库
@@ -63,8 +83,8 @@ python3 tools/bazel_offline.py --output-user-root "$PWD/artifacts/bazel-output" 
 在联网机器上准备好 SDK 路径及可选解码构建依赖后运行：
 
 ```bash
-python3 tools/prepare_bazel_offline.py --output artifacts/offline/bazel
-tar -czf artifacts/bazel-offline.tar.gz -C artifacts/offline/bazel .
+python3 tools/prepare_bazel_offline.py --output artifacts/offline/bazel &&
+tar -czf artifacts/bazel-offline.tar.gz -C artifacts/offline/bazel . &&
 sha256sum artifacts/bazel-offline.tar.gz
 ```
 

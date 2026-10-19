@@ -18,6 +18,10 @@
 仅将 `skills/<name>/SKILL.md` 作为发现来源维护；`.zh-CN.md` 是供人阅读的译文，
 不是另一份已安装 Skill。不要在不同 harness 目录分别维护不同指令。
 
+环境搭建选择 vbot-dev-setup，创建／扩展 Python/C++ 应用选择 vbot-app-dev，
+已有应用故障选择 vbot-diagnose。三者共用发现目录，Codex 以 `$<name>` 调用，
+Claude Code 以 `/<name>` 调用。
+
 在 Agent 中打开仓库，请它检查开发环境，不安装软件、不连接机器人。
 确认 harness 的 Skill 选择器中出现 `vbot-dev-setup`。
 如果没有，检查软链接、项目信任与配置，并在仓库内重启会话。
@@ -32,8 +36,12 @@
 ## 在自己的应用仓库中工作
 
 在 Agent 所在文件系统保留完整、固定版本的 VBOT Lab 工作副本。
-将其中单独的 `vbot-dev-setup` 目录链接到应用仓库的 `.agents/skills/` 和／或 `.claude/skills/`，
+只将需要的工作流目录分别链接到应用仓库的 `.agents/skills/` 和／或 `.claude/skills/`，
 不要替换这两个目录。保留其他 Skills，遇到同名条目时停止，不覆盖。
+
+例如开发时链接 vbot-app-dev，排障时链接 vbot-diagnose；需要环境搭建时再使用 vbot-dev-setup。
+不要在已有应用中用整目录链接替换 .agents/skills 或 .claude/skills。
+添加所选 Skills 不要求修改已有 AGENTS.md 或 CLAUDE.md。
 
 被链接的 Skill 解析实际位置后，使用同一版本的能力索引、工具与文档。
 不要只复制 `SKILL.md`，否则这些资源会丢失。应用输出放在自己的工作区，
@@ -54,11 +62,16 @@
 
 ## 按任务开展开发
 
+纯仓库检查可在宿主机或 CI runner 执行；Bazel、Recipe 预览、SDK 检查和打包均在配套开发容器内进行，
+CI 同样遵守。运行在宿主机的 Agent 需通过选定的容器执行这些命令；清点模式或另一个终端的交互会话
+不会改变其执行上下文，参阅[执行位置](../development/README.zh-CN.md)。
+
 1. 通过 [Skills](../../skills/README.zh-CN.md)选择相关流程。
 2. 查询[能力索引](../../catalog/README.zh-CN.md)，获得设备范围与参考资料。
 3. 阅读所选接口、SDK 与 [Recipe](../../recipes/README.zh-CN.md)，不必加载所有文档。
 4. 仅执行确实可用的构建／测试入口，报告实际结果和剩余阻塞。
 
-SDK 开发流程覆盖 Python 和 C++；设备 Recipes 已有可执行代码，Blueprints 仍处于规划阶段。
+SDK 开发流程覆盖 Python 和 C++。通过[健康监测 Blueprint](../../blueprints/health-monitor/README.zh-CN.md)
+通过 --language python 或 cpp 创建独立应用，将应用文件放在生成的工作区，而不是修改参考仓库。
 设备端 Skills 与 AGENTS.md 属于独立的[内容 API](../interfaces/agent/content-api.zh-CN.md)，
 不是这些 Coding Agent 发现目录。本地检查不赋予机器人控制权限。

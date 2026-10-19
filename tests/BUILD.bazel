@@ -5,6 +5,51 @@ filegroup(
 )
 
 py_test(
+    name = "applications_test",
+    srcs = ["test_applications.py", "test_python_packaging.py"],
+    main = "test_applications.py",
+    data = ["//:repository_files"],
+    python_version = "PY3",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "health_monitor_cpp_test",
+    srcs = ["test_health_monitor_cpp.py"],
+    main = "test_health_monitor_cpp.py",
+    deps = ["//blueprints/health-monitor:application"],
+    data = ["//blueprints/health-monitor:main_cpp", "//blueprints/health-monitor:repository_files"],
+    python_version = "PY3",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "python_packaging_test",
+    srcs = ["test_python_packaging.py"],
+    main = "test_python_packaging.py",
+    data = ["//:repository_files"],
+    python_version = "PY3",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "deployment_commands_test",
+    srcs = ["test_deployment_commands.py"],
+    main = "test_deployment_commands.py",
+    data = ["//:repository_files"],
+    python_version = "PY3",
+    tags = ["manual"],
+)
+
+py_test(
+    name = "execution_policy_test",
+    srcs = ["test_execution_policy.py"],
+    main = "test_execution_policy.py",
+    data = ["//:repository_files"],
+    python_version = "PY3",
+)
+
+py_test(
     name = "release_configuration_test",
     srcs = ["test_release.py"],
     main = "test_release.py",
@@ -70,7 +115,7 @@ py_test(
     name = "recipe_sdk_test",
     srcs = ["test_recipe_sdk.py"],
     main = "test_recipe_sdk.py",
-    deps = ["//recipes:common"],
+    deps = ["//recipes:common", "//blueprints/health-monitor:application"],
     data = ["//recipes:repository_files"],
     python_version = "PY3",
     tags = ["manual", "local"],

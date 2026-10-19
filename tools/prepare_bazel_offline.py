@@ -9,6 +9,8 @@ import subprocess
 from urllib.request import urlopen
 from urllib.parse import urlsplit
 
+from container_context import require_dev_container
+
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = ["//recipes/...", "//tests:repository_layout_test", "//tests:agent_workspace_test", "//tests:offline_build_test",
            "//tests:recipe_test", "//tests:family_recipe_test", "//tests:recipe_sdk_test", "//tests:recipe_cpp_test",
@@ -28,6 +30,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True, help="new bundle directory")
     parser.add_argument("--bazel", default="bazel")
     args = parser.parse_args()
+    require_dev_container()
     version = subprocess.check_output([args.bazel, "--version"], text=True).strip()
     if version != "bazel 7.6.1":
         parser.error("this bundle requires Bazel 7.6.1")
@@ -85,4 +88,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (OSError, ValueError, RuntimeError) as error:
+        raise SystemExit(f"Offline bundle preparation error: {error}")

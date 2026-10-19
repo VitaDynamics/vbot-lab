@@ -1,6 +1,6 @@
 ---
 name: vbot-dev-setup
-description: Check host Docker readiness and guide ARM64 application development in the provided VBOT container, through SDK preparation, Bazel build, deployment and a first read-only state sample. Also supports scoped environment checks, not general robot diagnostics or motion control.
+description: Set up VBOT development, reuse an existing development container or check host Docker, and guide Python packaging, deployment and a first read-only state sample. Also supports scoped environment checks and C++ build prerequisites; not general robot diagnostics or motion control.
 ---
 
 # VBOT development environment
@@ -59,6 +59,12 @@ is a separate action and must fit the user's request. For interface selection, u
 
 ## Host to development container
 
+Apply the shared [execution locations](../../docs/development/README.md): repository-only
+checks may run on the host or CI runner, but all Bazel builds/tests, Recipe previews,
+SDK execution checks, dependency preparation and packaging stay inside the matching
+development container, including CI. Offline or mocked application execution is not a
+repository inspection. Preserve explicit device-side installation/live-run steps separately.
+
 For a host environment check or full setup, follow the Docker checks in the
 [container guide](../../docker/README.md): check Docker CLI/client-server access,
 Compose v2, the selected Docker context, and the Compose configuration. Use a bounded
@@ -88,18 +94,32 @@ Record the selected container ID and mounted workspace path for subsequent comma
 check-only request, give these next steps without pulling or starting a container.
 Do not perform separate anonymous-access probes as part of setup.
 
+After inspecting image identity, mount and architecture, run `python3 tools/container_context.py`
+inside that container. Compose/editor configuration declares `VBOT_DEV_CONTAINER=1`; for an
+existing container use the guide's `docker exec -e VBOT_DEV_CONTAINER=1` command. A runtime
+marker plus this declaration is a guard, not proof of the image or SDK. Never set the flag
+on the host to force a pass, or treat `--profile container` as evidence. Use
+`python3 tools/in_container.py -- <command>` for development commands; Recipe check groups
+use `python3 tools/run_checks.py --scope recipes`. If the context cannot be established,
+stop the container-only stage and report it unexecuted rather than using the host toolchain.
+
 Continue from `/workspace` inside the container, using the container inventory profile.
 An Agent running on the host must execute subsequent development commands through
 the selected container; an interactive shell opened elsewhere does not move the Agent's
 execution context. Confirm the mounted checkout, image and container identity first.
-If already inside the provided container, skip host Docker checks; do not require Docker
-inside it or mount the host Docker socket.
+If already inside a user-confirmed development container, reuse it: inspect the runtime marker,
+checkout, tool versions and architecture, and skip host Docker checks. Do not require Docker
+inside it, create a nested container, or mount the host Docker socket. If identity cannot be
+inspected from inside, record that limitation instead of claiming the public image was checked.
 
-Check the container architecture and actual compiler target before producing ARM64 native
-artifacts. Docker alone does not turn x86_64 builds into ARM64 builds. Follow the supported
-SDK build path; if the provided container cannot produce compatible ARM64 binaries,
-report that blocker and request a matching container environment. Do not fall back to host
-or device compilation, invent a cross-toolchain, or change host emulation settings.
+Distinguish container runtime architecture from compiler target. The published image runs
+on linux/amd64 and includes ARM64 GCC/G++ cross-compilers; inspect them using the
+[container guide](../../docker/README.md). Reuse them rather than requiring an ARM64
+container solely because `uname -m` reports x86_64. Use the ARM64 SDK with the checked-in
+`--config=arm64` for device builds; use the native SDK/default configuration for previews
+and SDK tests. Match the compiler, SDK and output architecture. Do not execute ARM64
+binaries/tests in the AMD64 container or claim a plain native build produces ARM64.
+Do not fall back to host/device compilation or change host emulation settings.
 
 ## Full setup: build, deploy, receive state
 
@@ -116,25 +136,32 @@ or create another deployment just because a previous stage has already completed
    for the bundle; never substitute an undocumented dependency registry.
 2. **Prepare SDK and build the read-only example.** Use
    [subscribe-state](../../recipes/subscribe-state/README.md), which reads `/locomotion/status`.
-   - Python: follow the [SDK guide](../../packages/aorta/python/README.md) for release pairing
-     and real import checks. Build `//recipes/subscribe-state:main` and run its offline preview
-     inside the development container. Stage device-matching wheels using
-     [Python deployment](../../docs/development/python-deployment.md).
+   - Python (default): follow [Quickstart](../../docs/getting-started/README.md) as the
+     single command sequence. Build `//recipes/subscribe-state:main`, run its SDK-free
+     preview and use `tools/fetch_sdk.py` plus `tools/package_python.py` for the verified
+     ARM64 base package. A workstation SDK install is not a prerequisite for these steps.
+     Keep download, build, package and device deployment separate; the packager does not
+     perform the other stages. For container-native application work beyond this first
+     path, use the [SDK guide](../../packages/aorta/python/README.md) for actual import checks.
    - C++: follow the [C++ SDK guide](../../packages/aorta/cpp/README.md), configure matching
-     SDK/Schema paths, and build `//recipes/subscribe-state:main_cpp`. Device binaries must
+     SDK/Schema paths, and build `//recipes/subscribe-state:main_cpp` with `--config=arm64`
+     for the device. Native previews/tests use the native SDK and omit that configuration. Device binaries must
      be ARM64 with compatible runtime libraries. An x86_64 preview is not a deployable ARM64
-     binary; selecting ARM64 SDK archives does not configure cross-compilation. If no supported
-     ARM64 builder is available, stop that path at this blocker rather than building on the robot.
+     binary. Inspect ARM64 ELF headers/dependencies with `aarch64-linux-gnu-readelf`, not
+     host `ldd`; resolve runtime libraries with `ldd` after device login. If a compiler or
+     matching SDK is missing, report that specific input without switching containers automatically.
 3. **Connect and configure.** Follow the device section below: verify public-key SSH as
    `vbot`, then configure that device shell. Verify architecture and relevant runtime versions
    against the selected artifacts. Use a dedicated native Aorta SDK shell; ROS setup is not
    required for this example. For Python, follow the deployment guide's `PYTHONPATH` isolation
    rather than assuming activation of a venv removes ROS package paths.
 4. **Deploy only the selected example.** Full setup includes transferring the documented
-   application package to a fresh user application directory and setting up its runtime.
+   application package to a fresh user application directory and setting up its runtime;
+   follow [Python deployment](../../docs/development/python-deployment.md) for package boundaries.
    Confirm the intended target before this write; if the request excludes device writes,
    stop with the staged package and remaining steps. Use the selected deployment guide:
-   - Python: transfer source and ARM64 wheels, create a device-local venv, install offline,
+   - Python: verify the generated package with `tools/package_python.py --verify`, transfer
+     its complete contents, create a device-local venv, install pinned `requirements.txt` offline,
      and check imports. Never transfer the workstation venv or assume a device checkout exists.
    - C++: transfer the executable and required shared libraries, check architecture, checksums
      and dynamic-library resolution, then run `./bin/subscribe-state` directly. No device Bazel
@@ -144,7 +171,9 @@ or create another deployment just because a previous stage has already completed
    for the selected language. Require decoded state samples and successful process completion;
    an offline preview, topic listing, or inventory exit code is not live success. On timeout
    or failure, inspect the relevant environment/import/library/route error and report the
-   failing stage. Do not retry indefinitely or change services, permissions, bridge settings,
+   failing stage. Use the [symptom index](../../docs/troubleshooting/README.md) to distinguish
+   import/link errors, configuration and sampling timeouts. A timeout alone does not prove
+   an unsupported interface or access denial. Do not retry indefinitely or change services, permissions, bridge settings,
    or robot modes to force a sample.
 
 Stop after the read-only example exits. Do not add motion, audio/video capture, background

@@ -8,7 +8,8 @@ announcement or an installer. Component versions remain independent.
 
 The configuration uses the selected application, SDK, Schema and development image
 references. It records the intended source branch and tag; this does not create Git
-refs or announce a release. The image digest has not yet been recorded.
+refs or announce a release. The source tag is `V1.6.0.12`, the robot application is
+`V1.6.0-12`, and the SDK Release is `edu-sdk-2026.10.14`. The image digest is pinned.
 
 ## Fields
 
@@ -16,9 +17,9 @@ refs or announce a release. The image digest has not yet been recorded.
 | --- | --- |
 | `format_version` | Integer `1`; unknown fields and duplicate JSON keys are rejected |
 | `workspace.branch` | `main` for a formal release, or a long-lived iteration branch such as `pre_release/V1.6.0.X`; `X` is a literal letter, not an iteration number |
-| `workspace.tag` | Intended source tag, or `null` while preparing a snapshot; iteration tags match the branch family, such as `V1.6.0.10` for `pre_release/V1.6.0.X`. Robot application and SDK versions remain separate |
+| `workspace.tag` | Source tag for this snapshot: `V1.6.0.12`. Iteration tags match the branch version family and add a numeric iteration; robot application and SDK versions are recorded separately |
 | `robots` | Current released robot types from `catalog/robots/`; each records its exact `application_version`, not a minimum version |
-| `sdk.repository`, `sdk.release_tag` | Public GitHub download repository (`owner/name`) and SDK Release tag; reused SDK assets retain their existing tag |
+| `sdk.repository`, `sdk.release_tag` | Public GitHub download repository (`owner/name`) and exact SDK Release tag for the documented dependency pairing |
 | `sdk.aorta_version` | Aorta version paired with the Python and C++ SDK |
 | `sdk.python` | Minimum Python version (`major.minor`), exact versions of the four wheel packages, and available wheel platform tags |
 | `sdk.cpp` | Exact SDK version, positive integer ABI, distribution identifier and available architectures; keep ABI aligned with the Bazel native-library import |
@@ -42,15 +43,15 @@ VBOT Lab keeps formal releases on `main`. Prepare changes on the
 `pre_release/V<major>.<minor>.<patch>.X` branch for the selected version family.
 Each family has its own branch; `pre_release/V1.6.0.X` is only for the `V1.6.0` family.
 Iteration updates allow direct commits and pushes and do not require a PR.
-For example, robot application `V1.6.0-10` can be paired with source tag `V1.6.0.10`
-on `pre_release/V1.6.0.X`. Record the exact SDK/Schema pairing separately.
+The current pairing is source tag `V1.6.0.12` on `pre_release/V1.6.0.X` for robot
+application `V1.6.0-12`. Iteration tags belong to the selected branch version family;
+record the robot application and exact SDK/Schema pairing separately.
 
 Create the iteration tag on the checked source commit. A tag alone does not promote
 the iteration to `main` or create a GitHub Release. Continue iteration work on the
 selected branch; open a promotion PR only when formal release is explicitly requested.
-Existing tags identify immutable snapshots. While preparing changes after a tagged
-snapshot, keep `workspace.tag` as `null` until a new tag is selected; do not reuse or
-move an existing tag. See the
+Existing tags identify immutable snapshots. Record the selected source tag in
+`workspace.tag`; creating it requires an explicit release step. See the
 [collaboration workflow](../.github/WORKFLOWS.md) for review and promotion steps.
 
 The configuration does not replace [capability metadata](README.md), robot profiles,
@@ -109,6 +110,5 @@ metadata, not binary contents.
 | Hardware / models | Asset manifests, robot-type applicability, documentation and licensing notices |
 | Test expectations | Offline tests and any version-specific expectations; checks do not automatically migrate examples or dependencies |
 
-Update only components that changed. A documentation-only source update can reuse an
-existing SDK Release. The configuration is suitable for inspection by
-local tools, but no automatic publication is configured.
+Record each component's dependency version and artifacts independently. The configuration
+is suitable for inspection by local tools, but no automatic publication is configured.

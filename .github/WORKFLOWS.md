@@ -2,30 +2,54 @@
 
 <p align="center">English | <a href="WORKFLOWS.zh-CN.md">中文</a></p>
 
-The current workflow runs repository-content and offline agent-workspace checks on
-GitHub-hosted runners for PRs and pushes to `main` or `pre_release/**`.
-GitHub Actions checks out the code; the check script itself makes no network requests
-and performs no device operations.
+For PRs and pushes to `main` or `pre_release/**`, the workflow separates repository inspection
+from application execution. `repository-checks` runs read-only content and mocked tool checks
+on a GitHub-hosted runner. `recipe-checks` runs SDK-free previews and simulated application
+flows inside the development container selected by `docker/compose.yaml`.
+`sdk-integration` uses that same pinned container configuration for real SDK integration,
+fresh-venv installation, all Python/C++ Recipe builds, SDK serialization tests and package
+completeness checks. It verifies the assets pinned in `catalog/release.json` before use.
+Each fresh SDK venv explicitly loads the wheel-bundled native library, verifies its origin and
+release ABI, and clear `AORTA_CORE_FFI_LIB`; successful imports alone are not sufficient.
+It also cross-builds the base C++ Recipes for ARM64 and inspects target ELF/dependencies;
+actual ARM64 compile actions are checked for `fastbuild`, `opt` and `dbg`.
+ARM64 programs are not executed on the AMD64 runner/container.
+Checkout, image/SDK retrieval and initial Bazel dependency resolution need network access;
+pip installation then uses only the verified local wheels. This is a no-device integration
+job, not a fully network-disconnected build from scratch. No check contacts robots, creates
+an Aorta Node, or launches model sessions.
 
-It validates bilingual documentation, relative Codex / Claude Code Skill links, capability
-catalog decisions, local environment-tool behavior, and SDK-free Recipe previews and safety guards.
-It does not launch model sessions or open Aorta sessions.
+The existing required `repository-layout` job aggregates all three jobs and fails if any
+fails, is skipped or is cancelled. [checks.json](../catalog/checks.json) is the shared check
+inventory used locally and in CI. See [execution locations](../docs/development/README.md).
 
-Dependency builds and SDK tests are not yet included in this workflow.
+See [SDK checks](../tools/README.md#sdk-integration-without-a-robot) for the same local command.
+Synthetic package tests run in that container job; repository inspection remains host-safe.
+It also builds the Python/C++ health-monitor Blueprint, runs native model/decoder/CLI tests,
+cross-builds the C++ program/tests for ARM64 without execution, and tests independent
+Python/C++ workspace generation, Python packaging and diagnostic workflows. A generated C++
+workspace is built/tested independently with native SDK previews and ARM64 artifact checks.
+A generated Python workspace is also built/tested, packaged with real pinned SDK wheels,
+verified, installed in a fresh venv and exercised through offline preview/simulation.
+Its ARM64 package is verified without executing ARM64 code.
 
 ## Before committing or opening a PR
 
-Run the same offline checks from the repository root:
+From the repository root on the host or CI runner:
 
 ```bash
-python3 tests/check_repository.py
-python3 tests/check_schemas.py
-python3 tests/test_agent_workspace.py
-python3 tests/test_recipes.py
-python3 tests/test_family_recipes.py
-python3 tests/test_offline_build.py
-python3 tests/test_release.py
+python3 tools/run_checks.py --scope repository
 ```
+
+Inside the inspected development container, at the same checkout root:
+
+```bash
+python3 tools/run_checks.py --scope recipes
+```
+
+The host may invoke the second command through the selected container. Do not run Recipe
+tests, Bazel or packaging on the runner/host directly, even when they need no SDK or network.
+If the container is unavailable, report those checks as not run instead of falling back.
 
 Record the results and any relevant build or device checks with the change, following
 [Contributing](../CONTRIBUTING.md). Use the bug-report or documentation template
@@ -59,7 +83,7 @@ but does not require opening a PR or obtaining a pre-push CI result for each new
 | --- | --- |
 | `main` | Latest formal release; do not merge work-in-progress version updates |
 | `pre_release/V1.6.0.X` | Long-lived iteration branch for the `V1.6.0` family; the final `X` stays literal |
-| `V1.6.0.10` | Iteration source tag for robot application `V1.6.0-10`; later iterations receive new numeric suffixes |
+| `V1.6.0.12` | Source tag for robot application `V1.6.0-12`; select the exact source tag recorded in the release configuration |
 | `edu-sdk-*` | SDK attachment Release tags; independent of source tags and robot application versions |
 
 The `V1.6.0` branch is not shared by all future versions. A new family such as

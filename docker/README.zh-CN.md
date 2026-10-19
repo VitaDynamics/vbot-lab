@@ -2,8 +2,10 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-当前配置引用镜像标签 `dev-v0.0.1`，支持匿名拉取，无需登录镜像仓库。
-配置使用标签而非不可变 digest；需要固定环境时，将 `VBOT_LAB_DEV_IMAGE` 设置为带 digest 的镜像引用。
+Compose 将 `dev-v0.0.1` 镜像固定到 [release.json](../catalog/release.json) 中的不可变 digest：
+`sha256:8d5081784d9e7d34463f62ae5bef2b58cf4a0a37383435379c4bfc37ec01fdcd`。
+镜像支持匿名拉取，无需登录镜像仓库。已发布平台为 **linux/amd64**，Compose 显式选择该平台。
+ARM64 宿主机需具备兼容的 Linux/amd64 运行环境，不自动修改宿主机仿真设置。
 
 进入容器后，按 [SDK 指南](../packages/aorta/README.zh-CN.md)为所选语言和架构准备配套 SDK 与 Schema 制品。
 不要假定镜像自带的软件包与所选 SDK 发布版本一致。
@@ -51,13 +53,13 @@ docker inspect --format '{{json .Mounts}}' "$VBOT_DEV_CONTAINER_ID"
 - 仅检查环境时不启动容器。
 
 ```bash
-docker exec -it -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash
+docker exec -it -e VBOT_DEV_CONTAINER=1 -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash
 ```
 
 Agent 非交互命令不使用 -it，例如：
 
 ```bash
-docker exec -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash -lc 'python3 tools/check_environment.py --profile container'
+docker exec -e VBOT_DEV_CONTAINER=1 -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash -lc 'python3 tools/check_environment.py --profile container'
 ```
 
 ### 仅在没有合适容器时创建
@@ -77,14 +79,37 @@ docker compose -f docker/compose.yaml exec dev /bin/bash
 ```bash
 cd /workspace
 python3 tools/check_environment.py --profile container
+python3 tools/container_context.py
 uname -m
 ```
 
-原生代码除 `uname -m` 外还需检查实际编译目标与产物架构，Docker 不会自动将 x86_64 程序交叉编译为 ARM64。
-[C++ 指南](../packages/aorta/cpp/README.zh-CN.md)当前使用原生编译，该路径需在兼容的 ARM64 容器环境中
-使用提供的镜像。缺少该环境时停止并取得匹配的容器环境，不改在 host 或机器人上编译。
+仓库只读检查可在宿主机或 CI runner 运行；Bazel 构建／测试、Recipe 预览、SDK 执行检查、
+依赖准备和打包必须在本容器内完成，CI 同样遵守，参阅[执行位置](../docs/development/README.zh-CN.md)。
+Compose 自动声明 `VBOT_DEV_CONTAINER=1`；复用已有容器时，上面的 exec 命令在镜像／挂载检查后
+声明该变量，不重建或修改容器配置。上下文检查还要求 Linux 运行时标记；
+单个变量不证明镜像、架构或工作区正确。
+
+镜像运行平台为 `linux/amd64`，已包含 ARM64 GCC／G++ 交叉编译器。
+容器运行架构不决定编译器的输出架构。在开发容器内分别检查原生与交叉编译目标：
+
+```bash
+uname -m
+g++ -dumpmachine
+aarch64-linux-gnu-gcc -dumpmachine
+aarch64-linux-gnu-g++ -dumpmachine
+```
+
+交叉编译器应输出 `aarch64-linux-gnu`，它们在 AMD64 上运行并生成 ARM64 代码。
+应复用当前容器，不因 `uname -m` 为 x86_64 就要求另建 ARM64 容器。
+[C++ Recipe 指南](../packages/aorta/cpp/README.zh-CN.md)使用 `bazel build --config=arm64`
+配合 ARM64 SDK 生成设备程序；默认 Bazel 构建仍为容器内预览／测试所用的原生构建。
+不要在此 AMD64 容器内执行 ARM64 程序。
+部署前需匹配所选编译器、ARM64 SDK／运行库与产物架构，不改在 host 或机器人上编译来绕过问题。
 Python 源码可移植，但 wheel 与原生依赖仍需匹配目标设备。机器人只运行部署的应用，
 这些示例不要求设备安装 Docker 或 Bazel。
+
+首个 Python 应用可在 AMD64 容器内暂存 ARM64 wheel，无需在该容器安装或执行它们，
+见[快速开始](../docs/getting-started/README.zh-CN.md)。
 
 默认只挂载本仓到 `/workspace`，并为 Bazel 使用独立的命名缓存卷。
 本地可通过 `VBOT_LAB_DEV_IMAGE` 覆盖完整镜像引用，版本选择见[兼容矩阵](../docs/compatibility.zh-CN.md)。

@@ -51,9 +51,10 @@ class ReleaseTests(unittest.TestCase):
             expected.append("development.image.digest")
         self.assertEqual(release.validate(self.baseline, ROOT), expected)
 
-    def test_checkout_source_tag_is_recorded(self):
+    def test_current_source_snapshot_is_recorded(self):
         self.assertEqual(self.baseline["workspace"],
-                         {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.10"})
+                         {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.12"})
+        self.assertEqual(release.validate(self.baseline, ROOT), [])
 
     def test_consistent_draft_reports_pending(self):
         code, output, errors = self.invoke()
@@ -70,7 +71,7 @@ class ReleaseTests(unittest.TestCase):
     def test_complete_configuration(self):
         self.config["workspace"]["branch"] = "main"
         self.config["workspace"]["tag"] = "V1.6.1"
-        self.config["development"]["image"]["digest"] = "sha256:" + "a" * 64
+        self.config["development"]["image"]["digest"] = self.baseline["development"]["image"]["digest"]
         self.assertEqual(release.validate(self.config, ROOT), [])
         code, output, errors = self.invoke("--require-complete")
         self.assertEqual(code, 0)
@@ -170,15 +171,19 @@ class ReleaseTests(unittest.TestCase):
         self.config["development"]["image"]["digest"] = "latest"
         self.rejects(self.config, "image.digest")
 
+    def test_compose_digest_must_match_release_configuration(self):
+        self.config["development"]["image"]["digest"] = "sha256:" + "a" * 64
+        self.rejects(self.config, "Compose")
+
     def test_platform_selection(self):
         for platforms in ([], ["windows"], ["linux_aarch64", "linux_aarch64"], [None]):
             self.config["sdk"]["python"]["platforms"] = platforms
             self.rejects(self.config, "python.platforms")
 
     def test_iteration_tag_matches_branch_family(self):
-        self.config["workspace"] = {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.10"}
+        self.config["workspace"] = {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.12"}
         release.validate(self.config, ROOT)
-        for value in ("V1.6.1.10", "V1.6.0-10", "V1.6.0.X", "V1.6.0"):
+        for value in ("V1.16.0.12", "V1.6.1.12", "V1.6.0-12", "V1.6.0.X", "V1.6.0"):
             self.config["workspace"]["tag"] = value
             self.rejects(self.config, "iteration branch family")
 

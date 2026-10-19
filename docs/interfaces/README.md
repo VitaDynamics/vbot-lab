@@ -5,7 +5,7 @@
 Use the [capability catalog](../../catalog/README.md) to select the relevant interface and check
 release scope. The catalog indexes these contracts; it does not establish live device availability.
 
-The interface reference targets robot application **V1.6.0-10** on `foot_quadruped` EDU;
+The interface reference targets robot application **V1.6.0-12** on `foot_quadruped` EDU;
 see [compatibility](../compatibility.md) for component pairing and configuration limits.
 
 ## Agent extension interfaces

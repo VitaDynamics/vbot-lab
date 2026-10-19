@@ -2,28 +2,46 @@
 
 <p align="center"><a href="WORKFLOWS.md">English</a> | 中文</p>
 
-当前工作流在 PR 及 `main`、`pre_release/**` 推送时，在 GitHub 托管运行器执行
-无网络、无设备操作的仓库内容与离线 Agent 工作区检查。
-检出代码由 GitHub Actions 完成；检查脚本本身不请求网络。
+PR 及 `main`、`pre_release/**` 推送时，工作流将仓库检查与应用执行分开。
+`repository-checks` 在 GitHub 托管运行器执行只读内容检查及模拟工具检查；
+`recipe-checks` 在 `docker/compose.yaml` 选定的开发容器内执行不依赖 SDK 的预览和模拟应用流程。
+`sdk-integration` 使用同一套固定镜像配置，执行真实 SDK 集成、全新 venv 安装、所有 Python／C++
+Recipe 构建、SDK 序列化测试及部署包完整性检查；使用前核对 `catalog/release.json` 固定的制品。
+每个全新 SDK venv 均清除 `AORTA_CORE_FFI_LIB`，显式加载 wheel 自带的原生库并核对来源和发布 ABI；
+仅导入成功不足以证明原生库可用。
+还会为 ARM64 交叉构建基础 C++ Recipes 并检查目标 ELF／依赖，不在 AMD64 runner／容器内执行 ARM64 程序。
+同时核对 `fastbuild`、`opt`、`dbg` 的实际 ARM64 编译命令。
+代码、镜像、SDK 获取及首次 Bazel 依赖解析需要网络；随后 pip 仅使用已校验的本地 wheel 安装。
+这是不连接设备的集成任务，不是从零开始的完全断网构建。检查不联系机器人，不创建 Aorta Node，
+也不启动模型会话。
 
-检查双语文档、Codex／Claude Code 的相对 Skill 链接、能力索引决策、本地环境工具行为，
-以及不依赖 SDK 的 Recipe 预览和安全前提，不启动模型会话或建立 Aorta 会话。
+保留现有必需的 `repository-layout` 汇总检查，汇总上述三个任务；任一失败、跳过或取消都不能通过。
+[checks.json](../catalog/checks.json)是本地与 CI 共用的检查清单；参阅[执行位置](../docs/development/README.zh-CN.md)。
 
-当前工作流尚不包含依赖构建和 SDK 测试。
+相同的本地命令见[无机器人 SDK 集成检查](../tools/README.zh-CN.md#sdk-integration)。
+模拟制品的打包测试在该容器任务内运行；纯仓库检查仍可在宿主机执行。
+该任务也构建 Python／C++ 健康监测 Blueprint，运行原生模型／解码／CLI 测试，
+交叉构建 ARM64 的 C++ 程序／测试但不执行，并检查独立 Python／C++ 工作区生成、Python 打包与分层诊断流程。
+生成的 C++ 工作区另行独立构建／测试，执行原生 SDK 预览及 ARM64 产物检查。
+生成的 Python 工作区也会构建／测试，使用真实固定 SDK wheel 打包、校验，
+在全新 venv 安装并执行离线预览／模拟；ARM64 部署包仅校验，不执行 ARM64 代码。
 
 ## 提交代码或 PR 前
 
-在仓库根目录运行相同的离线检查：
+在宿主机或 CI runner 的仓库根目录执行：
 
 ```bash
-python3 tests/check_repository.py
-python3 tests/check_schemas.py
-python3 tests/test_agent_workspace.py
-python3 tests/test_recipes.py
-python3 tests/test_family_recipes.py
-python3 tests/test_offline_build.py
-python3 tests/test_release.py
+python3 tools/run_checks.py --scope repository
 ```
+
+在已检查的开发容器内，从同一仓库根目录执行：
+
+```bash
+python3 tools/run_checks.py --scope recipes
+```
+
+宿主机可以通过选定的容器执行第二条命令。即使不依赖 SDK 或网络，Recipe 测试、Bazel 和打包
+也不能直接在 runner／宿主机执行。容器不可用时如实说明未运行，不回退到宿主机。
 
 按[贡献说明](../CONTRIBUTING.zh-CN.md)，为修改保留检查结果及相关构建或设备验证情况。
 新建 Issue 时使用问题报告或文档改进模板；一般使用问题优先到
@@ -55,7 +73,7 @@ python3 tests/test_release.py
 | --- | --- |
 | `main` | 最新正式版本，不合入尚未正式发布的版本更新 |
 | `pre_release/V1.6.0.X` | `V1.6.0` 版本族的长期迭代分支，末尾 `X` 保留为字母 |
-| `V1.6.0.10` | 对应机器人应用 `V1.6.0-10` 的迭代源码 tag；后续迭代使用新的数字后缀 |
+| `V1.6.0.12` | 机器人应用 `V1.6.0-12` 配套的源码 tag；以发布配置中明确记录的源码 tag 为准 |
 | `edu-sdk-*` | SDK 附件 Release tag，与源码 tag 和机器人应用版本分别管理 |
 
 `V1.6.0` 的分支不作为所有后续版本的共用分支。

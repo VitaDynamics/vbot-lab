@@ -178,8 +178,12 @@ def validate(config, root):
     if image["digest"] is not None:
         text(image["digest"], "development.image.digest", r"sha256:[0-9a-f]{64}")
     compose = (root / "docker/compose.yaml").read_text(encoding="utf-8")
-    require(re.findall(r"\$\{VBOT_LAB_DEV_IMAGE:-(.*?)\}", compose) == [image["reference"]],
+    selected = re.findall(r"\$\{VBOT_LAB_DEV_IMAGE:-(.*?)\}", compose)
+    require(len(selected) == 1 and selected[0].split("@", 1)[0] == image["reference"],
             "development: Compose default image mismatch")
+    if image["digest"] is not None:
+        require(selected[0] == image["reference"] + "@" + image["digest"],
+                "development: Compose default image digest mismatch")
 
     return [name for name, value in (("workspace.tag", workspace["tag"]),
                                     ("development.image.digest", image["digest"])) if value is None]

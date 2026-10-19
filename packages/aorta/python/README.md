@@ -2,6 +2,10 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
+Run development-side SDK installation/import checks, local SDK examples, Bazel and packaging
+inside the matching development container, including CI; see [execution locations](../../../docs/development/README.md).
+The separately marked robot deployment/runtime steps remain in the device's vbot shell.
+
 The Aorta Python SDK is distributed as [vbot-lab release](https://github.com/VitaDynamics/vbot-lab/releases)
 assets. SDK packages must currently be downloaded from GitHub Releases; cloning this
 repository does not install them. Downloading requires network access; the four required
@@ -21,8 +25,8 @@ The release manifest, not identical version numbers, defines the pairing:
 | `flatbuffers` | `25.9.23` | Runtime for generated FlatBuffers messages |
 
 The Aorta and EDU wheels carry their `LICENSE` and `NOTICE` under `.dist-info/licenses/`.
-The FlatBuffers wheel from PyPI carries no license file, so the release attaches its upstream
-license text as `flatbuffers-<ver>.LICENSE`.
+The paired FlatBuffers wheel includes `.dist-info/LICENSE`. The release also attaches
+the same license text as `flatbuffers-<ver>.LICENSE` for redistribution alongside the wheel.
 
 Use Python 3.10 or newer. Published SDK wheel platforms are Linux x86_64, Linux aarch64,
 and macOS arm64. Check the selected machine's architecture and native-library compatibility;
@@ -56,26 +60,29 @@ Keep binaries out of Git. Put the four matching wheels, `SHA256SUMS`, and
 `EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.10.14/`. In the environment that
 will run Python, ensure Python 3.10+ and venv support are available.
 For application development use the [development container](../../../docker/README.md).
-From the parent of `artifacts/`, run on Linux; stop if any command fails:
+From the parent of `artifacts/`, run the following Linux command chain. `&&` skips
+the remaining installation steps after a failure without closing the interactive shell;
+fix the error before continuing:
 
 ```bash
-uname -m
-python3 --version
-cd artifacts/edu-sdk-2026.10.14
-sha256sum --ignore-missing -c SHA256SUMS
-cd ../..
-python3 -m venv .venv
-. .venv/bin/activate
-unset PYTHONPATH
-export PYTHONNOUSERSITE=1
-SDK_PLATFORM=linux_x86_64
+uname -m &&
+python3 --version &&
+cd artifacts/edu-sdk-2026.10.14 &&
+sha256sum --ignore-missing -c SHA256SUMS &&
+cd ../.. &&
+python3 -m venv .venv &&
+. .venv/bin/activate &&
+unset PYTHONPATH &&
+unset AORTA_CORE_FFI_LIB &&
+export PYTHONNOUSERSITE=1 &&
+SDK_PLATFORM=linux_x86_64 &&
 python -m pip install --no-index \
   "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
   artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
   artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl
-python -m pip check
-python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; print("SDK imports OK")'
+  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl &&
+python -m pip check &&
+python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; core = aorta.load_library(); print("SDK imports and native runtime OK; ABI", core.aorta_abi_version())'
 ```
 
 Set `SDK_PLATFORM=linux_aarch64` **instead** on an ARM64 robot. For macOS arm64 use
@@ -88,6 +95,11 @@ This command installs the three SDK packages and FlatBuffers from the same Relea
 local downloads. `--no-index` prevents fallback to a package index. If a file is missing
 or its checksum fails, obtain the matching Release asset before continuing.
 Keep the attached FlatBuffers license when redistributing the wheel.
+
+The check explicitly loads the bundled native library and runs the SDK's ABI guard;
+`import aorta` alone does not trigger this lazy load. It creates no Node or device session.
+The dedicated shell clears `AORTA_CORE_FFI_LIB` so a prior library override cannot select
+another runtime instead of the wheel's copy.
 
 For a robot without Internet access, follow [Python deployment](../../../docs/development/python-deployment.md):
 first download all four required wheels for the ARM64 device on a connected workstation,
@@ -334,8 +346,8 @@ install wheels or package a cross-platform runtime. Select the interpreter conta
 the four matching wheels explicitly:
 
 ```bash
-bazel build //recipes/...
-PATH="$PWD/.venv/bin:$PATH" bazel run //recipes/subscribe-state:main -- --help
+bazel build //recipes/... &&
+PATH="$PWD/.venv/bin:$PATH" bazel run //recipes/subscribe-state:main -- --help &&
 PATH="$PWD/.venv/bin:$PATH" bazel run //recipes/subscribe-state:main
 ```
 
@@ -388,7 +400,7 @@ unknown: inspect current state, rather than automatically repeating a write.
 Offline tests never open a device session:
 
 ```bash
-bazel test //tests:recipe_test
+bazel test //tests:recipe_test &&
 bazel test --test_env=PATH="$PWD/.venv/bin:$PATH" //tests:recipe_sdk_test
 ```
 
