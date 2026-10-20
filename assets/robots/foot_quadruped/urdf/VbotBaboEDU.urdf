@@ -819,7 +819,7 @@
     <parent link="base" />
     <child link="head_yaw" />
     <axis xyz="0 0 1" />
-    <limit lower="-0.69813" upper="0.69813" effort="0" velocity="0" />
+    <limit lower="-0.69813" upper="0.69813" effort="2.94" velocity="0.5" />
   </joint>
   <link name="head_pitch">
     <inertial>
@@ -855,7 +855,7 @@
     <parent link="head_yaw" />
     <child link="head_pitch" />
     <axis xyz="0 1 0" />
-    <limit lower="-0.5236" upper="0.20944" effort="0" velocity="0" />
+    <limit lower="-0.5236" upper="0.20944" effort="2.94" velocity="0.5" />
   </joint>
   <link name="vita_logo">
     <inertial>
