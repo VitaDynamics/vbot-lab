@@ -470,7 +470,8 @@ class RepositoryChecks(unittest.TestCase):
 
     def test_apache_license_and_notices(self):
         # Unmodified text from https://www.apache.org/licenses/LICENSE-2.0.txt.
-        # Keep this check offline; project-specific attribution belongs in NOTICE.
+        # Project-specific attribution is checked separately below.
+        copyright_notice = "Copyright (c) 2026 VitaDynamics"
         license_bytes = (REPO_ROOT / "LICENSE").read_bytes()
         self.assertEqual(
             hashlib.sha256(license_bytes).hexdigest(),
@@ -478,11 +479,13 @@ class RepositoryChecks(unittest.TestCase):
         )
         notice = (REPO_ROOT / "NOTICE").read_text()
         self.assertIn("VBOT Lab", notice)
-        self.assertIn("VitaDynamics", notice)
+        self.assertEqual(notice.splitlines()[1], copyright_notice)
         self.assertIn("Apache License, Version 2.0", notice)
         for name in ("README.md", "README.zh-CN.md", "CONTRIBUTING.md", "CONTRIBUTING.zh-CN.md"):
             with self.subTest(document=name):
                 text = (REPO_ROOT / name).read_text()
+                if name in ("README.md", "README.zh-CN.md"):
+                    self.assertIn(copyright_notice, text.splitlines())
                 self.assertIn("Apache-2.0", text)
                 self.assertIn("LICENSE", document_links(text))
                 self.assertIn("NOTICE", document_links(text))

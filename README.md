@@ -96,6 +96,8 @@ See [Security](SECURITY.md) for reporting vulnerabilities.
 
 ## License
 
+Copyright (c) 2026 VitaDynamics
+
 Unless otherwise noted, the code, documentation, interface definitions, and examples in
 this repository are licensed under the [Apache License, Version 2.0](LICENSE)
 (`Apache-2.0`). Attribution is provided in [NOTICE](NOTICE).
