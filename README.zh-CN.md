@@ -97,6 +97,8 @@ HTTP MCP、Skill／AGENTS.md 注入能力分开。
 
 ## 许可证
 
+Copyright (c) 2026 VitaDynamics
+
 除另有说明外，本仓库的代码、文档、接口定义与示例均采用
 [Apache License, Version 2.0](LICENSE)（`Apache-2.0`），署名信息见 [NOTICE](NOTICE)。
 
