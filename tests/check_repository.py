@@ -401,14 +401,12 @@ class RepositoryChecks(unittest.TestCase):
                 self.assertIn(guide.resolve(), targets, origin)
 
     def test_apache_license_and_notices(self):
-        # Project attribution precedes the unmodified Apache-2.0 license text.
-        # Keep the canonical license-body check offline.
+        # Unmodified text from https://www.apache.org/licenses/LICENSE-2.0.txt.
+        # Project-specific attribution is checked separately below.
         copyright_notice = "Copyright (c) 2026 VitaDynamics"
-        license_prefix = (copyright_notice + "\n\n").encode("utf-8")
         license_bytes = (REPO_ROOT / "LICENSE").read_bytes()
-        self.assertTrue(license_bytes.startswith(license_prefix))
         self.assertEqual(
-            hashlib.sha256(license_bytes[len(license_prefix):]).hexdigest(),
+            hashlib.sha256(license_bytes).hexdigest(),
             "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
         )
         notice = (REPO_ROOT / "NOTICE").read_text()
