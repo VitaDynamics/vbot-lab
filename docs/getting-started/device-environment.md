@@ -13,7 +13,7 @@ you do not need to start the bridge yourself. See [available interfaces](../inte
 
 ## 1. Select the right terminal
 
-Follow the [wired connection guide](../robots/quadruped-common/connection.md), then run the
+Follow the [wired / Wi-Fi connection guide](../robots/quadruped-common/connection.md), then run the
 following in the robot's SSH terminal, not your workstation or development container:
 
 ```bash

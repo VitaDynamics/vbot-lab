@@ -1,0 +1,68 @@
+py_library(
+    name = "application",
+    srcs = glob(["health_monitor/*.py"]),
+    imports = ["."],
+    data = ["config.json"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "main",
+    srcs = ["health_monitor/main.py"],
+    main = "health_monitor/main.py",
+    deps = [":application"],
+    python_version = "PY3",
+)
+
+py_test(
+    name = "model_test",
+    srcs = ["test_model.py"],
+    main = "test_model.py",
+    deps = [":application"],
+    python_version = "PY3",
+)
+
+filegroup(
+    name = "repository_files",
+    srcs = glob(["*.md", "*.py", "*.json", "health_monitor/*.py", "cpp/*.h", "cpp/*.cc", "cpp/*.md"]) + ["BUILD.bazel"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "model_cpp",
+    hdrs = ["cpp/model.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "decoder_cpp",
+    hdrs = ["cpp/decoder.h"],
+    deps = [":model_cpp", "//recipes:cpp_common"],
+    tags = ["manual"],
+)
+
+cc_binary(
+    name = "main_cpp",
+    srcs = ["cpp/main.cc"],
+    deps = [":decoder_cpp"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    data = ["config.json"],
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "model_cpp_test",
+    srcs = ["cpp/model_test.cc"],
+    deps = [":model_cpp"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)
+
+cc_test(
+    name = "sdk_cpp_test",
+    srcs = ["cpp/sdk_test.cc"],
+    deps = [":decoder_cpp"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)

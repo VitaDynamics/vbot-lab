@@ -1,0 +1,42 @@
+load(":aarch64_gcc.bzl", "aarch64_gcc_config")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "repository_files",
+    srcs = ["BUILD.bazel", "aarch64_gcc.bzl"],
+)
+
+platform(
+    name = "linux_arm64",
+    constraint_values = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
+)
+
+aarch64_gcc_config(name = "aarch64_gcc_config")
+
+# Compiler/binutils and target system headers come from the development image.
+# No SDK, compiler or dependency download is performed by this toolchain.
+filegroup(name = "empty")
+
+cc_toolchain(
+    name = "aarch64_gcc",
+    toolchain_identifier = "vbot-linux-aarch64-gcc11",
+    toolchain_config = ":aarch64_gcc_config",
+    all_files = ":empty",
+    ar_files = ":empty",
+    as_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 1,
+)
+
+toolchain(
+    name = "linux_aarch64_gcc",
+    toolchain = ":aarch64_gcc",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+    exec_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
+    target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
+)

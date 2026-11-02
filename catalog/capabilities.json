@@ -4,15 +4,15 @@
   "sdk": {
     "name": "Aorta Python SDK",
     "integration": "integrated",
-    "version": "2026.9.23",
+    "version": "2026.10.20",
     "python_import": "aorta",
     "reference": "packages/aorta/python/README.md",
-    "release": "edu-sdk-2026.9.24",
-    "edu_messages_version": "2026.9.24",
+    "release": "edu-sdk-2026.10.31",
+    "edu_messages_version": "2026.10.20",
     "cpp": {
-      "version": "2026.9.23",
-      "abi": 12,
-      "schema_pack": "2026.9.24-v4",
+      "version": "2026.10.20",
+      "abi": 13,
+      "schema_pack": "2026.10.20-v4",
       "reference": "packages/aorta/cpp/README.md"
     }
   },
@@ -31,6 +31,47 @@
       "effect": "local_read_only",
       "minimum_firmware": null,
       "verification": "local_tests"
+    },
+    {
+      "id": "development.diagnostics",
+      "availability": "implemented",
+      "robot_types": [],
+      "execution_location": "developer_host_or_container",
+      "interface_kind": "local_cli",
+      "reference": "docs/development/diagnostics.md",
+      "skill": "skills/vbot-diagnose/SKILL.md",
+      "tool": "tools/diagnose.py",
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "local_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests"
+    },
+    {
+      "id": "robot.health.monitor",
+      "availability": "implemented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_shell",
+      "interface_kind": "pub_sub",
+      "reference": "blueprints/health-monitor/README.md",
+      "skill": "skills/vbot-app-dev/SKILL.md",
+      "tool": "blueprints/health-monitor/health_monitor/main.py",
+      "recipe": null,
+      "blueprint": "blueprints/health-monitor/README.md",
+      "requires_sdk": true,
+      "effect": "device_read_only",
+      "minimum_firmware": null,
+      "verification": "local_tests",
+      "implementations": {
+        "python": {
+          "source": "blueprints/health-monitor/health_monitor/main.py",
+          "bazel_target": "//blueprints/health-monitor:main"
+        },
+        "cpp": {
+          "source": "blueprints/health-monitor/cpp/main.cc",
+          "bazel_target": "//blueprints/health-monitor:main_cpp"
+        }
+      }
     },
     {
       "id": "device.environment.check",
@@ -163,7 +204,7 @@
       "tool": null,
       "recipe": "recipes/audio/README.md",
       "requires_sdk": false,
-      "effect": "device_read_only",
+      "effect": "depends_on_operation",
       "minimum_firmware": null,
       "verification": "documentation_only",
       "implementations": {
@@ -359,6 +400,21 @@
       "execution_location": "device_service",
       "interface_kind": "http",
       "reference": "docs/interfaces/agent/content-api.md",
+      "skill": null,
+      "tool": null,
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only"
+    },
+    {
+      "id": "device.agent.mcp-config",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_service",
+      "interface_kind": "http",
+      "reference": "docs/interfaces/agent/mcp-config.md",
       "skill": null,
       "tool": null,
       "recipe": null,

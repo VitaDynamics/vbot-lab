@@ -6,7 +6,7 @@ Software libraries for applications built on VBOT EDU robots.
 
 Use the [Aorta Python SDK](aorta/python/README.md) or [Aorta C++ SDK](aorta/cpp/README.md).
 Its package, native runtime, and installable artifacts are distributed as
-vbot-lab release assets (first release `edu-sdk-*`).
+SDK Release assets (`edu-sdk-*`).
 A C++ SDK is provided with the release; Rust is not available yet.
 Keep Aorta's actual package names, imports, and API contracts.
 

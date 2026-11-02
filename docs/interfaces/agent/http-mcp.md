@@ -3,14 +3,14 @@
 <p align="center">English | <a href="http-mcp.zh-CN.md">中文</a></p>
 
 Scope and compatibility follow the [Agent capability overview](README.md).
-The developer runs the server on S100 as `vbot`; the EDU runtime is the MCP client.
+For a local service, run the server on S100 as `vbot`; the EDU runtime is the MCP client.
 This is an HTTP request / response interface, not Aorta or ROS2 pub/sub.
 
 ## Endpoint and protocol
 
 | Item | Contract |
 | --- | --- |
-| Device endpoint | `http://192.168.127.2:18080/mcp` |
+| Default S100 endpoint | `http://192.168.127.2:18080/mcp` |
 | Transport | HTTP POST carrying JSON-RPC `2.0` |
 | Protocol version | `2025-06-18` |
 | Request Content-Type | `application/json` |
@@ -19,10 +19,12 @@ This is an HTTP request / response interface, not Aorta or ROS2 pub/sub.
 | Optional transport session | Preserve `Mcp-Session-Id` if returned by initialization |
 | Environment | S100, `vbot` account, writable user directory `/userdata/vbot` |
 
-The fixed address is the agreed developer-service endpoint for this EDU contract.
-Workstation loopback addresses are for local
-protocol testing only and do not change where the robot runtime connects.
-Keep the device listener on the agreed internal interface; do not expose or forward
+The address above is the default developer-service endpoint. For an additional
+S100 service or another reachable, trusted HTTP MCP service, register its actual URL
+through the [connection API](mcp-config.md). Changing a test client's `MCP_URL`
+alone does not change where the device runtime connects. Loopback in a registered URL
+refers to the machine running the Agent runtime, not the workstation.
+Keep a device listener on the intended trusted interface; do not expose or forward
 the service to untrusted networks, campus public networks, or the Internet.
 
 ## Supported methods

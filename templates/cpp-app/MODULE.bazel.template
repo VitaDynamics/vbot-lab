@@ -1,0 +1,6 @@
+module(name = "__APP_MODULE__", version = "0.1.0")
+
+bazel_dep(name = "platforms", version = "0.0.9")
+aorta_release_repository = use_repo_rule("//sdk:repositories.bzl", "aorta_release_repository")
+aorta_release_repository(name = "aorta_release")
+register_toolchains("//toolchains:linux_aarch64_gcc")

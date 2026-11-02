@@ -5,10 +5,15 @@ from recipes.observe import observe
 ROUTES = {
     "system": ("/system/sm_status", "sm.SmStatus"),
     "display": ("/display_node/status", "aorta.topic.peripheral.DisplayStatus"),
+    "version": ("/ota_version", "aorta.topic.system_monitor.OtaVersion"),
 }
 
 
 def summarize(stream, m):
+    if stream == "version":
+        header = m.AortaHeader()
+        return dict(version=text(m.Version()),
+                    publish_stamp_ns=header.PublishStampNs() if header else None)
     if stream == "display":
         return dict(data=text(m.Data()))
     return dict(timestamp_ns=m.SensorTimestampNs(), heartbeat_seq=m.HeartbeatSeq(),

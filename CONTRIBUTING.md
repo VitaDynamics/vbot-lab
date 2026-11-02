@@ -8,21 +8,24 @@ the affected features, validation, and compatibility impact.
 See [CI and repository collaboration](.github/WORKFLOWS.md) for the current automated checks.
 Participation follows the [Code of conduct](CODE_OF_CONDUCT.md).
 
-For usage questions, application discussions and feature ideas, start with
+For usage questions, application discussions and feature ideas, search the forum first,
+then add to a relevant topic or open a focused discussion following
 [Community & Support](docs/community/README.md). Use repository issues/PRs for concrete
 code or documentation changes, and link an existing forum discussion when relevant.
+Technical support is also available at [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn).
 
 - Use Bazel for Python and C++ recipes and reference applications; keep SDK APIs, Schema, code, documentation, and Skills consistent.
+- Repository-only checks may run on the host or CI runner. Bazel builds/tests, Recipe previews, SDK execution checks, dependency preparation and packaging must run in the matching development container, including CI. Follow [execution locations](docs/development/README.md); an offline operation is not automatically host-safe. Do not build, package or run development previews on a robot.
 - Put Aorta SDK integration under `packages/aorta/python/` and `packages/aorta/cpp/`, single-task reference programs under `recipes/`, and complete reference applications under `blueprints/`. Document actual availability; outlines and planned Blueprints must not appear runnable.
 - Maintain one Skill source under `skills/`, exposed through `.agents/skills/` and `.claude/skills/` symlinks. Keep `CLAUDE.md` as a thin import of the shared `AGENTS.md`; do not maintain divergent harness instructions. Skill discovery uses English `SKILL.md`; its `.zh-CN.md` is the paired translation.
 - Keep `AGENTS.md` short and task-oriented. Record capability scope and references in `catalog/`, retain structural facts in Schema, and explain behavior in interface docs. Check catalog changes with the offline tool tests; unknown versions and routes must not become implied support.
-- Maintain every document in English and Simplified Chinese. Default filenames use English; translations use `.zh-CN.md`. Update both in the same PR and retain language navigation and same-language document links.
+- Maintain every document in English and Simplified Chinese. Default filenames use English; translations use `.zh-CN.md`. Update both in the same change and retain language navigation and same-language document links.
 - Write user guides as complete, correct usage workflows: prerequisites, commands, responses, completion conditions, and recovery. Keep test reports separate from usage instructions.
 - Follow the [robot-type documentation structure](docs/robots/README.md): reuse shared chapters and hardware specifications, isolate type-specific differences, and update the release scope and compatibility matrix without implying support for unreleased types.
 - Keep the existing shared wired connection and sensor specification for `foot_quadruped` and `wheel_quadruped`; do not duplicate them or apply them to `foot_humanoid`. Current EDU release scope remains `foot_quadruped` until separately released and documented.
 - Include the dependencies needed to build Schema changes and keep generated Python bindings consistent.
 - Include reproducible steps and relevant test results; follow the [security guidance](SECURITY.md) when sharing reports.
-- Run `python3 tests/check_repository.py`, `python3 tests/test_agent_workspace.py`, and the relevant Bazel checks. Distinguish offline tests from actual harness-session and device behavior.
+- Run `python3 tools/run_checks.py --scope repository` on the host or CI runner; run `python3 tools/run_checks.py --scope recipes` and relevant Bazel checks inside the development container. Distinguish offline tests from actual harness-session and device behavior.
 - Distinguish read-only device checks from control operations; never operate robots automatically in ordinary CI.
 - Before releasing a new or modified live example, run every published language implementation and documented execution path on a supported robot using the documented account, SDK pairing, setup and deployment steps. Compilation, previews and offline tests alone do not meet this release gate. Keep verification evidence in the review record, not in public usage guides; unresolved or untested paths must not be released as runnable examples.
 
@@ -33,8 +36,15 @@ contributions and coordinate compatibility changes. [CODEOWNERS](.github/CODEOWN
 lists the reviewers for all repository paths; update it when administrator membership changes.
 Review routing does not grant repository permissions or replace configured merge requirements.
 
-Create a topic branch and open a PR against `main`; do not push directly to `main`.
-Merge requires approval from another listed maintainer, passing `repository-layout`
+VBOT Lab version iterations use a separate `pre_release/V<major>.<minor>.<patch>.X`
+branch for each version family. After checks, maintainers may commit and push directly
+to that iteration branch; iteration updates do not require a PR. A topic PR targeting
+the iteration branch remains optional when review is wanted.
+V1.6.0 application development uses `release/V1.6.0`; `Rel/V1.6.0` records the formal snapshot.
+`main` is reserved for the latest formal release. Open a release-promotion PR only when a formal
+release has been explicitly requested; do not create one during ordinary iteration work.
+Do not push directly to `main` or imply support for unreleased capabilities.
+PRs to `main` require approval from another listed maintainer, passing `repository-layout`
 checks against the current base, and resolved review discussions. New reviewable commits
 require renewed approval. Maintainers merge with **Squash and merge**; administrators
 follow the same protection rules. See the [collaboration workflow](.github/WORKFLOWS.md)

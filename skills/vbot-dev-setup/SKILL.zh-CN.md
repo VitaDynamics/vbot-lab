@@ -1,6 +1,6 @@
 ---
 name: vbot-dev-setup
-description: 检查 host Docker 环境，引导在提供的 VBOT 开发容器中完成 ARM64 应用开发，包括 SDK 准备、Bazel 构建、部署与首次只读状态收数。也支持按范围检查环境，不用于通用机器人诊断或运动控制。
+description: 搭建 VBOT 开发环境，复用已有开发容器或检查 host Docker，引导 Python 打包、部署与首次只读状态收数；也支持按范围检查环境及 C++ 构建前提，不用于通用机器人诊断或运动控制。
 ---
 
 # VBOT 开发环境
@@ -53,6 +53,10 @@ python3 tools/check_environment.py --profile host
 
 ## 从 host 进入开发容器
 
+遵循统一的[执行位置](../../docs/development/README.zh-CN.md)：纯仓库检查可在宿主机或 CI runner 运行；
+所有 Bazel 构建／测试、Recipe 预览、SDK 执行检查、依赖准备和打包均在配套开发容器内进行，
+CI 同样遵守。应用离线运行或使用模拟传输不等于仓库检查；设备侧安装／在线运行仍按显式步骤单独执行。
+
 在 host 上检查环境或完整搭建时，按[容器指南](../../docker/README.zh-CN.md)检查 Docker：
 CLI 与服务端访问、Compose v2、当前 Docker context 及 Compose 配置。命令设置合理超时。
 清点脚本保持离线，其成功不能代替这些检查。仅咨询时解释命令，不实际执行。
@@ -73,14 +77,25 @@ ARM64 应用的后续开发、SDK 准备、Bazel 构建、离线预览与打包�
 记录选定的容器 ID 和容器内工作区路径，后续命令沿用。
 仅检查时给出后续步骤，不拉取或启动容器；搭建流程不额外执行匿名访问探测。
 
+检查镜像身份、挂载与架构后，在该容器内执行 `python3 tools/container_context.py`。
+Compose／编辑器配置声明 `VBOT_DEV_CONTAINER=1`；复用已有容器时，使用指南中的
+`docker exec -e VBOT_DEV_CONTAINER=1` 命令。运行时标记和此声明只是防误操作检查，不证明镜像或 SDK 正确。
+不要在宿主机设置该变量强行通过，也不要把 `--profile container` 当作证据。
+开发命令使用 `python3 tools/in_container.py -- <command>`，Recipe 检查分组使用
+`python3 tools/run_checks.py --scope recipes`。无法建立上下文时停止容器内阶段并说明未执行，不回退宿主机工具链。
+
 进入容器后从 `/workspace` 继续，使用 container 清点模式。
 Agent 若运行在 host，后续开发命令必须通过选定容器执行；在另一个终端打开交互 shell
 不代表 Agent 的执行环境已切换。先确认挂载仓库、镜像和容器身份。
-已经位于所提供容器内时跳过 host Docker 检查，不要求容器内安装 Docker 或挂载 host Docker socket。
+已处于用户确认的开发容器时直接复用，检查运行时标记、仓库、工具版本和架构，跳过 host Docker 检查；
+不要求容器内安装 Docker，不创建嵌套容器或挂载 host Docker socket。
+容器内无法检查镜像身份时记录该限制，不声称已检查公开镜像。
 
-生成 ARM64 原生产物前检查容器架构及实际编译目标。使用 Docker 不会自动把 x86_64 构建变成 ARM64。
-按 SDK 支持的构建路径操作；所提供容器不能生成兼容 ARM64 二进制时，报告阻塞并请求匹配的容器环境。
-不要回退为 host／设备编译，不臆造交叉工具链，也不修改 host 仿真配置。
+区分容器运行架构与编译目标。已发布镜像运行于 linux/amd64，包含 ARM64 GCC／G++ 交叉编译器，
+按[容器指南](../../docker/README.zh-CN.md)检查并复用，不因 `uname -m` 为 x86_64 就要求 ARM64 容器。
+设备构建使用 ARM64 SDK 与仓库中的 `--config=arm64`；预览及 SDK 测试使用原生 SDK 和默认配置。
+匹配编译器、SDK 与产物架构；不在 AMD64 容器内执行 ARM64 程序／测试，也不声称普通原生构建会生成 ARM64。
+不要回退为 host／设备编译，也不修改 host 仿真配置。
 
 ## 完整搭建：构建、部署、收到状态
 
@@ -93,27 +108,33 @@ Agent 若运行在 host，后续开发命令必须通过选定容器执行；在
    缺少制品时使用文档列出的公开发布来源或请求提供依赖包，不替换成未记录的依赖仓库。
 2. **准备 SDK 并构建只读示例。** 使用订阅 `/locomotion/status` 的
    [subscribe-state](../../recipes/subscribe-state/README.zh-CN.md)。
-   - Python：按 [SDK 指南](../../packages/aorta/python/README.zh-CN.md)选择配套版本并实际检查导入。
-     在开发容器中构建 `//recipes/subscribe-state:main` 并执行离线预览；按
-     [Python 部署流程](../../docs/development/python-deployment.zh-CN.md)准备匹配设备的 wheel。
+   - Python（默认）：以[快速开始](../../docs/getting-started/README.zh-CN.md)为唯一命令主线。
+     构建 `//recipes/subscribe-state:main` 并执行不依赖 SDK 的预览，再用 `tools/fetch_sdk.py`
+     与 `tools/package_python.py` 准备已校验的 ARM64 基础包；这些步骤无需先安装工作站 SDK。
+     下载、构建、打包和部署分开，打包工具不代替其他阶段。超出首次路径的容器内原生应用开发，
+     按 [SDK 指南](../../packages/aorta/python/README.zh-CN.md)实际检查导入。
    - C++：按 [C++ SDK 指南](../../packages/aorta/cpp/README.zh-CN.md)设置配套 SDK／Schema 路径，
-     构建 `//recipes/subscribe-state:main_cpp`。设备程序必须是 ARM64 且运行库兼容。
-     x86_64 预览产物不能作为 ARM64 部署产物；选择 ARM64 SDK 压缩包不等于配置交叉编译。
-     没有支持的 ARM64 构建环境时报告该阻塞，不改为在机器人上构建。
+     以 `--config=arm64` 构建 `//recipes/subscribe-state:main_cpp` 用于设备；原生预览／测试使用原生 SDK，
+     不加该配置。设备程序必须是 ARM64 且运行库兼容，x86_64 预览产物不能作为 ARM64 部署产物。
+     用 `aarch64-linux-gnu-readelf` 检查 ARM64 ELF 与依赖，不使用 host `ldd`；登录设备后再用 `ldd`
+     检查运行库解析。缺少编译器或匹配 SDK 时报告具体输入，不自动更换容器。
 3. **连接与配置。** 按下方设备章节先验证 `vbot` SSH 公钥登录，再配置设备 shell。
    核对设备架构与相关运行时版本是否匹配制品。使用独立的原生 Aorta SDK shell，
    本示例不要求加载 ROS。Python 按部署指南隔离 `PYTHONPATH`，不能假定激活 venv 会移除 ROS 包路径。
-4. **只部署所选示例。** 完整搭建包含将文档规定的应用包传到新的用户应用目录并准备运行时。
+4. **只部署所选示例。** 完整搭建包含将文档规定的应用包传到新的用户应用目录并准备运行时；
+   包范围参阅 [Python 部署](../../docs/development/python-deployment.zh-CN.md)。
    写入前确认目标设备；请求排除设备写入时，停在本地制品准备并说明后续步骤。
    使用所选语言的部署指南：
-   - Python：传输源码和 ARM64 wheel，在设备创建 venv、离线安装并检查导入。
+   - Python：用 `tools/package_python.py --verify` 检查生成包，传输其完整内容，
+     在设备创建 venv，按固定版本的 `requirements.txt` 离线安装并检查导入。
      不传输工作站 venv，也不假定设备上已有仓库。
    - C++：传输可执行文件与所需动态库，检查架构、校验和及动态库解析，再直接运行
      `./bin/subscribe-state`。设备无需 Bazel 或编译器，不替换系统库。
 5. **实际收到状态。** 从记录的应用目录、在配置好的运行环境中，执行所选语言示例的
    `--execute --count 3 --timeout 10` 有时限命令。需收到解码后的状态消息且进程成功退出；
    离线预览、topic 列表或清点退出码不算在线成功。超时或失败时检查相关环境、导入、动态库或路由错误，
-   说明失败阶段。不无限重试，也不修改服务、权限、bridge 配置或机器人模式来强行获得数据。
+   说明失败阶段。按[症状索引](../../docs/troubleshooting/README.zh-CN.md)区分导入／链接错误、配置与采样超时；
+   仅超时不能证明接口不支持或访问被拒绝。不无限重试，也不修改服务、权限、bridge 配置或机器人模式来强行获得数据。
 
 只读示例退出后停止，不附加运动、音视频采集、后台进程或自启动配置。
 交付实际应用目录、语言／SDK 配对、准确的再次运行命令与 shell 前提，以及剩余阻塞。

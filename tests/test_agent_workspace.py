@@ -37,7 +37,7 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_unknown_versions_are_not_wildcards(self):
         self.assertEqual(self.catalog["sdk"]["integration"], "integrated")
-        self.assertEqual(self.catalog["sdk"]["version"], "2026.9.23")
+        self.assertEqual(self.catalog["sdk"]["version"], "2026.10.20")
         self.assertEqual(self.catalog["sdk"]["python_import"], "aorta")
         for robot in self.robots.values():
             self.assertEqual(robot["models"], [])
@@ -45,9 +45,9 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_application_target_is_separate_from_sdk_and_release_scope(self):
         result = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")
-        self.assertEqual(result["robot"]["application_version"], "V1.6.0")
-        self.assertEqual(result["sdk"]["version"], "2026.9.23")
-        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.9.24")
+        self.assertEqual(result["robot"]["application_version"], "V1.6.0-15")
+        self.assertEqual(result["sdk"]["version"], "2026.10.20")
+        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.31")
         self.assertIsNone(result["robot"]["minimum_firmware"])
         self.assertEqual(result["capabilities"][0]["decision"], "requires_device_verification")
         self.assertFalse(result["device_contacted"])
@@ -57,7 +57,7 @@ class AgentWorkspaceTests(unittest.TestCase):
             self.assertEqual(planned["capabilities"][0]["decision"], "blocked_release")
 
     def test_application_target_rejects_invalid_versions_and_ranges(self):
-        for value in (True, 1.6, [], "", "v1.6.0", "V1.6", "V1.6.0+", ">=V1.6.0"):
+        for value in (True, 1.6, [], "", "v1.6.0", "V1.6", "V1.6.0-10+", ">=V1.6.0-10"):
             robots = deepcopy(self.robots)
             robots["foot_quadruped"]["application_version"] = value
             with self.subTest(value=value), self.assertRaises(CatalogError):
@@ -83,6 +83,22 @@ class AgentWorkspaceTests(unittest.TestCase):
         self.assertEqual(entry["verification"], "documentation_only")
         self.assertIsNone(entry["skill"])
 
+    def test_mcp_configuration_is_a_device_http_contract_not_a_server_program(self):
+        entry = query_catalog(ROOT, "foot_quadruped", "device.agent.mcp-config")["capabilities"][0]
+        self.assertEqual(entry["reference"], "docs/interfaces/agent/mcp-config.md")
+        self.assertEqual(entry["execution_location"], "device_service")
+        self.assertEqual(entry["interface_kind"], "http")
+        self.assertEqual(entry["effect"], "depends_on_operation")
+        self.assertEqual(entry["availability"], "documented")
+        self.assertEqual(entry["verification"], "documentation_only")
+        self.assertEqual(entry["decision"], "requires_device_verification")
+        self.assertFalse(entry["requires_sdk"])
+        self.assertIsNone(entry["recipe"])
+        self.assertIsNone(entry["tool"])
+        for robot in ("wheel_quadruped", "foot_humanoid"):
+            self.assertEqual(query_catalog(ROOT, robot, entry["id"])["capabilities"][0]["decision"],
+                             "blocked_release")
+
     def test_implemented_recipe_still_needs_device_checks(self):
         entry = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")["capabilities"][0]
         self.assertEqual(entry["decision"], "requires_device_verification")
@@ -99,12 +115,43 @@ class AgentWorkspaceTests(unittest.TestCase):
                          "blocked_integration")
 
     def test_python_and_cpp_implementations_are_indexed(self):
-        self.assertEqual(self.catalog["sdk"]["cpp"]["abi"], 12)
+        self.assertEqual(self.catalog["sdk"]["cpp"]["abi"], 13)
         for entry in self.catalog["capabilities"]:
             if entry.get("recipe"):
                 self.assertEqual(set(entry["implementations"]), {"python", "cpp"})
                 for language, target in (("python", ":main"), ("cpp", ":main_cpp")):
                     self.assertTrue(entry["implementations"][language]["bazel_target"].endswith(target))
+
+    def test_health_monitor_implementations_use_the_owning_package(self):
+        result = query_catalog(ROOT, "foot_quadruped", "robot.health.monitor")
+        entry = result["capabilities"][0]
+        self.assertEqual(entry["availability"], "implemented")
+        self.assertEqual(entry["verification"], "local_tests")
+        self.assertEqual(entry["blueprint"], "blueprints/health-monitor/README.md")
+        self.assertIsNone(entry["recipe"])
+        self.assertEqual(entry["tool"], entry["implementations"]["python"]["source"])
+        for language, source, target in (("python", "health_monitor/main.py", "main"), ("cpp", "cpp/main.cc", "main_cpp")):
+            self.assertEqual(entry["implementations"][language], {
+                "source": "blueprints/health-monitor/" + source,
+                "bazel_target": "//blueprints/health-monitor:" + target})
+        self.assertEqual(entry["decision"], "requires_device_verification")
+        self.assertFalse(result["device_contacted"])
+
+    def test_blueprint_references_and_wrong_package_targets_are_rejected(self):
+        for mutate in (
+            lambda entry: entry.update(blueprint="missing.md"),
+            lambda entry: entry.update(blueprint="../outside.md"),
+            lambda entry: entry["implementations"]["python"].update(bazel_target="//blueprints/health-monitor/health_monitor:main"),
+            lambda entry: entry["implementations"]["cpp"].update(bazel_target="//blueprints/health-monitor/cpp:main_cpp"),
+            lambda entry: entry["implementations"]["cpp"].update(bazel_target="//:main_cpp"),
+            lambda entry: entry["implementations"]["cpp"].update(bazel_target="//recipes/sensors:main_cpp"),
+            lambda entry: entry["implementations"]["cpp"].update(bazel_target="@other//blueprints/health-monitor:main_cpp"),
+        ):
+            data = deepcopy(self.catalog)
+            entry = next(item for item in data["capabilities"] if item["id"] == "robot.health.monitor")
+            mutate(entry)
+            with self.subTest(entry=entry), self.assertRaises(CatalogError):
+                validate_catalog(ROOT, data, self.robots)
 
     def test_cpp_catalog_rejects_invalid_sources_targets_and_metadata(self):
         for mutate in (
@@ -182,7 +229,7 @@ class AgentWorkspaceTests(unittest.TestCase):
             self.assertEqual(query_catalog(ROOT, robot, capability)["capabilities"][0]["decision"],
                              "blocked_release")
 
-    def test_read_only_families_are_documented_as_single_capabilities(self):
+    def test_interface_families_are_documented_as_single_capabilities(self):
         references = {
             "robot.sensors": "docs/interfaces/sensors.md",
             "robot.cameras": "docs/interfaces/cameras.md",
@@ -203,7 +250,7 @@ class AgentWorkspaceTests(unittest.TestCase):
                 self.assertEqual(entry["availability"], "documented")
                 self.assertEqual(entry["verification"], "documentation_only")
                 self.assertEqual(entry["interface_kind"], "pub_sub")
-                self.assertEqual(entry["effect"], "device_read_only")
+                self.assertEqual(entry["effect"], "depends_on_operation" if capability == "robot.audio" else "device_read_only")
                 self.assertEqual(entry["execution_location"], "device_shell")
                 self.assertFalse(entry["requires_sdk"])
                 self.assertIsNone(entry["minimum_firmware"])
@@ -290,15 +337,22 @@ class AgentWorkspaceTests(unittest.TestCase):
         self.assertEqual(result["inventory_status"], "attention_required")
 
     def test_skill_discovery_content_matches(self):
-        source = ROOT / "skills/vbot-dev-setup"
-        for harness in (".agents", ".claude"):
-            discovered = ROOT / harness / "skills/vbot-dev-setup"
-            for name in ("SKILL.md", "SKILL.zh-CN.md"):
-                self.assertEqual((discovered / name).read_bytes(), (source / name).read_bytes())
-        english = (source / "SKILL.md").read_text()
-        frontmatter = english.split("---", 2)[1]
-        self.assertIn("name: vbot-dev-setup", frontmatter)
-        self.assertIn("description:", frontmatter)
+        for skill in ("vbot-dev-setup", "vbot-app-dev", "vbot-diagnose"):
+            source = ROOT / "skills" / skill
+            for harness in (".agents", ".claude"):
+                discovered = ROOT / harness / "skills" / skill
+                for name in ("SKILL.md", "SKILL.zh-CN.md"):
+                    self.assertEqual((discovered / name).read_bytes(), (source / name).read_bytes())
+            frontmatter = (source / "SKILL.md").read_text().split("---", 2)[1]
+            self.assertIn("name: " + skill, frontmatter)
+            self.assertIn("description:", frontmatter)
+
+    def test_diagnostics_is_a_local_workflow_not_device_support(self):
+        entry = query_catalog(ROOT, capability="development.diagnostics")["capabilities"][0]
+        self.assertEqual(entry["decision"], "local_only")
+        self.assertEqual(entry["skill"], "skills/vbot-diagnose/SKILL.md")
+        self.assertEqual(entry["execution_location"], "developer_host_or_container")
+        self.assertFalse(entry["requires_sdk"])
 
     def test_setup_skill_references_runnable_language_paths(self):
         # Validate the workflow's concrete resources, not model behavior.
@@ -317,6 +371,35 @@ class AgentWorkspaceTests(unittest.TestCase):
             for target in ("main", "main_cpp"):
                 self.assertIn(f"//recipes/subscribe-state:{target}", body)
                 self.assertIn(f'name = "{target}"', build)
+
+    def test_new_skills_link_into_external_projects_without_replacing_configuration(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            project = Path(temporary)
+            for name in ("AGENTS.md", "CLAUDE.md"):
+                (project / name).write_text("existing instructions\n")
+            (project / "tools").mkdir()
+            (project / "tools/diagnose.py").write_text("raise SystemExit(99)\n")
+            for harness in (".agents", ".claude"):
+                directory = project / harness / "skills"
+                directory.mkdir(parents=True)
+                (directory / "existing-skill").mkdir()
+                for name in ("vbot-app-dev", "vbot-diagnose"):
+                    link = directory / name
+                    link.symlink_to(ROOT / "skills" / name, target_is_directory=True)
+                    physical_root = (ROOT / "skills" / name / "SKILL.md").resolve().parents[2]
+                    self.assertEqual((link / "SKILL.md").resolve().parents[2], physical_root)
+                    self.assertTrue(((link / "SKILL.md").resolve().parents[2] / "tools/diagnose.py").is_file())
+                    if name == "vbot-diagnose":
+                        result = subprocess.run([sys.executable, str(physical_root / "tools/diagnose.py"), "--level", "inventory"],
+                                                cwd=project, capture_output=True, text=True, timeout=10)
+                        self.assertIn(result.returncode, (0, 1), result.stderr)
+                        report = json.loads(result.stdout)
+                        self.assertEqual(report["level"], "inventory")
+                        self.assertFalse(report["interfaces_contacted"])
+                        self.assertFalse(report["changes_made"])
+                self.assertTrue((directory / "existing-skill").is_dir())
+            for name in ("AGENTS.md", "CLAUDE.md"):
+                self.assertEqual((project / name).read_text(), "existing instructions\n")
 
     def test_checkout_aliases_are_relative_symlinks(self):
         if RUNFILES:
@@ -364,10 +447,11 @@ class AgentWorkspaceTests(unittest.TestCase):
                      "skills/vbot-dev-setup/SKILL.md", self.catalog["sdk"]["reference"], self.catalog["sdk"]["cpp"]["reference"]}
         resources.update(str(path.relative_to(ROOT)) for path in (ROOT / "catalog/robots").glob("*.json"))
         for entry in self.catalog["capabilities"]:
-            resources.update(entry[field] for field in ("reference", "skill", "tool", "recipe") if entry[field])
+            resources.update(entry[field] for field in ("reference", "skill", "tool", "recipe", "blueprint") if entry.get(field))
             for implementation in entry.get("implementations", {}).values():
                 resources.add(implementation["source"])
-                resources.add(str(Path(implementation["source"]).parent / "BUILD.bazel"))
+                package = implementation["bazel_target"].removeprefix("//").split(":", 1)[0]
+                resources.add(str(Path(package) / "BUILD.bazel"))
         for robot in self.robots.values():
             resources.update(robot[field] for field in ("guide", "sensor_reference", "connection_reference") if robot[field])
         with tempfile.TemporaryDirectory() as temporary:

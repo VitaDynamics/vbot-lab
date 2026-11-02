@@ -1,0 +1,120 @@
+{
+  "format_version": 1,
+  "workspace": {
+    "branch": "release/V1.6.0",
+    "tag": "Rel/V1.6.0"
+  },
+  "robots": {
+    "foot_quadruped": {
+      "application_version": "V1.6.0-15"
+    }
+  },
+  "sdk": {
+    "repository": "VitaDynamics/vbot-lab",
+    "release_tag": "edu-sdk-2026.10.31",
+    "aorta_version": "2026.10.20",
+    "python": {
+      "minimum_version": "3.10",
+      "wheels": {
+        "aorta_sdk": "2026.10.20",
+        "aorta_msgs": "2026.10.20",
+        "vbot_edu_msgs": "2026.10.20",
+        "flatbuffers": "25.12.19"
+      },
+      "platforms": [
+        "linux_x86_64",
+        "linux_aarch64",
+        "macosx_11_0_arm64"
+      ]
+    },
+    "cpp": {
+      "version": "2026.10.20",
+      "abi": 13,
+      "distribution": "ubuntu22.04",
+      "architectures": [
+        "x86_64",
+        "aarch64"
+      ]
+    },
+    "assets": [
+      {
+        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst",
+        "sha256": "80267ec464c016c003e43c22dbe0a921310e9a2f8a2f516a221fab81b74c5264"
+      },
+      {
+        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst.sha256",
+        "sha256": "0491a47f725839325dea6e8141afd42ac44eb7147b3f9a3e843eada76aee4fd0"
+      },
+      {
+        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst",
+        "sha256": "73d5884009766e5bdd5607191ae0e6b6840471d89283277c98f09e467d889157"
+      },
+      {
+        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst.sha256",
+        "sha256": "8aebc3eea281b02588f55c177f4947c10f0506f983aed6f001f836088cc2c73f"
+      },
+      {
+        "name": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst",
+        "sha256": "e6a590fda45d7c27e76f28e79566a5371a40cb065809040d7d378392cfb75e4e"
+      },
+      {
+        "name": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst.sha256",
+        "sha256": "b45b12f29f4bb9c81af92a4e27638f2adb21dbaab970c4efe637fc3271284faa"
+      },
+      {
+        "name": "aorta_msgs-2026.10.20-py3-none-any.whl",
+        "sha256": "2500bb44f397b65676e81ca6d7afd103892bd2e3bfedc3e463d1036dbbecfd2c"
+      },
+      {
+        "name": "aorta_sdk-2026.10.20-py3-none-linux_aarch64.whl",
+        "sha256": "559f8c22871fda131e6d706fa9dd5edc4b07fa3297cf42f51a844318bf9ff7ba"
+      },
+      {
+        "name": "aorta_sdk-2026.10.20-py3-none-linux_x86_64.whl",
+        "sha256": "e0909b322f20b78a2b043a9605b5f495f8555039480999273fb4e6ad0eb1c5f0"
+      },
+      {
+        "name": "aorta_sdk-2026.10.20-py3-none-macosx_11_0_arm64.whl",
+        "sha256": "8b4e36435a0b8cff560f83d3ca4b9a672c12bf2745e70bc7ebfb8a3d6eb827f7"
+      },
+      {
+        "name": "EDU_SDK_MANIFEST.json",
+        "sha256": "c455469d9b59fe4d87c42cd922a4b09dcfae35715c915c9be464a0be2540a25b"
+      },
+      {
+        "name": "flatbuffers-25.12.19-py2.py3-none-any.whl",
+        "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4"
+      },
+      {
+        "name": "flatbuffers-25.12.19.LICENSE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "name": "SHA256SUMS",
+        "sha256": "eac62f2a85a310712f127ef920dba51b2374d7aeea96e94b38cc899f2575393d"
+      },
+      {
+        "name": "vbot_edu_msgs-2026.10.20-py3-none-any.whl",
+        "sha256": "22a3b33e92dde8a42ffd471c1f64b6a66f0bb448e9cca9379beaf60486aed46f"
+      },
+      {
+        "name": "vbot_edu_msgs-2026.10.20-py3-none-any.whl.sha256",
+        "sha256": "d15427124525a80f4d6b7b132c79a5aacf4e2d47ec401c435e172fd8621077eb"
+      }
+    ]
+  },
+  "schema": {
+    "version": "2026.10.20",
+    "pack_version": "2026.10.20-v4",
+    "asset": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst",
+    "sha256": "e6a590fda45d7c27e76f28e79566a5371a40cb065809040d7d378392cfb75e4e",
+    "ros2_bridge_version": "2026.10.21"
+  },
+  "development": {
+    "bazel_version": "7.6.1",
+    "image": {
+      "reference": "crpi-0kb86kk5y2bv7o41.cn-shanghai.personal.cr.aliyuncs.com/vitarobotics/vbot-edu:dev-v0.0.1",
+      "digest": "sha256:8d5081784d9e7d34463f62ae5bef2b58cf4a0a37383435379c4bfc37ec01fdcd"
+    }
+  }
+}

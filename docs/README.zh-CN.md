@@ -36,6 +36,6 @@ SDK 下载入口及组件配套要求。
 
 - [Aorta Python SDK](../packages/README.zh-CN.md)：Aorta Python SDK 入口与兼容要求。
 - [Recipes](../recipes/README.zh-CN.md)：单项任务 Python／C++ 参考程序与 Bazel 目标。
-- [VBOT Blueprints](../blueprints/README.zh-CN.md)：完整参考应用，目前处于规划阶段。
-- [Skills](../skills/README.zh-CN.md)：供 Codex 与 Claude Code 使用的本地环境检查流程及配置说明。
+- [VBOT Blueprints](../blueprints/README.zh-CN.md)：只读健康监测、独立工作区与应用测试。
+- [Skills](../skills/README.zh-CN.md)：环境搭建、Python/C++ 应用开发与分层诊断。
 - [Interface Definitions（接口定义）](../schemas/README.zh-CN.md)：已入库的开放 Aorta Schema 与版本化生成绑定。

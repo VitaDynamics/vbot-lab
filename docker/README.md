@@ -2,9 +2,12 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-The configuration references the `dev-v0.0.1` image tag, which supports anonymous
-pulls without registry login. The configuration uses a tag rather than an immutable digest.
-For a reproducible environment, set `VBOT_LAB_DEV_IMAGE` to the image reference with its digest.
+Compose pins the `dev-v0.0.1` image to the immutable digest recorded in
+[release.json](../catalog/release.json):
+`sha256:8d5081784d9e7d34463f62ae5bef2b58cf4a0a37383435379c4bfc37ec01fdcd`.
+The image supports anonymous pulls without registry login. Its published platform is
+**linux/amd64**; Compose selects that platform explicitly. On ARM64 hosts, a compatible
+Linux/amd64 runtime is required. Do not change host emulation settings automatically.
 
 After entering the container, follow the [SDK guides](../packages/aorta/README.md)
 to prepare the matching SDK and Schema artifacts for your language and architecture.
@@ -58,13 +61,13 @@ substitute the verified workspace path when reusing a different layout.
 - Check-only requests do not start containers.
 
 ```bash
-docker exec -it -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash
+docker exec -it -e VBOT_DEV_CONTAINER=1 -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash
 ```
 
 For non-interactive Agent commands omit -it, for example:
 
 ```bash
-docker exec -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash -lc 'python3 tools/check_environment.py --profile container'
+docker exec -e VBOT_DEV_CONTAINER=1 -w /workspace "$VBOT_DEV_CONTAINER_ID" /bin/bash -lc 'python3 tools/check_environment.py --profile container'
 ```
 
 ### Create only when no suitable container exists
@@ -86,17 +89,41 @@ provided container, skip the host checks and use the container inventory profile
 ```bash
 cd /workspace
 python3 tools/check_environment.py --profile container
+python3 tools/container_context.py
 uname -m
 ```
 
-Check the actual compiler target and output architecture as well as `uname -m` for
-native code. Docker does not automatically cross-compile x86_64 programs to ARM64.
-The [C++ guide](../packages/aorta/cpp/README.md) currently describes native compilation;
-use the provided image in a compatible ARM64 container environment for that path.
-If that environment is unavailable, stop and obtain the matching container environment
-instead of compiling on the host or robot. Python source is portable, but wheels and
-native dependencies must still match the target. The robot runs deployed applications;
+Read-only repository checks may run on the host or CI runner. Bazel builds/tests, Recipe
+previews, SDK execution checks, dependency preparation and packaging must run in this
+container, including CI; see [execution locations](../docs/development/README.md).
+Compose declares `VBOT_DEV_CONTAINER=1` automatically. For an existing container, the exec
+commands above declare it only after image/mount inspection, without recreating or modifying
+the container configuration. The context guard also requires a Linux runtime marker; the
+flag alone does not verify an image, architecture or workspace.
+
+The image runs on `linux/amd64` and includes the ARM64 GCC/G++ cross-compilers.
+The container's runtime architecture does not determine the compiler's output architecture.
+Inside the development container, inspect both native and cross-compiler targets:
+
+```bash
+uname -m
+g++ -dumpmachine
+aarch64-linux-gnu-gcc -dumpmachine
+aarch64-linux-gnu-g++ -dumpmachine
+```
+
+The cross-compilers should report `aarch64-linux-gnu`; they run on AMD64 and produce
+ARM64 code. Reuse this container rather than requiring another ARM64 container solely
+because `uname -m` reports x86_64. The [C++ Recipe guide](../packages/aorta/cpp/README.md)
+uses `bazel build --config=arm64` with the ARM64 SDK for device binaries; default Bazel
+builds remain native for container previews/tests. Do not execute ARM64 binaries in this AMD64 container.
+Match the selected compiler, ARM64 SDK/libraries and output architecture before deployment;
+do not build on the host or robot as a workaround. Python source is portable, but wheels
+and native dependencies must still match the target. The robot runs deployed applications;
 it does not need Docker or Bazel for these examples.
+
+For the first Python application, the AMD64 container can stage ARM64 wheels without
+installing or executing them. Follow [Quickstart](../docs/getting-started/README.md).
 
 By default, only this repository is mounted at `/workspace`, with a separate named cache volume for Bazel.
 Use `VBOT_LAB_DEV_IMAGE` to override the complete image reference locally.

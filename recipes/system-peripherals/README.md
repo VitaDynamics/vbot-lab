@@ -6,7 +6,11 @@
 
 ## Select a stream
 
-`--stream`: system → /system/sm_status; display → /display_node/status.
+`--stream`: system → /system/sm_status; display → /display_node/status; version → /ota_version.
+
+`version` decodes `aorta.topic.system_monitor.OtaVersion` and prints the full robot
+application `version`, including any `~` build suffix, and `publish_stamp_ns` when a
+header is present. The subscription does not change the robot's mode.
 
 System output preserves category, lifecycle status, severity, active-state path, timestamp and heartbeat. A system observation does not complete an unrelated application request. Display data remains opaque text, not an assumed JSON object or image. These subscriptions never change lights or display contents. For existing read-only firmware and light queries, see [device-info](../device-info/README.md) and [service-call](../service-call/README.md).
 
@@ -35,6 +39,23 @@ C++: switch to the deployed binary's application directory and configure its run
 ```
 
 Select one stream at a time. Replace --stream using the list above; do not automatically restart services or switch modes to obtain samples.
+
+For the application version, use the same deployed application/venv and runtime setup:
+
+```bash
+python -m recipes.system-peripherals.main --stream version --count 1 --timeout 20 --execute
+```
+
+Or, from the deployed C++ application directory:
+
+```bash
+./bin/system-peripherals --stream version --count 1 --timeout 20 --execute
+```
+
+Require a received `version`, not only a topic listing. Compare the identifier before
+the `~` suffix with the [application pairing](../../docs/compatibility.md).
+The control-enable and power-saving services are documented in the interface guides;
+this read-only Recipe deliberately does not invoke them.
 
 ## Output and exit
 

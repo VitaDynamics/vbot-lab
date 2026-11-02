@@ -13,7 +13,7 @@ import sys
 import time
 
 
-SDK_VERSIONS = {"aorta-sdk": "2026.9.23", "aorta-msgs": "2026.9.23", "vbot-edu-msgs": "2026.9.24"}
+SDK_VERSIONS = {"aorta-sdk": "2026.10.20", "aorta-msgs": "2026.10.20", "vbot-edu-msgs": "2026.10.20"}
 MAX_SAMPLE_BYTES = 8 * 1024 * 1024
 
 

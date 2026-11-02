@@ -6,7 +6,10 @@
 
 ## 选择数据流
 
-`--stream`: system → /system/sm_status; display → /display_node/status.
+`--stream`: system → /system/sm_status; display → /display_node/status; version → /ota_version.
+
+`version` 解码 `aorta.topic.system_monitor.OtaVersion`，输出含 `~` 构建后缀的完整机器人应用
+`version`；消息头存在时同时输出 `publish_stamp_ns`。订阅不改变机器人模式。
 
 系统输出保留类别、流程状态、严重性、活动状态路径、时间戳与心跳。系统状态不能作为无关应用请求的完成依据。显示 data 按原始文本保留，不假设为 JSON 对象或图像。订阅不改变灯光或显示内容。已有固件查询与灯光查询示例见 [device-info](../device-info/README.zh-CN.md) 和 [service-call](../service-call/README.zh-CN.md)。
 
@@ -35,6 +38,22 @@ C++：切换到已部署 C++ 二进制的应用目录，按 C++ 指南配置运�
 ```
 
 每次只选择一个数据流。按上方列表替换 --stream；不要为获取样本而自动重启服务或改变模式。
+
+读取应用版本时，复用同一部署目录／venv 与运行环境：
+
+```bash
+python -m recipes.system-peripherals.main --stream version --count 1 --timeout 20 --execute
+```
+
+或者从已部署 C++ 程序的应用目录执行：
+
+```bash
+./bin/system-peripherals --stream version --count 1 --timeout 20 --execute
+```
+
+必须收到实际的 `version`，不能以话题列表代替收数。将 `~` 后缀前的应用标识与
+[应用配套](../../docs/compatibility.zh-CN.md)核对。
+控制使能和低功耗服务见接口指南；本只读示例有意不调用这些服务。
 
 ## 输出与退出
 

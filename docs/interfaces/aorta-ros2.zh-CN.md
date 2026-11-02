@@ -9,11 +9,11 @@ ROS 2 接口，并非另一套完全等价的机器人接口。请先完成[设�
 
 本参考适用于 `foot_quadruped` EDU 软件。接口是否可用取决于已安装固件，
 使用前请发现确切路由并检查交付的消息类型。
-本文统一适配机器人应用版本 **V1.6.0**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
+本文统一适配机器人应用版本 **V1.6.0-15**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
 此软件范围不覆盖其他机器人类型。
 
-本页列出开放 topic 集及受支持的映射，并整理 service 与 RCP action。
-topic 表共包含 46 个不同的 Aorta 路由：43 个订阅输出、3 个控制输入。
+本页列出开放 topic 集及受支持的映射，并整理 25 个请求／响应 service 与 RCP action。
+topic 表共包含 48 个不同的 Aorta 路由：44 个订阅输出、4 个控制输入。
 发现输出路由后，限时获取样本检查发布者；不要通过向控制 topic 发布消息来检查环境。
 Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 设备 CLI 使用不要求安装 Python SDK。
@@ -30,7 +30,7 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 | [传感器与硬件遥测](sensors.zh-CN.md) | 电池、IMU、雷达、UWB、GNSS、舵机反馈 |
 | [相机与 AprilTag](cameras.zh-CN.md) | 标定、压缩视频、标签检测 |
 | [Perception](perception.zh-CN.md) | 目标检测与人体关键点 |
-| [Audio](audio.zh-CN.md) | 音频帧、ASR 文本、语音事件、UWB 输入结束 |
+| [Audio](audio.zh-CN.md) | 音频帧、ASR 文本、语音事件、UWB 输入结束、PCM 播放及语音策略 service |
 | [运动](locomotion.zh-CN.md) | 状态、终态报告、摇杆／速度输入 |
 | [系统与外设](system-peripherals.zh-CN.md) | 系统状态、显示、耳灯调制 |
 | [RCP](rcp.zh-CN.md) | 任务 action 与追踪事件 |
@@ -82,6 +82,7 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 | [运动事件](locomotion.zh-CN.md) | `/locomotion/event` | `/locomotion/event` | pub/sub — 订阅 | `locomotion.LocomotionEvent` | `software_msgs/msg/LocomotionEvent` |
 | [RCP 任务追踪事件](rcp.zh-CN.md) | `/rcp/trace` | `/rcp/trace` | pub/sub — 订阅 | `aorta.topic.rcp.TraceEvent` | `function_msgs/msg/TraceEvent` |
 | [系统状态机](system-peripherals.zh-CN.md) | `/system/sm_status` | `/sm/status` | pub/sub — 订阅 | `sm.SmStatus` | `software_msgs/msg/SystemStateMachineStatus` |
+| [OTA 应用版本](system-peripherals.zh-CN.md) | `/ota_version` | `/ota_version` | pub/sub — 订阅 | `aorta.topic.system_monitor.OtaVersion` | `std_msgs/msg/String` |
 | [显示状态](system-peripherals.zh-CN.md) | `/display_node/status` | `/display_node/status` | pub/sub — 订阅 | `aorta.topic.peripheral.DisplayStatus` | `aorta_msgs/msg/DisplayStatus` |
 | [语音交互事件](audio.zh-CN.md) | `/voice/event` | `/voice/event` | pub/sub — 订阅 | `aorta.voice.VoiceEvent` | `aorta_msgs/msg/VoiceEvent` |
 | [最终识别文本；provider 区分本体／UWB 输入](audio.zh-CN.md) | `/speech/asr_result` | `/speech/asr_result` | pub/sub — 订阅 | `aorta.topic.speech.AsrResult` | `aorta_msgs/msg/AsrResult` |
@@ -95,7 +96,7 @@ IMU、雷达、图像、地图与音频可能涉及较高带宽或隐私要求�
 
 ## 控制 topic
 
-下列三条路由均为 **pub/sub 输入**：应用发布，ROS bridge 按 ROS → Aorta 转发，
+下列四条路由均为 **pub/sub 输入**：应用发布，ROS bridge 按 ROS → Aorta 转发，
 不是机器人状态订阅。发布前明确唯一控制方、检查交付类型与 QoS，并约定清理和停止方式。
 运动操作还需确认运行模式、有人监护的安全区域以及可随时使用的停止控制。
 发现接口时不要发送占位消息或全零测试消息。
@@ -105,6 +106,7 @@ IMU、雷达、图像、地图与音频可能涉及较高带宽或隐私要求�
 | [摇杆控制输入](locomotion.zh-CN.md) | `/locomotion/joy` | `/joy` | pub/sub — 发布 | `locomotion.Joy` | `sensor_msgs/msg/Joy` |
 | [速度控制输入](locomotion.zh-CN.md) | `/locomotion/velocity_command` | `/vel_cmd` | pub/sub — 发布 | `aorta.topic.navigation.Twist` | `geometry_msgs/msg/Twist` |
 | [耳灯亮度调制](system-peripherals.zh-CN.md) | `/light/ear_modulation` | `/light/ear_modulation` | pub/sub — 发布 | `aorta.topic.peripheral.EarModulation` | `aorta_msgs/msg/EarModulation` |
+| [扬声器 PCM 播放](audio.zh-CN.md) | `/audio/play_pcm` | `/audio/play_pcm` | pub/sub — 发布 | `aorta.topic.audio.PcmPlayback` | `aorta_msgs/msg/PcmPlayback` |
 
 - 摇杆轴值必须有限，且处于归一化范围 [-1, 1]。不能从通用 ROS 类型猜测轴／按键映射。
   原生 Joy 消息没有 ROS header，ROS 时间戳与坐标系标识不会传入该消息。
@@ -113,6 +115,9 @@ IMU、雷达、图像、地图与音频可能涉及较高带宽或隐私要求�
 - 耳灯调制使用有限的 `value`，范围为 [0, 1]，乘到当前耳灯亮度上。
   它不选择 RGB 颜色，也不启动灯效；这些操作使用灯效控制或渐变 service。
   活跃的 ROS 转发会话结束时，bridge 恢复中性因子 `1.0`，不是关灯。
+- PCM 播放要求 16 kHz、有符号 16 位单声道采样及匹配的采样数。
+  它播放声音，不录音或识别语音；帧格式、节奏、限制和清理见 [audio](audio.zh-CN.md)，
+  发现接口时不要发布测试音频。
 - ROS 控制 bridge 实施单写入方占用、输入检查和输入中断超时保护。
   被拒帧直接丢弃，不自动截断数值。活跃会话结束时，运动路由发送终止零指令后停止转发；
   这不能替代机器人的正常停止控制。这些是 **bridge** 行为，不能据此认定任意直接使用
@@ -133,6 +138,7 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/firmware_version/servo` | `/firmware_version/servo` | service — 查询舵机固件 |
 | `/firmware_version/lidar` | `/firmware_version/lidar` | service — 查询雷达固件 |
 | `/firmware_version/uwb` | `/firmware_version/uwb` | service — 查询 UWB 固件 |
+| `/get_jpeg_images` | `/get_jpeg_images` | service — [获取 JPEG 图像](cameras.zh-CN.md)，以响应的实际尺寸为准 |
 | `/display_node/get_supported_emotions` | `/display_node/get_supported_emotions` | service — 查询可用表情 |
 | `/display_node/play_emotion` | `/display_node/play_emotion` | service — 播放表情 |
 | `/display_node/display_imgs` | `/display_node/display_imgs` | service — 显示图片 |
@@ -143,11 +149,16 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/locomotion/head_action` | `/head_action` | service — 头部控制 |
 | `/locomotion/set_run_mode` | `/locomotion/set_run_mode` | service — 切换运行模式 |
 | `/locomotion/runtime_control` | `/locomotion/runtime_control` | service — 调整运动运行时设置 |
+| `/rcp/function_input` | `/function_input` | service — [兼容 DAG 提交入口](rcp.zh-CN.md#兼容提交服务)，仅返回受理结果，不是任务终态 |
 | `/slam/set_slam_mode` | `/slam/set_slam_mode` | service — 建图、保存与定位模式 |
 | `/slam/get_path_to_target` | `/slam/get_path_to_target` | service — 请求路径，不是运动命令 |
 | `/slam/query_map` | `/slam/query_map` | service — 查询地图数据 |
 | `/volume_control` | `/volume_control` | service — 按请求查询／调整音量 |
 | `/speech/set_speak` | `/set_speak` | service — 语音播放／控制 |
+| `/speech_control` | `/speech_control` | service — 按请求类型[查询／修改语音策略](audio.zh-CN.md) |
+| `/locomotion/control_enable` | `/locomotion/control_enable` | service — [暂停／恢复控制与电机通信](locomotion.zh-CN.md) |
+| `/system/power_saving/enable` | `/system/power_saving/enable` | service — [进入／退出低功耗模式](system-peripherals.zh-CN.md) |
+| `/function/following` | `/function/following` | service — [跟随／导航模式控制](locomotion.zh-CN.md) |
 
 固件查询需要正确的 `target_device_type`：MOTOR=`0`、SERVO=`1`、LIDAR=`2`、UWB=`3`。
 调用前检查交付的请求类型，不能对所有设备类型都使用空请求／默认请求。

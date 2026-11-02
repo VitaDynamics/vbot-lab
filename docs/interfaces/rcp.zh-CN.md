@@ -2,7 +2,7 @@
 
 <p align="center"><a href="rcp.md">English</a> | 中文</p>
 
-本功能域包含任务 action 和只读追踪输出。先在 `foot_quadruped` EDU 上完成
+本功能域包含任务 action、兼容提交 service 和只读追踪输出。先在 `foot_quadruped` EDU 上完成
 [设备 shell 配置](../getting-started/device-environment.zh-CN.md)。任务执行可能改变设备状态；
 查看追踪与检查 provider 不会提交任务。类型及映射总览见[接口表](aorta-ros2.zh-CN.md)。
 
@@ -44,6 +44,24 @@ ROS bridge 同时只允许一个目标执行，另一个会以 `GOAL_BUSY` 拒�
 取消是请求：需等待取消终态，或处理取消被拒／目标已经完成的情况。
 客户端超时或关闭终端不等于任务被取消。应在 provider 保留期内获取结果，
 使用 `/rcp/trace` 辅助了解任务事件，不能用它代替终态结果。
+
+## 兼容提交服务
+
+`/rcp/function_input` 是 **service**，映射到 ROS `/function_input`，类型为
+`function_msgs/srv/FunctionInput`。Aorta 根类型为 `aorta.services.rcp.FunctionInputRequest`
+和 `aorta.services.rcp.FunctionInputResponse`，见
+[Schema 定义](../../schemas/aorta/schemas/service/rcp/function_input.fbs)。
+
+- 请求包含 `request_id`、`source`、带类型标记的 `input`（`DagSpec` 或 `DagPresetRef`）
+  及可选的 `user_interaction_context`。DAG／预设字段参阅 [DAG 指南](../guides/rcp-dag.zh-CN.md)，
+  但需构造 service 请求，而不是 action goal。
+- 响应包含 `status`、`accepted`、`request_id`、`message`。
+  成功响应中的 `accepted=true` 仅表示提交已受理并等待处理，不表示执行或后续准入检查成功。
+- 一次性响应不提供 action 反馈、终态结果或取消句柄。
+  保留返回的 `request_id` 关联追踪；超时不代表没有提交，不要盲目重试。
+
+新应用推荐 `/rcp/execute_task`，便于调用方跟踪完整任务生命周期。
+两个入口均可能执行运动或其他设备变化；发现 provider 不代表可以提交默认请求。
 
 ## 追踪 topic 的定义与使用
 

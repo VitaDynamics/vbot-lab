@@ -2,6 +2,10 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
+构建、预览、SDK 检查和打包均在配套开发容器内进行，CI 同样遵守，参阅[执行位置](../docs/development/README.zh-CN.md)。
+直接执行 Python 预览或模拟应用测试也受此规则约束，不仅是 Bazel 命令。
+各 Recipe 的构建／预览章节沿用此执行位置；设备章节仅用于部署后显式在线执行。
+
 单项任务参考程序：Recipe 提供实现，[Skill](../skills/README.zh-CN.md) 引导开发流程，[Blueprint](../blueprints/README.zh-CN.md) 组合完整应用。
 
 ## 能力分类
@@ -13,14 +17,14 @@
 | Perception | [perception](perception/README.zh-CN.md)：目标／人体框、人体关键点 | pub/sub |
 | Audio | [audio](audio/README.zh-CN.md)：本体／UWB 音频、ASR、输入结束事件 | pub/sub |
 | 运动 | [locomotion](locomotion/README.zh-CN.md)：站起／趴下；[subscribe-state](subscribe-state/README.zh-CN.md)：姿态与心跳 | service + pub/sub |
-| 系统与外设 | [system-peripherals](system-peripherals/README.zh-CN.md)：系统／显示状态；[device-info](device-info/README.zh-CN.md)：固件查询；[service-call](service-call/README.zh-CN.md)：灯光状态 | service + pub/sub |
+| 系统与外设 | [system-peripherals](system-peripherals/README.zh-CN.md)：系统／显示状态及应用版本；[device-info](device-info/README.zh-CN.md)：固件查询；[service-call](service-call/README.zh-CN.md)：灯光状态 | service + pub/sub |
 | RCP | [rcp-task](rcp-task/README.zh-CN.md)：Sleep DAG 提交、结果与取消 | action |
 | SLAM | [slam](slam/README.zh-CN.md)：状态、里程计、静态变换 | pub/sub |
 
 各分类覆盖上表所列实现，并非每条公开路由都有独立示例。SLAM 读取不切换模式；
 主动建图、保存与定位按[建图流程](../docs/guides/mapping-localization.zh-CN.md)执行。现有辅助示例入口继续保留。
 
-这些入口已有 Python／C++ 源码与 Bazel 目标。适配四足 EDU 的机器人应用版本 **V1.6.0**，SDK 配套为 edu-sdk-2026.9.24；安装步骤见 [客户端开发库](../packages/README.zh-CN.md)及 [Python SDK](../packages/aorta/python/README.zh-CN.md)。SDK 可导入、代码可构建不代表设备接口已就绪；先检查目标固件的路由与类型。
+这些入口已有 Python／C++ 源码与 Bazel 目标。适配四足 EDU 的机器人应用版本 **V1.6.0-15**，SDK 配套为 edu-sdk-2026.10.31；安装步骤见 [客户端开发库](../packages/README.zh-CN.md)及 [Python SDK](../packages/aorta/python/README.zh-CN.md)。SDK 可导入、代码可构建不代表设备接口已就绪；先检查目标固件的路由与类型。
 
 ## Python 运行流程
 

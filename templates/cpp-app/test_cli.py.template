@@ -1,0 +1,43 @@
+"""Native CLI tests with an unusable device configuration; no device session."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import unittest
+
+ROOT = Path(os.environ["TEST_SRCDIR"]) / os.environ["TEST_WORKSPACE"]
+
+
+class CliTests(unittest.TestCase):
+    def run_app(self, *args, config=None, **environment):
+        return subprocess.run([str(ROOT / "main"), "--config", str(config or ROOT / "config.json"), *args],
+                              env=dict(os.environ, ZENOH_SESSION_CONFIG_URI="/nonexistent-config", **environment),
+                              capture_output=True, text=True, timeout=10)
+
+    def test_preview_and_help(self):
+        result = self.run_app()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(json.loads(result.stdout)["execute"])
+        self.assertEqual(self.run_app("--help", config="/nonexistent-config").returncode, 0)
+
+    def test_simulation(self):
+        result = self.run_app("--simulate")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        records = [json.loads(line) for line in result.stdout.splitlines()]
+        self.assertEqual(len(records), 2)
+        self.assertTrue(records[0]["all_streams_receiving"])
+        self.assertFalse(records[1]["all_streams_receiving"])
+        self.assertTrue(all(record["source"] == "synthetic" for record in records))
+
+    def test_invalid_arguments_and_missing_configuration(self):
+        for args in (("--execute", "--simulate"), ("--duration", "nan"), ("--duration", "0"), ("--unknown",)):
+            with self.subTest(args=args):
+                self.assertEqual(self.run_app(*args).returncode, 2)
+        self.assertEqual(self.run_app(config="/nonexistent-config").returncode, 1)
+
+    def test_host_preview_is_rejected(self):
+        self.assertEqual(self.run_app(VBOT_DEV_CONTAINER="0").returncode, 1)
+
+
+if __name__ == "__main__":
+    unittest.main()

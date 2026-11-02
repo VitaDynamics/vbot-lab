@@ -1,0 +1,27 @@
+// PCM playback input on /audio/play_pcm.
+// Publishers stream signed 16-bit mono PCM at 16000 Hz to the robot speaker.
+// The first nonempty frame starts playback; stopping the stream lets the
+// receiver close the session after its silence timeout and drain queued audio.
+// Send samples only: no WAV header or in-band start/end marker is required.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.audio;
+
+table PcmPlayback {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  /// Frame sequence number for ordering.
+  frame_sequence: uint = 0 (id: 1);
+  /// Sample rate in Hz.
+  sample_rate: uint = 0 (id: 2);
+  /// Bit depth (16).
+  bit_depth: uint = 0 (id: 3);
+  /// Playback supports one channel (mono).
+  num_channels: uint = 0 (id: 4);
+  /// Samples per channel in this frame.
+  num_samples: uint = 0 (id: 5);
+  /// Signed 16-bit samples; length must equal num_samples for mono playback.
+  audio_data: [short] (id: 6);
+}
+
+root_type PcmPlayback;

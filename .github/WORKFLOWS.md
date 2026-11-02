@@ -2,45 +2,120 @@
 
 <p align="center">English | <a href="WORKFLOWS.zh-CN.md">中文</a></p>
 
-The current workflow runs repository-content and offline agent-workspace checks on GitHub-hosted runners.
-GitHub Actions checks out the code; the check script itself makes no network requests
-and performs no device operations.
+For PRs and pushes to `main`, `release/**` or `pre_release/**`, the workflow separates repository inspection
+from application execution. `repository-checks` runs read-only content and mocked tool checks
+on a GitHub-hosted runner. `recipe-checks` runs SDK-free previews and simulated application
+flows inside the development container selected by `docker/compose.yaml`.
+`sdk-integration` uses that same pinned container configuration for real SDK integration,
+fresh-venv installation, all Python/C++ Recipe builds, SDK serialization tests and package
+completeness checks. It verifies the assets pinned in `catalog/release.json` before use.
+The job downloads the Release recorded in `catalog/release.json` using its GitHub token.
+Missing authorization, a missing Release or an incomplete attachment inventory fails the job.
+Every downloaded file is checked against its pinned digest before use.
+Each fresh SDK venv explicitly loads the wheel-bundled native library, verifies its origin and
+release ABI, and clear `AORTA_CORE_FFI_LIB`; successful imports alone are not sufficient.
+It also cross-builds the base C++ Recipes for ARM64 and inspects target ELF/dependencies;
+actual ARM64 compile actions are checked for `fastbuild`, `opt` and `dbg`.
+ARM64 programs are not executed on the AMD64 runner/container.
+Checkout, image/SDK retrieval and initial Bazel dependency resolution need network access;
+pip installation then uses only the verified local wheels. This is a no-device integration
+job, not a fully network-disconnected build from scratch. No check contacts robots, creates
+an Aorta Node, or launches model sessions.
 
-It validates bilingual documentation, relative Codex / Claude Code Skill links, capability
-catalog decisions, local environment-tool behavior, and SDK-free Recipe previews and safety guards.
-It does not launch model sessions or open Aorta sessions.
+The existing required `repository-layout` job aggregates all three jobs and fails if any
+fails, is skipped or is cancelled. [checks.json](../catalog/checks.json) is the shared check
+inventory used locally and in CI. See [execution locations](../docs/development/README.md).
 
-Dependency builds and SDK tests are not yet included in this workflow.
+See [SDK checks](../tools/README.md#sdk-integration-without-a-robot) for the same local command.
+Synthetic package tests run in that container job; repository inspection remains host-safe.
+It also builds the Python/C++ health-monitor Blueprint, runs native model/decoder/CLI tests,
+cross-builds the C++ program/tests for ARM64 without execution, and tests independent
+Python/C++ workspace generation, Python packaging and diagnostic workflows. A generated C++
+workspace is built/tested independently with native SDK previews and ARM64 artifact checks.
+A generated Python workspace is also built/tested, packaged with real pinned SDK wheels,
+verified, installed in a fresh venv and exercised through offline preview/simulation.
+Its ARM64 package is verified without executing ARM64 code.
 
-## Before opening a PR
+## Before committing or opening a PR
 
-Run the same offline checks from the repository root:
+From the repository root on the host or CI runner:
 
 ```bash
-python3 tests/check_repository.py
-python3 tests/check_schemas.py
-python3 tests/test_agent_workspace.py
-python3 tests/test_recipes.py
-python3 tests/test_family_recipes.py
-python3 tests/test_offline_build.py
+python3 tools/run_checks.py --scope repository
 ```
 
-Include the results and any relevant build or device checks in the PR, following
+Inside the inspected development container, at the same checkout root:
+
+```bash
+python3 tools/run_checks.py --scope recipes
+```
+
+The host may invoke the second command through the selected container. Do not run Recipe
+tests, Bazel or packaging on the runner/host directly, even when they need no SDK or network.
+If the container is unavailable, report those checks as not run instead of falling back.
+
+Record the results and any relevant build or device checks with the change, following
 [Contributing](../CONTRIBUTING.md). Use the bug-report or documentation template
 when opening an issue; general usage questions belong in [Community & Support](../docs/community/README.md).
 
-## Review and merge
+The [release-configuration checks](../catalog/release.md) compare local component
+pairing and test mismatch handling. They do not download attachments or publish a Release.
 
-1. Make changes on a topic branch and open a PR targeting `main`.
+## Iteration updates
+
+Use the `pre_release/V<major>.<minor>.<patch>.X` branch for the selected version family.
+Maintainers may commit and push directly after running the applicable checks;
+iteration updates do not require a PR. Topic PRs are optional when review is wanted.
+Retain protection against force pushes and deletion. CI runs on iteration-branch pushes,
+but does not require opening a PR or obtaining a pre-push CI result for each new commit.
+
+## Formal release review and merge
+
+1. Open a PR to `main` only when formal release is explicitly requested.
 2. Obtain approval from another maintainer listed in [CODEOWNERS](CODEOWNERS).
    New reviewable commits dismiss earlier approvals; someone other than the latest
    pusher must approve the latest changes.
 3. Resolve review discussions and ensure the GitHub Actions check `repository-layout`
-   passes against the current `main`. Update the topic branch if the base advances.
-4. Use **Squash and merge**. Direct pushes, force pushes and deletion of `main` are blocked.
-   Administrators have no protection bypass configured.
+   passes against the current target branch. Update the topic branch if the base advances.
+4. Use **Squash and merge**. Protect `main` against direct pushes, force pushes and
+   deletion, with no administrator bypass.
+5. From the merged `main` commit, create the approved `release/V<major>.<minor>.<patch>`
+   branch and `Rel/V<major>.<minor>.<patch>` tag. At promotion, all three must resolve to
+   that same commit. Do not create the permanent release branch from the pre-squash
+   topic head or move an existing tag to make the references match.
 
-Tags matching `V*` and `edu-sdk-*` can be created but cannot be moved or deleted.
+## Version iterations and formal promotion
+
+| Reference | Role |
+| --- | --- |
+| `main` | Latest formal release; do not merge work-in-progress version updates |
+| `release/V1.6.0` | Development entry for the final `V1.6.0` family release, targeting robot application `V1.6.0-15` |
+| `Rel/V1.6.0` | Immutable formal source snapshot; not the default development checkout |
+| `pre_release/V1.6.0.X` | Completed iteration history for the `V1.6.0` family, not its development entry; the final `X` stays literal |
+| `V1.6.0.15` | Preserved iteration snapshot for robot application `V1.6.0-15` |
+| `edu-sdk-*` | SDK attachment Release tags; independent of source tags and robot application versions |
+
+The `V1.6.0` branch is not shared by all future versions. A new family such as
+`V1.6.1` uses its own `pre_release/V1.6.1.X` branch.
+
+1. Create a new family branch from a known baseline; keep existing iteration content
+   when adopting this workflow. Subsequent changes may be committed directly to that
+   family branch, without a required PR.
+2. Update [release configuration](../catalog/release.md), component pairing and both
+   languages. Run the offline checks and applicable SDK/build/device checks before
+   recording the checked iteration commit under a new source tag.
+3. An iteration tag is not a formal release approval. Continue changes on the selected
+   iteration branch; do not open a promotion PR during ordinary iteration work.
+4. Only when formal release is explicitly requested, select the exact checked snapshot,
+   complete the release configuration, and open a promotion PR to `main`. Do not merge unrelated
+   changes or move the existing iteration tag. Record any newly required changes under
+   a new tag instead.
+5. After release approval and maintainer review, update VBOT Lab's `main` through its
+   PR process, then create the formal branch and tag from the merged commit as above.
+   Publish source Release notes and SDK attachments only when requested.
+   This workflow does not publish releases automatically. Never reset or force-push `main`.
+
+Version tags `V*`, `Rel/V*` and `edu-sdk-*` identify immutable snapshots; do not move or delete them.
 Publish corrections under a new tag; do not retarget an existing version.
 Creating a source tag does not create a GitHub Release: this workflow has no tag or
 Release-publishing trigger. SDK download assets remain separate from source tags.

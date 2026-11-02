@@ -1,0 +1,29 @@
+py_library(
+    name = "application",
+    srcs = glob(["health_monitor/*.py"]),
+    imports = ["."],
+    data = ["config.json"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "main",
+    srcs = ["health_monitor/main.py"],
+    main = "health_monitor/main.py",
+    deps = [":application"],
+    python_version = "PY3",
+)
+
+py_test(
+    name = "model_test",
+    srcs = ["test_model.py"],
+    main = "test_model.py",
+    deps = [":application"],
+    python_version = "PY3",
+)
+
+filegroup(
+    name = "repository_files",
+    srcs = glob(["*.md", "*.py", "*.json", "health_monitor/*.py"]) + ["BUILD.bazel"],
+    visibility = ["//visibility:public"],
+)

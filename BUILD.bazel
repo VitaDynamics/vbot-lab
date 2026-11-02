@@ -13,6 +13,7 @@ filegroup(
         "catalog/**/*.json",
         "schemas/**",
         "tools/*.py",
+        "templates/**",
         "docker/**",
         "*.bazel",
         "*.bazel.lock",
@@ -26,5 +27,7 @@ filegroup(
         "//recipes:repository_files",
         "//packages/aorta/cpp:repository_files",
         "//tests:repository_files",
+        "//toolchains:repository_files",
+        "//blueprints/health-monitor:repository_files",
     ],
 )

@@ -7,20 +7,23 @@
 当前自动检查的范围见 [CI 与仓库协作说明](.github/WORKFLOWS.zh-CN.md)。
 参与协作请遵循[行为准则](CODE_OF_CONDUCT.zh-CN.md)。
 
-使用问题、应用讨论与新能力建议，优先按[社区与支持](docs/community/README.zh-CN.md)到论坛交流。
+使用问题、应用讨论与新能力建议，优先在论坛搜索已有解答；未解决时，
+按[社区与支持](docs/community/README.zh-CN.md)在相关帖子中补充信息或新建讨论。
 明确的仓库代码或文档修改使用 Issue／PR；已有相关论坛讨论时，附上链接即可。
+技术支持也可联系 [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn)。
 
 - Python／C++ Recipes 与参考应用统一使用 Bazel；SDK API、Schema、代码、文档和 Skill 应保持一致。
+- 纯仓库检查可在宿主机或 CI runner 执行；Bazel 构建／测试、Recipe 预览、SDK 执行检查、依赖准备和打包必须在配套开发容器内进行，CI 同样遵守。参阅[执行位置](docs/development/README.zh-CN.md)；离线操作不等于适合在宿主机运行，不在机器人上构建、打包或执行开发预览。
 - Aorta SDK 接入放在 `packages/aorta/python/` 与 `packages/aorta/cpp/`，单项任务参考程序放在 `recipes/`，完整参考应用放在 `blueprints/`。如实说明可用状态，不将提纲或规划中的 Blueprint 展示为可运行程序。
 - Skills 仅在 `skills/` 维护一份，通过 `.agents/skills/` 与 `.claude/skills/` 软链接暴露。`CLAUDE.md` 仅薄层导入共享 `AGENTS.md`，不维护分叉的 harness 指令。发现入口使用英文 `SKILL.md`，`.zh-CN.md` 为配对译文。
 - `AGENTS.md` 保持简短并面向任务。能力范围与引用记录在 `catalog/`，结构事实保留在 Schema，行为通过接口文档解释。索引修改用离线工具测试校验，未知版本与路由不能变成隐含支持。
-- 每份文档均维护英文和简体中文。默认文件名对应英文，中文使用 `.zh-CN.md` 后缀；在同一 PR 中同步更新，并保留语言切换和同语言文档链接。
+- 每份文档均维护英文和简体中文。默认文件名对应英文，中文使用 `.zh-CN.md` 后缀；在同一项修改中同步更新，并保留语言切换和同语言文档链接。
 - 使用指南应提供完整、正确的功能流程：前置条件、命令、响应、完成条件及恢复方法。测试报告与使用说明分开。
 - 遵循[设备类型文档结构](docs/robots/README.zh-CN.md)：复用通用章节与硬件规格，隔离机型差异，同步发布范围和兼容矩阵，不把尚未发布的类型写成已支持。
 - 保留 `foot_quadruped` 与 `wheel_quadruped` 现有的共用有线连接和传感器规格，不重复维护，也不应用到 `foot_humanoid`。其他类型单独发布并记录之前，当前 EDU 范围仍为 `foot_quadruped`。
 - Schema 修改应包含构建所需依赖，并保持生成的 Python 绑定一致。
 - 提供复现步骤及相关测试结果；分享问题报告时遵循[安全说明](SECURITY.zh-CN.md)。
-- 运行 `python3 tests/check_repository.py`、`python3 tests/test_agent_workspace.py` 及相关 Bazel 检查；区分离线测试与实际 harness 会话、设备运行行为。
+- 宿主机或 CI runner 运行 `python3 tools/run_checks.py --scope repository`；开发容器内运行 `python3 tools/run_checks.py --scope recipes` 及相关 Bazel 检查。区分离线测试与实际 harness 会话、设备运行行为。
 - 设备测试必须区分只读检查和控制操作；不得在普通 CI 中自动操控机器人。
 - 新增或修改的在线示例发布前，必须使用文档规定的账户、SDK 配套版本、环境配置与部署步骤，在支持的机器人上验证每种公开语言实现和文档中的执行分支。仅编译、预览或离线测试不能满足发布条件。验证证据保留在评审记录中，不放入公开使用指南；未验证或仍有问题的分支不得作为可运行示例发布。
 
@@ -30,8 +33,13 @@
 [CODEOWNERS](.github/CODEOWNERS) 列出所有仓库路径的评审负责人；管理员成员变化时同步更新。
 评审分配不会授予仓库权限，也不替代已配置的合并要求。
 
-请创建工作分支并向 `main` 提交 PR，不要直接推送 `main`。
-合并前需要另一位列出的维护者批准、基于当前目标分支的 `repository-layout` 检查通过，
+VBOT Lab 每个版本族使用各自的 `pre_release/V<major>.<minor>.<patch>.X` 分支。
+维护者完成检查后，可以直接向对应迭代分支提交和推送，不要求 PR；
+需要评审时，也可使用以迭代分支为目标的工作分支 PR。
+V1.6.0 应用开发使用 `release/V1.6.0`，`Rel/V1.6.0` 标记正式快照。
+`main` 保留最新正式版本；只有明确要求正式发布时，才创建正式发布提升 PR，
+日常迭代期间不提前创建。不要直接推送 `main`，也不要暗示支持尚未发布的能力。
+向 `main` 合并 PR 前，需要另一位列出的维护者批准、基于当前目标分支的 `repository-layout` 检查通过，
 并解决评审讨论。推送新的待评审提交后需要重新批准。
 维护者使用 **Squash and merge** 合并；管理员同样遵守保护规则。
 检查范围与版本 tag 规则见[协作流程](.github/WORKFLOWS.zh-CN.md)。

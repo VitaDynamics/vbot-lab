@@ -1,0 +1,7 @@
+common --enable_bzlmod
+test --test_output=errors
+test --test_env=VBOT_DEV_CONTAINER
+
+# Native builds run in the development container; only cross-build ARM64 targets.
+build:arm64 --platforms=//toolchains:linux_arm64
+build:arm64 --incompatible_enable_cc_toolchain_resolution

@@ -12,7 +12,7 @@ Aorta 是原生通信层。系统启动 `aorta_ros2_bridge`，兼容部分此前
 
 ## 1. 确认操作终端
 
-按[有线连接指南](../robots/quadruped-common/connection.zh-CN.md)登录后，
+按[有线／Wi-Fi 连接指南](../robots/quadruped-common/connection.zh-CN.md)登录后，
 在机器人的 SSH 终端执行以下命令，不是在工作站或开发容器中执行：
 
 ```bash

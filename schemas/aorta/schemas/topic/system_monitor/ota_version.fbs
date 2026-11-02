@@ -1,0 +1,15 @@
+// System Monitor OTA Version Topic
+//
+// `/ota_version` is a read-only committed application OTA version string.
+// The legacy ROS2 representation is std_msgs/String.data.
+
+include "schemas/system/aorta_base.fbs";
+
+namespace aorta.topic.system_monitor;
+
+table OtaVersion {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  version: string (id: 1);
+}
+
+root_type OtaVersion;
