@@ -4,12 +4,10 @@
 
 ## 机器人应用版本
 
-本仓库设备指南、接口与 Recipes 统一适配 **V1.6.0-12** 应用版本，适用设备为 `foot_quadruped` EDU。
+本仓库设备指南、接口与 Recipes 统一适配 **V1.6.0-15** 应用版本，适用设备为 `foot_quadruped` EDU。
 这是应用适配版本，不代表最低版本范围，也不保证更早或后续版本兼容。
-SDK、Schema、开发镜像、系统镜像及外设固件仍保留各自的版本号，配套要求见下文。
-
-[发布配置](../catalog/release.zh-CN.md)通过 [release.json](../catalog/release.json)
-记录组件组合，尚未填写的字段保留为空。本地配套一致不等于已发布版本或已确定设备兼容性。
+版本配套与制品校验值统一记录在 [release.json](../catalog/release.json)，
+按[发布配置指南](../catalog/release.zh-CN.md)检查配套。
 
 ## SDK 下载与版本选择
 
@@ -46,33 +44,28 @@ SDK 从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases) 中
 [Aorta／ROS 2 可用接口映射](interfaces/aorta-ros2.zh-CN.md)。
 设备 CLI 可用性与工作站 SDK 安装是不同的前置条件。
 
-应用版本 `V1.6.0-12` 的接口参考包含开放 topic 集、原生系统状态、静态 TF、控制 topic 与 RCP action，
+应用版本 `V1.6.0-15` 的接口参考包含开放 topic 集、原生系统状态、静态 TF、控制 topic 与 RCP action，
 以及[感知输出](interfaces/perception.zh-CN.md)和[音频／语音输入](interfaces/audio.zh-CN.md)。
 请在选定设备上检查确切路由、消息类型及下文列出的配置限制。
 
 | 项目 | 当前可用状态 | 兼容性检查 |
 | --- | --- | --- |
-| 仓库源码 | 源码 tag `V1.6.0.12` | 克隆仓库后，按[快速开始](getting-started/README.zh-CN.md)切换到此 tag；源码引用与 SDK Release 制品分别管理版本 |
+| 仓库源码 | 源码 tag `V1.6.0.15` | 克隆仓库后，按[快速开始](getting-started/README.zh-CN.md)切换到此 tag；源码引用与 SDK Release 制品分别管理版本 |
 | 开发镜像 | Compose 与发布配置已固定 dev-v0.0.1 的 digest；运行于 linux/amd64，包含 ARM64 GCC／G++ 交叉编译器 | 设备 C++ 程序使用 ARM64 SDK 与 `bazel build --config=arm64`；默认构建／预览／测试为原生目标；可直接暂存 ARM64 Python wheel |
 | Bazel | 7.6.1 骨架基线 | 与 SDK 和镜像联调 |
-| [Aorta Python SDK](../packages/aorta/python/README.zh-CN.md) | 通过 vbot-lab Release 附件分发（首版 `edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 固定公开版本与制品 |
-| Python / ABI | 需要 Python 3.10 或更高版本；SDK wheel 提供 macOS arm64、Linux x86_64 与 Linux aarch64 版本。从 `edu-sdk-2026.10.14` 下载全部四个必需 wheel，包括 `flatbuffers`。`linux_*` wheel 是 Ubuntu/glibc 构建 | 分别检查工作站与设备的架构、原生依赖；配套 wheel 下载完成后可离线安装；可选采集／解码依赖另行准备 |
-| 工作站原生运行库 | 通过 vbot-lab Release 附件分发（首版 `edu-sdk-*`），提供 x86_64 与 aarch64 的 Ubuntu 22.04 压缩包；版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 匹配架构、系统与 SDK；已验证的包需要 glibc 2.34 或更高版本 |
+| [Aorta Python SDK](../packages/aorta/python/README.zh-CN.md) | 通过 SDK Release 附件分发（`edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 固定版本与制品 |
+| Python / ABI | 需要 Python 3.10 或更高版本；SDK wheel 提供 macOS arm64、Linux x86_64 与 Linux aarch64 版本。从发布配置记录的 SDK Release 下载全部四个必需 wheel，包括 `flatbuffers`。`linux_*` wheel 是 Ubuntu/glibc 构建 | 分别检查工作站与设备的架构、原生依赖；配套 wheel 下载完成后可离线安装；可选采集／解码依赖另行准备 |
+| 工作站原生运行库 | 通过 SDK Release 附件分发（`edu-sdk-*`），提供 x86_64 与 aarch64 的 Ubuntu 22.04 压缩包；版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 匹配架构、系统与 SDK；已验证的包需要 glibc 2.34 或更高版本 |
 | 离机路由器 | 不随 Release 分发。请从[官方 Release 页面](https://github.com/eclipse-zenoh/zenoh/releases)安装 Eclipse zenoh `zenohd` 1.10.x（SDK 所基于的 zenoh minor），已验证版本为 1.10.1 | 路由器 minor 与 SDK 保持一致；机器人镜像自带路由器 |
-| 设备 Aorta／ROS 2 工具 | 已整理应用版本 `V1.6.0-12` 的配置和部分可用 bridge 路由 | 分别检查公开文件、shell 变量、类型、发现与实际收数 |
-| [Interface Definitions — 开放 Aorta Schema](../schemas/README.zh-CN.md) | 通过 vbot-lab Release 附件分发（首版 `edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 匹配 SDK 版本、依赖及生成的绑定 |
+| 设备 Aorta／ROS 2 工具 | 已整理应用版本 `V1.6.0-15` 的配置和部分可用 bridge 路由 | 分别检查公开文件、shell 变量、类型、发现与实际收数 |
+| [Interface Definitions — 开放 Aorta Schema](../schemas/README.zh-CN.md) | 通过 SDK Release 附件分发（`edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 匹配 SDK 版本、依赖及生成的绑定 |
 | [Recipes](../recipes/README.zh-CN.md) | 按能力组织的 Python 与 C++ 示例，包含 Bazel 目标与离线测试 | 验证 Python 依赖、Bazel 目标、文档列明的接口及预期结果 |
 | [VBOT Blueprints](../blueprints/README.zh-CN.md) | 已提供 Python 与 C++ 只读健康监测应用，支持生成独立项目和打包 | 按所选语言指南确认 SDK 配套、配置、部署和停止方式；合成数据测试不代表设备数据可用 |
-| [Agent HTTP MCP](interfaces/agent/http-mcp.zh-CN.md) | 已整理应用版本 `V1.6.0-12` 的契约 | 检查运行时可用性与 Agent 到工具调用；本仓不包含服务可执行代码 |
-| [设备端 Skills／AGENTS.md API](interfaces/agent/content-api.zh-CN.md) | 已整理应用版本 `V1.6.0-12` 的编写规范与 HTTP 内容契约 | 检查路由可用性及用户内容路径；写入前备份、写入后比较读回，并在新 Turn 使用内容 |
+| [Agent HTTP MCP](interfaces/agent/http-mcp.zh-CN.md) | 已整理应用版本 `V1.6.0-15` 的契约 | 检查运行时可用性与 Agent 到工具调用；本仓不包含服务可执行代码 |
+| [设备端 Skills／AGENTS.md API](interfaces/agent/content-api.zh-CN.md) | 已整理应用版本 `V1.6.0-15` 的编写规范与 HTTP 内容契约 | 检查路由可用性及用户内容路径；写入前备份、写入后比较读回，并在新 Turn 使用内容 |
 | [Coding Agent Skills](../skills/README.zh-CN.md) | `vbot-dev-setup`、`vbot-app-dev` 与 `vbot-diagnose` 分别覆盖环境配置、应用开发和限定范围排障；共享 Codex／Claude Code 发现链接 | 在使用的 harness 中确认发现与调用 |
 | [能力索引](../catalog/README.zh-CN.md) | 本地 JSON 查询与校验 | 格式版本、引用及发布范围检查，不是在线设备发现 |
-| 机器人应用 | `V1.6.0-12` | 确认已安装应用版本及所需接口；组件版本分别核对 |
-
-应用 `V1.6.0-12` 配套设备端 Aorta `2026.10.16`、ROS 2 bridge `2026.10.12` 和
-`vbot-agent-harness` `v3.0.5`。应用开发依赖 SDK `2026.10.12`／ABI 13、
-EDU Schema `2026.10.13-v4` 与 Release `edu-sdk-2026.10.14`。
-设备组件和客户端 SDK 的版本号不要求相同；按上述组合使用，不要为匹配 CLI 版本字符串而更改 SDK 依赖。
+| 机器人应用 | `V1.6.0-15` | 确认已安装应用版本及所需接口；组件版本分别核对 |
 
 ## 设备配置与 schema pack 行
 
@@ -80,9 +73,11 @@ EDU schema pack 用稳定的行号标识公开路由；随包分发的 `manifest
 在 `map_rows` 中列出这些行。机器人镜像决定其访问控制允许哪些行，因此请按应用使用的行
 核对镜像。
 
-应用 `V1.6.0-12` 的公开接口包含已启用的 `/audio/play_pcm`（行 57，pub/sub 输入）
-和 `/speech_control`（行 58，service）bridge 路由。
-配套 pack 有 58 个编号公开行；`schemas/ros2/routes.json` 有 72 条映射，因为别名与派生
+应用 `V1.6.0-15` 的公开接口包含已启用的 `/audio/play_pcm`（行 57，pub/sub 输入）
+和 `/speech_control`（行 58，service）bridge 路由，以及 `/locomotion/control_enable`（行 59，service）、
+`/ota_version`（行 60，pub/sub 输出）、`/system/power_saving/enable`（行 61，service）
+和 `/function/following`（行 62，service）。
+配套 pack 有 62 个编号公开行；`schemas/ros2/routes.json` 有 76 条映射，因为别名与派生
 ROS 输出可能形成多条记录。更早的通信配置可能采用不同子集，其排除项不是当前版本的接口清单。
 使用前按已安装应用与路由发现结果核对[接口参考](interfaces/aorta-ros2.zh-CN.md)。
 
@@ -97,8 +92,19 @@ Schema 存在不等于提供方或发布者正在运行。请在选定设备上�
 
 ### 设备端版本查询
 
-以下命令查询系统镜像或单个组件，并非应用适配版本 `V1.6.0-12`。
-请将其与机器人的应用版本信息分别记录。
+完成[设备 shell 配置](getting-started/device-environment.zh-CN.md)后，通过公开的只读话题
+读取已安装的应用版本：
+
+```bash
+timeout 15s aorta topic echo /ota_version --count 1
+```
+
+将收到的 `version` 字段与 `V1.6.0-15` 核对。字符串可能带 `~` 构建后缀；
+比较后缀之前的应用标识，反馈问题时保留完整版本字符串。
+发现话题或显示等待订阅的提示不代表已收到版本。没有收到样本时，已安装版本应保持未确认，
+不要根据 SDK、源码 checkout 或 CLI 版本推断。
+
+以下命令查询系统镜像或单个组件，并非应用版本；请分别记录。
 
 | 命令 | 结果 |
 | --- | --- |
@@ -108,7 +114,7 @@ Schema 存在不等于提供方或发布者正在运行。请在选定设备上�
 
 ## C++ 示例配套
 
-[C++ SDK 指南](../packages/aorta/cpp/README.zh-CN.md)固定使用 SDK 2026.10.12／ABI 13 与 EDU Schema 2026.10.13-v4，
+按 [C++ SDK 指南](../packages/aorta/cpp/README.zh-CN.md)使用发布配置记录的 SDK／Schema 配套，
 支持 Ubuntu 22.04 x86_64／aarch64 制品和 C++17。镜像包含 ARM64 GCC／G++ 11 交叉编译器。
 设备程序使用 ARM64 SDK 与 `bazel build --config=arm64`；默认 Bazel 构建与本地测试使用原生 SDK／编译器。
 交叉编译产物在机器人上运行，不在 AMD64 容器内执行。

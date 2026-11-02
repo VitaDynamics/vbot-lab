@@ -37,7 +37,7 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_unknown_versions_are_not_wildcards(self):
         self.assertEqual(self.catalog["sdk"]["integration"], "integrated")
-        self.assertEqual(self.catalog["sdk"]["version"], "2026.10.12")
+        self.assertEqual(self.catalog["sdk"]["version"], "2026.10.20")
         self.assertEqual(self.catalog["sdk"]["python_import"], "aorta")
         for robot in self.robots.values():
             self.assertEqual(robot["models"], [])
@@ -45,9 +45,9 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_application_target_is_separate_from_sdk_and_release_scope(self):
         result = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")
-        self.assertEqual(result["robot"]["application_version"], "V1.6.0-12")
-        self.assertEqual(result["sdk"]["version"], "2026.10.12")
-        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.14")
+        self.assertEqual(result["robot"]["application_version"], "V1.6.0-15")
+        self.assertEqual(result["sdk"]["version"], "2026.10.20")
+        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.31")
         self.assertIsNone(result["robot"]["minimum_firmware"])
         self.assertEqual(result["capabilities"][0]["decision"], "requires_device_verification")
         self.assertFalse(result["device_contacted"])

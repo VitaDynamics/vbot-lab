@@ -5,7 +5,7 @@
 为 VBOT EDU 机器人应用提供软件开发库。
 
 可选择 [Aorta Python SDK](aorta/python/README.zh-CN.md) 或 [Aorta C++ SDK](aorta/cpp/README.zh-CN.md)。
-软件包、原生运行库与可安装制品通过 vbot-lab Release 附件分发（首版 `edu-sdk-*`）。
+软件包、原生运行库与可安装制品通过 SDK Release 附件分发（`edu-sdk-*`）。
 Release 提供 C++ SDK；暂不提供 Rust。
 保留 Aorta 实际包名、导入路径和 API 契约。
 

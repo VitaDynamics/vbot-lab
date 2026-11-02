@@ -4,8 +4,8 @@
 
 A standalone Bazel workspace based on the read-only health monitor. Keep application changes
 here rather than editing your VBOT Lab reference checkout. Requires Python 3.10+, Bazel 7.6.1
-and the VBOT development container. The supported robot application is V1.6.0-12 (foot_quadruped);
-SDK Release edu-sdk-2026.10.14 supplies the pinned requirements.
+and the VBOT development container. The supported robot application is V1.6.0-15 (foot_quadruped);
+SDK Release edu-sdk-2026.10.31 supplies the pinned requirements.
 
 ## Build and test — development container
 
@@ -44,7 +44,7 @@ The example assumes /workspace/vbot-lab and an application under /workspace/my-a
 
 ```bash
 python3 /workspace/vbot-lab/tools/package_app.py --project /workspace/my-app \
-  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.10.14 \
+  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.10.31 \
   --output /workspace/my-app-package &&
 python3 /workspace/vbot-lab/tools/package_app.py --verify /workspace/my-app-package
 ```

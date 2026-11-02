@@ -3,9 +3,17 @@
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 Building with VBOT EDU robots, stuck on a problem, or exploring a new idea?
-Join [Vbot 超能社区](https://forum.vbot.cn/) to ask questions, share applications,
-and suggest improvements. A reproducible question helps others investigate and leaves
-a useful answer for the next developer.
+Search the forum first at [Vbot 超能社区](https://forum.vbot.cn/) for the feature name
+or error. Add useful details to a relevant existing topic, or open one focused question
+if you do not find an answer. You can also share applications and suggest improvements.
+A reproducible question helps others investigate and leaves a useful answer for the next developer.
+
+Technical support is also available from the VBOT EDU team at
+[vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn). The mailbox covers device setup and
+connectivity, development environments, SDK/API integration and application troubleshooting.
+When emailing support, we recommend including the device serial number (SN) to help
+identify the device and investigate the issue; do not post the SN in public forum topics or GitHub issues.
+Include the relevant versions, reproduction steps and sanitized details described below.
 
 ## Choose where to post
 
@@ -15,10 +23,9 @@ a useful answer for the next developer.
 | SDK integration, robot applications, skills or Agent development discussions | [技能开发与 AI Agent · Skills & AI Agent](https://forum.vbot.cn/c/skills-agent/8) |
 | A new capability or a product/workflow improvement | [灵感与建议 · Ideas & Suggestions](https://forum.vbot.cn/c/ideas/7) |
 | A specific bug in this repository's code/examples or an incorrect document | [GitHub Issues](https://github.com/VitaDynamics/vbot-lab/issues), or a fix following [Contributing](../../CONTRIBUTING.md) |
+| Technical support by email | [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn) |
 | A suspected security vulnerability | Privately email [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn); follow [Security](../../SECURITY.md), not a public post |
 
-For general usage questions, start in the community. Search for the feature name or
-error first; add useful details to a relevant existing topic, or open one focused topic.
 Use the category names shown on the forum. If a discussion identifies a repository bug,
 link the forum topic from the issue rather than submitting the same report twice.
 
@@ -50,7 +57,7 @@ and desired behavior; a guessed API design is not required.
 
 ## Share safely
 
-- Remove passwords, tokens, private keys, account details, device serial numbers and
+- For public posts, remove passwords, tokens, private keys, account details, device serial numbers (SN) and
   unrelated personal information. Do not upload EDU session configuration or credential dictionaries.
 - Share short, reviewed excerpts instead of full logs, environment dumps or configuration bundles.
   Review screenshots for account details and other people's information.

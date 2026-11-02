@@ -9,7 +9,7 @@
 VBOT Lab 汇集面向任务的 Skills、能力索引、Aorta Python SDK、接口定义和参考程序，
 用于开发机器人应用。
 
-当前适配的机器人应用版本：**V1.6.0-12**，适用于 `foot_quadruped` EDU。
+当前适配的机器人应用版本：**V1.6.0-15**，适用于 `foot_quadruped` EDU。
 SDK 与平台配套见[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 ## 与 Agent 开始开发
@@ -76,10 +76,17 @@ HTTP MCP、Skill／AGENTS.md 注入能力分开。
 
 ## 社区与支持
 
-开发中遇到问题，或有希望支持的新能力？欢迎到 [Vbot 超能社区](https://forum.vbot.cn/)
-提问、交流开发经验和分享成果。[社区与支持](docs/community/README.zh-CN.md)
+开发中遇到问题，建议优先在论坛搜索已有解答；未解决时，到
+[Vbot 超能社区](https://forum.vbot.cn/)的相关帖子补充信息或新建问题帖。
+也欢迎交流开发经验、分享成果和提出新能力建议。[社区与支持](docs/community/README.zh-CN.md)
 提供对应板块及简短反馈模板。附上复现步骤与必要的脱敏信息，便于大家一起定位，
 也能帮助后来者找到答案。
+
+设备配置、SDK 接入或应用开发相关的技术支持，也可联系
+[vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn)。邮件反馈时建议附上设备序列号（SN），
+便于识别设备并定位问题；请勿在公开论坛或 GitHub Issue 中发布 SN。
+安全问题也通过同一邮箱私下反馈，
+具体要求见[安全说明](SECURITY.zh-CN.md)。
 
 ## 贡献与验证
 

@@ -1,0 +1,52 @@
+// ControlFollowing — vln follow/navigation mode control service
+//
+// Aorta `/function/following`; legacy ROS2 function_msgs/srv/ControlFollowing.
+// A successful reply acknowledges a request, not arrival.
+// Legacy ROS2 lacks request `source`, `waypoints` and response `warning`.
+//
+// ROS2 ↔ Aorta mapping notes:
+//   - `uint32 mode` maps to shared `aorta.follow.common.FollowMode`.
+//   - `uint32 target_state` is narrowed to ubyte (wire values are 0/1).
+//   - `bool success` maps to `status: ServiceStatus` (SUCCESS iff success);
+//     `error_code` numeric domain is preserved.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+include "schemas/shared/follow_common/follow_common.fbs";
+
+namespace aorta.services.vln;
+
+enum ControlSource: ubyte {
+  UNKNOWN = 0,
+  RCP = 1,
+  FSM = 2,
+  BASE_ACTION = 3,
+  ODOM_QR = 4,
+}
+
+table ControlFollowingRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  target_state: ubyte = 0 (id: 1);      // 0=OFF 1=ON
+  mode: aorta.follow.common.FollowMode = STOP (id: 2);
+  req_id: string (id: 3);               // request trace id (srv field carried over)
+  pre_check: bool = false (id: 4);      // prepare/check phase only
+  x: float (id: 5);                     // NAV_TO_POINT only
+  y: float (id: 6);                     // NAV_TO_POINT only
+  yaw: float (id: 7);                   // target yaw (rad) at destination; NAV_TO_POINT only
+  goal_frame: string (id: 8);           // "global" if x/y are world-frame; default "local"
+  stop_distance: float (id: 9);         // arrival threshold override (0.0 = config default)
+  max_xvel: float (id: 10);             // NAV_TO_POINT max forward velocity override (<=0 = default)
+  prompt: string (id: 11);              // SYNC/ASYNC_SEMANTIC_NAV/CIVIC_NAV instruction
+  source: ControlSource = UNKNOWN (id: 12);
+  waypoints: string (id: 13);           // CIVIC_NAV path hint: "x1,y1,...,x40,y40" in base_link
+}
+
+table ControlFollowingResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: int (id: 3);
+  warning: string (id: 4);              // concurrent-owner conflict note (request still honored)
+}
+
+root_type ControlFollowingRequest;

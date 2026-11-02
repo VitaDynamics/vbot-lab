@@ -100,7 +100,9 @@ def wheel_info(path, name, version, target, versions):
         licenses = sorted(item.filename for item in entries if item.filename.startswith(prefix)
                           and not item.is_dir() and any(word in item.filename.lower()
                                                       for word in ("license", "notice", "copying")))
-        if not licenses:
+        # Upstream FlatBuffers wheels carry no license file; its text is the pinned
+        # flatbuffers-<ver>.LICENSE Release asset, which every package bundles.
+        if not licenses and name != "flatbuffers":
             raise ValueError(f"wheel has no bundled license material: {path.name}")
         return {"name": normalized(name), "version": version, "tags": tags,
                 "requires_dist": dependencies, "license_files_in_wheel": licenses}

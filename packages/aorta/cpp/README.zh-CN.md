@@ -8,8 +8,8 @@
 每个 Bash 命令块应作为一条命令链执行。`&&` 会在失败后跳过本段后续命令，
 并保留下一步所需的 shell 变量。处理错误后，再执行下一个命令块。
 
-使用 [edu-sdk-2026.10.14 版本](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14)：
-C++ SDK `2026.10.12`、ABI `13`，配套 EDU Schema pack `2026.10.13-v4`。
+使用 [edu-sdk-2026.10.31 版本](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31)：
+C++ SDK `2026.10.20`、ABI `13`，配套 EDU Schema pack `2026.10.20-v4`。
 示例使用 C++17、Bazel 7.6.1 与发布包中的生成头文件，不依赖 Python wheel，也无需本地生成 Schema。
 
 ## 准备发布制品
@@ -37,17 +37,17 @@ bazel --version
 不在 AMD64 容器内执行 ARM64 程序／测试，无需另建容器或在机器人上编译。
 
 将对应 SDK 压缩包、EDU Schema 压缩包及 `SHA256SUMS` 下载至
-`artifacts/edu-sdk-2026.10.14/`。Linux x86_64 上从仓库根目录执行：
+`artifacts/edu-sdk-2026.10.31/`。Linux x86_64 上从仓库根目录执行：
 
 ```bash
-cd artifacts/edu-sdk-2026.10.14 &&
+cd artifacts/edu-sdk-2026.10.31 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-x86_64 edu-schema &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
-tar --zstd -xf aorta-edu-schema-pack-2026.10.13-v4.tar.zst -C edu-schema &&
+tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
+tar --zstd -xf aorta-edu-schema-pack-2026.10.20-v4.tar.zst -C edu-schema &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.14/cpp-sdk-x86_64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema"
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-x86_64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema"
 ```
 
 确认所选两个压缩包的校验均通过；校验命令会跳过未下载制品。使用新的解压目录；
@@ -59,7 +59,7 @@ export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema"
 也可通过 Bazel 参数 `--repo_env=AORTA_CPP_SDK_DIR=...` 和
 `--repo_env=AORTA_EDU_SCHEMA_DIR=...` 指定路径。
 保留发布包自带的 FlatBuffers 头文件：C++ 生成代码要求精确版本，
-本配套为 `25.9.23`；Python 包的版本不能代替 C++ 头文件版本。
+本配套为 `25.12.19`；Python 包的版本不能代替 C++ 头文件版本。
 
 ## 构建与预览
 
@@ -135,13 +135,13 @@ bazel run //recipes/camera:main_cpp_decode -- --decode --consent
 并为设备构建选择它：
 
 ```bash
-cd artifacts/edu-sdk-2026.10.14 &&
+cd artifacts/edu-sdk-2026.10.31 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-aarch64 &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
+tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.14/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
 bazel build --config=arm64 //recipes/subscribe-state:main_cpp &&
 file bazel-bin/recipes/subscribe-state/main_cpp &&
 aarch64-linux-gnu-readelf -d bazel-bin/recipes/subscribe-state/main_cpp

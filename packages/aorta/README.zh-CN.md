@@ -3,7 +3,7 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 Aorta 提供 VBOT Lab [客户端开发库](../README.zh-CN.md)中的通信 SDK。
-可选择 [Aorta Python SDK](python/README.zh-CN.md) 或 [Aorta C++ SDK](cpp/README.zh-CN.md)，可安装制品通过 vbot-lab Release
+可选择 [Aorta Python SDK](python/README.zh-CN.md) 或 [Aorta C++ SDK](cpp/README.zh-CN.md)，可安装制品通过 SDK Release
 附件分发（首版 `edu-sdk-*`）。
 
 使用时需配套匹配版本的 [Interface Definitions（接口定义）](../../schemas/README.zh-CN.md)。
@@ -13,7 +13,7 @@ SDK 的包名、导入路径及 API 契约仍沿用 Aorta。
 
 ## 安装
 
-从 [vbot-lab Releases](https://github.com/VitaDynamics/vbot-lab/releases) 下载附件，
+从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases) 下载附件，
 并用同一 Release 中的 `SHA256SUMS` 校验。同一 Release 内的 `EDU_SDK_MANIFEST.json`
 记录了版本配对及每个附件的 SHA-256 摘要。
 
@@ -23,8 +23,8 @@ SDK 的包名、导入路径及 API 契约仍沿用 Aorta。
 `linux_aarch64`、`linux_x86_64` 或 `macosx_11_0_arm64`——以及 `aorta_msgs`、
 `vbot_edu_msgs`。SDK 下载需要联网。
 
-`vbot_edu_msgs` 还依赖 `flatbuffers`；`edu-sdk-2026.10.14` Release 附带 `flatbuffers`
-25.9.23 wheel。按 [Aorta Python SDK 指南](python/README.zh-CN.md)在专用 venv 中安装
+`vbot_edu_msgs` 还依赖 `flatbuffers`；`edu-sdk-2026.10.31` Release 附带 `flatbuffers`
+25.12.19 wheel。按 [Aorta Python SDK 指南](python/README.zh-CN.md)在专用 venv 中安装
 同一 Release 的全部四个 wheel，安装时不访问包索引。
 该指南还介绍了无互联网设备的依赖准备、连接方式与可运行示例。
 

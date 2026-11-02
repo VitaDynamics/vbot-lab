@@ -8,14 +8,14 @@ robot interface. Start with the [device shell setup](../getting-started/device-e
 
 ## Version scope
 
-This reference targets robot application **V1.6.0-12** on `foot_quadruped` EDU.
+This reference targets robot application **V1.6.0-15** on `foot_quadruped` EDU.
 Discover the exact routes and inspect their delivered types before use; configuration
 limits are listed in the [compatibility matrix](../compatibility.md).
 Other robot types are not covered by this software scope.
 
 This page lists the public topic set and supported mappings, along with services and the
-RCP action. The service table lists 22 request/reply routes. The topic tables contain
-47 distinct Aorta routes: 43 subscription outputs and 4 command inputs.
+RCP action. The service table lists 25 request/reply routes. The topic tables contain
+48 distinct Aorta routes: 44 subscription outputs and 4 command inputs.
 After discovering an output, take a bounded sample to check its
 producer; do not publish to command topics as an environment check.
 Python SDK wheel installation and checked-in Schema sources are documented separately;
@@ -88,6 +88,7 @@ robot capabilities and are not included in this list.
 | [Locomotion events](locomotion.md) | `/locomotion/event` | `/locomotion/event` | pub/sub — subscribe | `locomotion.LocomotionEvent` | `software_msgs/msg/LocomotionEvent` |
 | [RCP task trace events](rcp.md) | `/rcp/trace` | `/rcp/trace` | pub/sub — subscribe | `aorta.topic.rcp.TraceEvent` | `function_msgs/msg/TraceEvent` |
 | [System state machine](system-peripherals.md) | `/system/sm_status` | `/sm/status` | pub/sub — subscribe | `sm.SmStatus` | `software_msgs/msg/SystemStateMachineStatus` |
+| [OTA application version](system-peripherals.md) | `/ota_version` | `/ota_version` | pub/sub — subscribe | `aorta.topic.system_monitor.OtaVersion` | `std_msgs/msg/String` |
 | [Display state](system-peripherals.md) | `/display_node/status` | `/display_node/status` | pub/sub — subscribe | `aorta.topic.peripheral.DisplayStatus` | `aorta_msgs/msg/DisplayStatus` |
 | [Voice interaction events](audio.md) | `/voice/event` | `/voice/event` | pub/sub — subscribe | `aorta.voice.VoiceEvent` | `aorta_msgs/msg/VoiceEvent` |
 | [Final recognized text; provider distinguishes body / UWB input](audio.md) | `/speech/asr_result` | `/speech/asr_result` | pub/sub — subscribe | `aorta.topic.speech.AsrResult` | `aorta_msgs/msg/AsrResult` |
@@ -167,6 +168,9 @@ environment check, even when their purpose is read-only.
 | `/volume_control` | `/volume_control` | service — query/change audio volume according to request |
 | `/speech/set_speak` | `/set_speak` | service — speech playback/control |
 | `/speech_control` | `/speech_control` | service — [query/change speech policy](audio.md), depending on request type |
+| `/locomotion/control_enable` | `/locomotion/control_enable` | service — [pause/resume control and motor communication](locomotion.md) |
+| `/system/power_saving/enable` | `/system/power_saving/enable` | service — [enter/exit power-saving mode](system-peripherals.md) |
+| `/function/following` | `/function/following` | service — [follow/navigation mode control](locomotion.md) |
 
 Firmware queries require the appropriate `target_device_type`: MOTOR=`0`, SERVO=`1`,
 LIDAR=`2`, UWB=`3`. Inspect the delivered request type before calling; an empty/default request

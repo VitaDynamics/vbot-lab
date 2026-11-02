@@ -5,8 +5,8 @@
 这是以只读健康监测为起点的独立 C++17／Bazel 工作区。
 只订阅 /locomotion/status、/bms_state 与 /system/sm_status，
 不发布控制指令、不调用 service／action，也不采集音视频。
-配套 foot_quadruped 应用 V1.6.0-12、C++ SDK 2026.10.12／ABI 13，
-以及 SDK Release edu-sdk-2026.10.14 中的 Schema pack 2026.10.13-v4。
+配套 foot_quadruped 应用 V1.6.0-15、C++ SDK 2026.10.20／ABI 13，
+以及 SDK Release edu-sdk-2026.10.31 中的 Schema pack 2026.10.20-v4。
 
 ## 项目内容
 
@@ -35,7 +35,7 @@ bazel test //:model_test
 首次 Bazel 构建可能需要联网获取公共构建规则；应用的接入规则不下载 SDK 或编译器。
 
 ```bash
-SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.10.14 &&
+SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.10.31 &&
 export AORTA_CPP_SDK_DIR="$SDK_ARTIFACTS/cpp-sdk-x86_64" &&
 export AORTA_EDU_SCHEMA_DIR="$SDK_ARTIFACTS/edu-schema" &&
 bazel build //:main &&

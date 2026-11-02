@@ -7,6 +7,9 @@ PR 及 `main`、`pre_release/**` 推送时，工作流将仓库检查与应用�
 `recipe-checks` 在 `docker/compose.yaml` 选定的开发容器内执行不依赖 SDK 的预览和模拟应用流程。
 `sdk-integration` 使用同一套固定镜像配置，执行真实 SDK 集成、全新 venv 安装、所有 Python／C++
 Recipe 构建、SDK 序列化测试及部署包完整性检查；使用前核对 `catalog/release.json` 固定的制品。
+任务使用 GitHub 令牌下载 `catalog/release.json` 记录的 Release。
+缺少授权、Release 不存在或附件不完整时任务失败。
+每个下载文件均在使用前按固定摘要校验。
 每个全新 SDK venv 均清除 `AORTA_CORE_FFI_LIB`，显式加载 wheel 自带的原生库并核对来源和发布 ABI；
 仅导入成功不足以证明原生库可用。
 还会为 ARM64 交叉构建基础 C++ Recipes 并检查目标 ELF／依赖，不在 AMD64 runner／容器内执行 ARM64 程序。
@@ -73,7 +76,7 @@ python3 tools/run_checks.py --scope recipes
 | --- | --- |
 | `main` | 最新正式版本，不合入尚未正式发布的版本更新 |
 | `pre_release/V1.6.0.X` | `V1.6.0` 版本族的长期迭代分支，末尾 `X` 保留为字母 |
-| `V1.6.0.12` | 机器人应用 `V1.6.0-12` 配套的源码 tag；以发布配置中明确记录的源码 tag 为准 |
+| `V1.6.0.15` | 机器人应用 `V1.6.0-15` 配套的源码 tag；以发布配置中明确记录的源码 tag 为准 |
 | `edu-sdk-*` | SDK 附件 Release tag，与源码 tag 和机器人应用版本分别管理 |
 
 `V1.6.0` 的分支不作为所有后续版本的共用分支。

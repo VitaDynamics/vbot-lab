@@ -339,6 +339,10 @@ class CheckGroupTests(unittest.TestCase):
         self.assertIn('test "$SDK_RESULT" = success', gate)
         self.assertIn("docker compose -f docker/compose.yaml run", jobs["sdk-integration"])
         self.assertIn("python3 tools/sdk_ci.py", jobs["sdk-integration"])
+        self.assertIn('test "$repository" = VitaDynamics/vbot-lab', jobs["sdk-integration"])
+        self.assertIn('"repos/$repository/releases/tags/$tag"', jobs["sdk-integration"])
+        self.assertIn("Pinned SDK Release is incomplete", jobs["sdk-integration"])
+        self.assertNotIn("exit 0", jobs["sdk-integration"])
 
 
 class StatusSemanticsTests(unittest.TestCase):

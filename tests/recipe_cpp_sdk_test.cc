@@ -1,6 +1,7 @@
 #include "CompressedVideo_generated.h"
 #include "asr_result_generated.h"
 #include "locomotion_lowlevel_action_msg.h"
+#include "ota_version_generated.h"
 #include "recipes/cpp_common.h"
 #include "recipes/rcp-task/goal.h"
 #include "system_get_firmware_version_msg.h"
@@ -64,6 +65,16 @@ int main() {
               aorta::services::system::DeviceType_UWB,
           "device type");
     Check(decoded->aorta_header()->sequence() == 7, "SDK header");
+
+    builder.Clear();
+    header = aorta::sys::CreateAortaHeader(builder, 123, builder.CreateString("offline"), 1);
+    auto version = aorta::topic::system_monitor::CreateOtaVersion(
+        builder, header, builder.CreateString("V1.6.0-15~example-build"));
+    builder.Finish(version);
+    bytes.assign(builder.GetBufferPointer(), builder.GetBufferPointer() + builder.GetSize());
+    const auto *ota = recipe::Decode<aorta::topic::system_monitor::OtaVersion>(bytes);
+    Check(recipe::Text(ota->version()) == "V1.6.0-15~example-build", "OTA version round trip");
+    Check(ota->aorta_header()->publish_stamp_ns() == 123, "OTA publish timestamp");
 
     Check(recipe::Json("a\n\"\\") == "\"a\\u000a\\\"\\\\\"", "JSON escaping");
     Throws<std::invalid_argument>([] { recipe::Number("nan", 0, 120); });

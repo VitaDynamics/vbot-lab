@@ -171,6 +171,35 @@ class ReleaseSDKTests(unittest.TestCase):
         cls.guard = patch.object(cls.sdk, "Node", side_effect=AssertionError("offline tests must not open Node"))
         cls.guard.start()
 
+    def test_system_version_decodes_the_release_binding(self):
+        from aorta.sys.AortaHeader import AortaHeaderT
+        from aorta.topic.system_monitor.OtaVersion import OtaVersion, OtaVersionT
+        module = recipe("system-peripherals")
+        value = OtaVersionT(aortaHeader=AortaHeaderT(publishStampNs=123),
+                            version="V1.6.0-15~example-build")
+        payload = self.sdk.FlatbuffersActionCodec.serialize(value)
+        self.assertEqual(module.summarize("version", OtaVersion.GetRootAs(payload, 0)),
+                         {"version": "V1.6.0-15~example-build", "publish_stamp_ns": 123})
+        value = OtaVersionT(version="V1.6.0-15")
+        payload = self.sdk.FlatbuffersActionCodec.serialize(value)
+        self.assertIsNone(module.summarize("version", OtaVersion.GetRootAs(payload, 0))["publish_stamp_ns"])
+
+    def test_sdk_bundle_contains_additional_service_bindings(self):
+        cases = (
+            ("aorta.services.locomotion.ControlEnableRequest", {"enable": True}, "Enable", True),
+            ("aorta.services.system.PowerSavingEnableRequest", {"data": True}, "Data", True),
+            ("aorta.services.vln.ControlFollowingRequest", {"targetState": 0, "mode": 3}, "Mode", 3),
+            ("aorta.services.speech.SpeechControlRequest", {"requestType": 1}, "RequestType", 1),
+        )
+        for name, fields, accessor, expected in cases:
+            with self.subTest(binding=name):
+                module = importlib.import_module(name)
+                root = name.rsplit(".", 1)[1]
+                value = getattr(module, root + "T")(**fields)
+                payload = self.sdk.FlatbuffersActionCodec.serialize(value)
+                decoded = getattr(module, root).GetRootAs(payload, 0)
+                self.assertEqual(getattr(decoded, accessor)(), expected)
+
     @classmethod
     def tearDownClass(cls):
         cls.guard.stop()

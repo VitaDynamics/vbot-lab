@@ -15,6 +15,7 @@ Python/C++ 只读示例见 [system-peripherals Recipe](../../recipes/system-peri
 | Aorta topic | 方向 | 定义与用途 |
 | --- | --- | --- |
 | `/system/sm_status` | 订阅 | 系统类别、流程状态、活跃状态／路径、级别、心跳与描述数据；区分状态、OTA 和告警消息 |
+| `/ota_version` | 订阅 | `version` 中的已提交应用 OTA 版本字符串；ROS 使用 String.data |
 | `/display_node/status` | 订阅 | 通过 `data` 携带显示状态；按交付表示解析，不预设为图像或稳定 JSON 布局 |
 | `/light/ear_modulation` | 发布 | [0, 1] 范围内的有限 `value` 缩放当前耳灯效果亮度，不是颜色／灯效选择器 |
 
@@ -43,6 +44,43 @@ timeout 15s aorta topic echo /display_node/status --count 1
 3. ROS 用成对的 ID／名称数组表达状态路径，不同于 Aorta 的条目向量；保留配对并检查长度。
    便捷的低功耗标志没有对应的额外 ROS 字段，不能按相同结构解码两种表示。
 4. 显示状态只是观察数据，收到它不能证明有人看到了指定图片，也不能由状态字符串推断完整像素内容。
+
+## OTA 应用版本
+
+`/ota_version` 是只读的已提交应用 OTA 版本字符串。
+[Schema](../../schemas/aorta/schemas/topic/system_monitor/ota_version.fbs) 定义
+`aorta.topic.system_monitor.OtaVersion`，字段为 `aorta_header` 和 `version`。
+ROS 2 在同名 topic 使用 `std_msgs/msg/String`，Aorta 的 `version` 对应 ROS 的 `data`。
+[Bridge 路由](../../schemas/ros2/routes.json) 方向为 Aorta → ROS，
+QoS 为 reliable、volatile、keep-last、深度 10。
+此输出未声明服务超时或指令速率限制。
+Python／C++ SDK 读取使用 [system-peripherals](../../recipes/system-peripherals/README.zh-CN.md)
+的 `--stream version`。比较 `~` 构建后缀之前的应用标识，反馈问题时保留完整字符串。
+此值不是 SDK 包版本。
+
+```bash
+timeout 15s ros2 interface show std_msgs/msg/String
+```
+
+## 低功耗服务
+
+`/system/power_saving/enable` 用于进入／退出低功耗模式。
+[Schema](../../schemas/aorta/schemas/service/system/power_saving_enable.fbs) 定义
+`aorta.services.system.PowerSavingEnableRequest` 和
+`aorta.services.system.PowerSavingEnableResponse`，两者均包含 `aorta_header`。
+请求 `data=true` 进入该模式，`data=false` 退出。Aorta 返回
+`status` 和可选的 `message`；`ServiceStatus.SUCCESS=0` 表示成功。
+ROS 2 在同名服务使用 `std_srvs/srv/SetBool`，请求为 `data`，响应为
+`success` 和 `message`。
+
+[Bridge 路由](../../schemas/ros2/routes.json) 设置 5000 ms 超时、最多一个在途请求、
+单写者、每秒 5 个请求、突发上限 10、请求大小上限 4096 字节。
+QoS 为 reliable、volatile、keep-last、深度 4。未配置 deadman 超时或 zero-on-deadman 指令。
+这是控制接口；只检查类型，不调用服务：
+
+```bash
+timeout 15s ros2 interface show std_srvs/srv/SetBool
+```
 
 ## 耳灯交互与清理
 

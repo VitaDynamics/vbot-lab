@@ -32,7 +32,7 @@ Prepare these items before disconnecting:
   development/runtime libraries for C++. Bazel does not install these.
 
 SDK artifacts must first be downloaded from GitHub Releases with network access.
-The `edu-sdk-2026.10.14` release attaches the `flatbuffers` 25.9.23 wheel next to the SDK
+The `edu-sdk-2026.10.31` release attaches the `flatbuffers` 25.12.19 wheel next to the SDK
 wheels; [Python deployment](python-deployment.md) shows how to stage all four Release wheels.
 Prepare any optional dependencies separately. The commands below assume that complete,
 verified wheelhouse is already available.
@@ -41,7 +41,7 @@ Keep wheel files together in a wheelhouse; then install without package-index ac
 
 ```bash
 python -m pip install --no-index --find-links artifacts/wheelhouse \
-  aorta-sdk==2026.10.12 aorta-msgs==2026.10.12 vbot-edu-msgs==2026.10.13 flatbuffers==25.9.23
+  aorta-sdk==2026.10.20 aorta-msgs==2026.10.20 vbot-edu-msgs==2026.10.20 flatbuffers==25.12.19
 ```
 
 ## Build from the bundle

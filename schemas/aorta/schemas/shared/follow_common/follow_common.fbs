@@ -1,0 +1,22 @@
+// Follow Common Definitions
+//
+// Canonical follow/navigation mode domain shared across schemas. STOP through
+// ACCOMPANY mirror the ROS2 ControlFollowing.srv modes. CIVIC_NAV=9 is
+// defined here only and is not declared by that service.
+//
+// Used by service/vln/control_following.fbs for the request mode.
+
+namespace aorta.follow.common;
+
+enum FollowMode: ubyte {
+  STOP = 0,
+  FOLLOWING = 1,
+  ROAMING = 2,
+  NAV_TO_POINT = 3,
+  COME_TO_ME = 4,
+  WALK = 5,
+  SYNC_SEMANTIC_NAV = 6,
+  ASYNC_SEMANTIC_NAV = 7,
+  ACCOMPANY = 8,
+  CIVIC_NAV = 9,
+}

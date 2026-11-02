@@ -9,7 +9,7 @@
 VBOT Lab brings together task-oriented Skills, a capability catalog, the Aorta Python SDK,
 interface definitions, and reference programs for building robot applications.
 
-Current robot application target: **V1.6.0-12**, for `foot_quadruped` EDU.
+Current robot application target: **V1.6.0-15**, for `foot_quadruped` EDU.
 See the [compatibility matrix](docs/compatibility.md) for SDK and platform pairing.
 
 ## Build with your Agent
@@ -79,10 +79,17 @@ authorization and the documented preconditions.
 ## Community & Support
 
 Stuck on an integration, exploring a new capability, or ready to share what you built?
-Join [Vbot 超能社区](https://forum.vbot.cn/) to ask questions, exchange development
+Search the forum first at [Vbot 超能社区](https://forum.vbot.cn/). If no answer fits,
+add details to a relevant topic or open a focused question. You can also exchange development
 experience and suggest improvements. See [Community & Support](docs/community/README.md)
 for topic categories and a short report template. Include reproduction steps and
 sanitized details so others can help and benefit from the answer.
+
+Technical support with device setup, SDK integration or application development is also
+available at [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn). When emailing support, we recommend
+including the device serial number (SN) to help identify the device and investigate the issue.
+Do not include the SN in public forum posts or GitHub issues. Send security reports privately
+to the same mailbox, following [Security](SECURITY.md).
 
 ## Contributing and validation
 

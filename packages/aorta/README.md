@@ -4,7 +4,7 @@
 
 Aorta provides the communication SDK in VBOT Lab's [client libraries](../README.md).
 Choose the [Aorta Python SDK](python/README.md) or [Aorta C++ SDK](cpp/README.md); installable
-artifacts are distributed as vbot-lab release assets (first release `edu-sdk-*`).
+artifacts are distributed as SDK Release assets (`edu-sdk-*`).
 
 Use the SDK together with matching [Interface Definitions](../../schemas/README.md).
 The repository tracks the synchronized FlatBuffers and ROS 2 definitions; generated C++
@@ -13,7 +13,7 @@ SDK package names, import paths, and API contracts remain those of Aorta.
 
 ## Install
 
-Download the assets from the [vbot-lab releases](https://github.com/VitaDynamics/vbot-lab/releases)
+Download the assets from [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases)
 and verify them against the release's `SHA256SUMS`. `EDU_SDK_MANIFEST.json` in the
 same release records the version pairing and each asset's SHA-256 digest.
 
@@ -23,8 +23,8 @@ Python 3.10 or newer is required. Download the `aorta_sdk` wheel for the machine
 `linux_aarch64`, `linux_x86_64`, or `macosx_11_0_arm64` — plus `aorta_msgs` and
 `vbot_edu_msgs` from GitHub Releases. SDK downloads require network access.
 
-`vbot_edu_msgs` also requires `flatbuffers`; the `edu-sdk-2026.10.14` release attaches the
-`flatbuffers` 25.9.23 wheel. Follow the [Aorta Python SDK guide](python/README.md) to
+`vbot_edu_msgs` also requires `flatbuffers`; the `edu-sdk-2026.10.31` release attaches the
+`flatbuffers` 25.12.19 wheel. Follow the [Aorta Python SDK guide](python/README.md) to
 install all four wheels from that release in a dedicated venv without package-index access.
 That guide also covers preparing dependencies for a robot without Internet access,
 connection modes, and a runnable example.

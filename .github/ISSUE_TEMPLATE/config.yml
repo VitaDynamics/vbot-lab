@@ -9,6 +9,9 @@ contact_links:
   - name: "Ideas and suggestions · 灵感与建议"
     url: https://forum.vbot.cn/c/ideas/7
     about: "Suggest capabilities and workflow improvements · 提出新能力需求与使用体验建议。"
+  - name: "Technical support · 技术支持"
+    url: mailto:vbot-edu@vbot.cn
+    about: "Search the forum first; technical support is also available by email · 建议优先在论坛搜索反馈，也可通过邮箱获取技术支持。"
   - name: "Security report · 安全反馈"
     url: https://github.com/VitaDynamics/vbot-lab/security/policy
     about: "Email vbot-edu@vbot.cn privately; do not open a public issue · 请私下发送邮件，不要公开漏洞细节。"

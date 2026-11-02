@@ -5,7 +5,7 @@
 Use the [capability catalog](../../catalog/README.md) to select the relevant interface and check
 release scope. The catalog indexes these contracts; it does not establish live device availability.
 
-The interface reference targets robot application **V1.6.0-12** on `foot_quadruped` EDU;
+The interface reference targets robot application **V1.6.0-15** on `foot_quadruped` EDU;
 see [compatibility](../compatibility.md) for component pairing and configuration limits.
 
 ## Agent extension interfaces
@@ -36,8 +36,9 @@ retain their distinct types and operating conditions. Inspect only what the task
 | RCP | [Tasks and tracing](rcp.md): action lifecycle, cancellation, and correlated events |
 | SLAM | [Mapping and localization](../guides/mapping-localization.md): maps, poses, transforms, and mode transitions |
 
-Field definitions are in [Schema](../../schemas/README.md); executable Python examples are in
-[Recipes](../../recipes/README.md), with installation in the [SDK guide](../../packages/aorta/python/README.md).
+Field definitions are in [Schema](../../schemas/README.md); executable Python/C++ examples are in
+[Recipes](../../recipes/README.md), with installation in the [Python](../../packages/aorta/python/README.md)
+and [C++](../../packages/aorta/cpp/README.md) SDK guides.
 Detailed Aorta interface pages must record:
 
 - Function, public availability, supported `robot_type` identifiers, exact models / hardware revisions, and minimum firmware version.

@@ -1,0 +1,32 @@
+# 请求
+uint32 target_state     # Target state: 0=OFF, 1=ON
+uint32 mode             # Function mode: 0=Stop, 1=Following, 2=Roaming, 3=Nav, 4=ComeToMe, 5=Walk, 6=SyncSemanticNav, 7=AsyncSemanticNav, 8=Accompany
+string req_id          # Request ID for trace
+bool pre_check         # If true, only perform the prepare/check phase
+
+
+# User Friendly Definition Here
+uint8 STOP=0
+uint8 FOLLOWING=1
+uint8 ROAMING=2
+uint8 NAV_TO_POINT=3
+uint8 COME_TO_ME=4
+uint8 WALK=5
+uint8 SYNC_SEMANTIC_NAV=6
+uint8 ASYNC_SEMANTIC_NAV=7
+uint8 ACCOMPANY=8
+
+
+float32 x # Only works When mode is Nav
+float32 y # Only works when mode is Nav
+float32 yaw # Target yaw angle (radians) at destination; only used in Nav mode
+string goal_frame # Optional: "global" if x/y are expressed in the global/world frame; defaults to "local"
+float32 stop_distance # Arrival threshold override (0.0 = use config default)
+float32 max_xvel # Nav mode max forward velocity override (<= 0.0 = use default 0.5m/s)
+string prompt # Optional semantic navigation prompt override; only used in mode 6/7
+
+---
+# 响应
+bool success         # 是否成功
+string message       # 响应消息 Optional
+int32 error_code # Optional

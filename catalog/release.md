@@ -8,8 +8,8 @@ announcement or an installer. Component versions remain independent.
 
 The configuration uses the selected application, SDK, Schema and development image
 references. It records the intended source branch and tag; this does not create Git
-refs or announce a release. The source tag is `V1.6.0.12`, the robot application is
-`V1.6.0-12`, and the SDK Release is `edu-sdk-2026.10.14`. The image digest is pinned.
+refs or announce a release. The source tag is `V1.6.0.15`, the robot application is
+`V1.6.0-15`, and the SDK Release is `edu-sdk-2026.10.31`. The image digest is pinned.
 
 ## Fields
 
@@ -17,10 +17,10 @@ refs or announce a release. The source tag is `V1.6.0.12`, the robot application
 | --- | --- |
 | `format_version` | Integer `1`; unknown fields and duplicate JSON keys are rejected |
 | `workspace.branch` | `main` for a formal release, or a long-lived iteration branch such as `pre_release/V1.6.0.X`; `X` is a literal letter, not an iteration number |
-| `workspace.tag` | Source tag for this snapshot: `V1.6.0.12`. Iteration tags match the branch version family and add a numeric iteration; robot application and SDK versions are recorded separately |
+| `workspace.tag` | Source tag for this snapshot: `V1.6.0.15`. Iteration tags match the branch version family and add a numeric iteration; robot application and SDK versions are recorded separately |
 | `robots` | Current released robot types from `catalog/robots/`; each records its exact `application_version`, not a minimum version |
-| `sdk.repository`, `sdk.release_tag` | Public GitHub download repository (`owner/name`) and exact SDK Release tag for the documented dependency pairing |
-| `sdk.aorta_version` | Aorta version paired with the Python and C++ SDK |
+| `sdk.repository`, `sdk.release_tag` | GitHub download repository (`owner/name`) and exact EDU SDK bundle Release tag |
+| `sdk.aorta_version` | Aorta SDK package version, aligned with the Python and C++ SDK |
 | `sdk.python` | Minimum Python version (`major.minor`), exact versions of the four wheel packages, and available wheel platform tags |
 | `sdk.cpp` | Exact SDK version, positive integer ABI, distribution identifier and available architectures; keep ABI aligned with the Bazel native-library import |
 | `sdk.assets` | Attachment inventory: exact filenames and lowercase 64-character SHA-256 values, including checksum/manifest/license attachments; no credentials or signed download URLs |
@@ -43,8 +43,8 @@ VBOT Lab keeps formal releases on `main`. Prepare changes on the
 `pre_release/V<major>.<minor>.<patch>.X` branch for the selected version family.
 Each family has its own branch; `pre_release/V1.6.0.X` is only for the `V1.6.0` family.
 Iteration updates allow direct commits and pushes and do not require a PR.
-The current pairing is source tag `V1.6.0.12` on `pre_release/V1.6.0.X` for robot
-application `V1.6.0-12`. Iteration tags belong to the selected branch version family;
+The current pairing is source tag `V1.6.0.15` on `pre_release/V1.6.0.X` for robot
+application `V1.6.0-15`. Iteration tags belong to the selected branch version family;
 record the robot application and exact SDK/Schema pairing separately.
 
 Create the iteration tag on the checked source commit. A tag alone does not promote

@@ -53,7 +53,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_current_source_snapshot_is_recorded(self):
         self.assertEqual(self.baseline["workspace"],
-                         {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.12"})
+                         {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.15"})
         self.assertEqual(release.validate(self.baseline, ROOT), [])
 
     def test_consistent_draft_reports_pending(self):
@@ -181,9 +181,9 @@ class ReleaseTests(unittest.TestCase):
             self.rejects(self.config, "python.platforms")
 
     def test_iteration_tag_matches_branch_family(self):
-        self.config["workspace"] = {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.12"}
+        self.config["workspace"] = {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.15"}
         release.validate(self.config, ROOT)
-        for value in ("V1.16.0.12", "V1.6.1.12", "V1.6.0-12", "V1.6.0.X", "V1.6.0"):
+        for value in ("V1.16.0.12", "V1.6.1.12", "V1.6.0-15", "V1.6.0.X", "V1.6.0"):
             self.config["workspace"]["tag"] = value
             self.rejects(self.config, "iteration branch family")
 

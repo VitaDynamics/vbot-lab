@@ -4,15 +4,15 @@
   "sdk": {
     "name": "Aorta Python SDK",
     "integration": "integrated",
-    "version": "2026.10.12",
+    "version": "2026.10.20",
     "python_import": "aorta",
     "reference": "packages/aorta/python/README.md",
-    "release": "edu-sdk-2026.10.14",
-    "edu_messages_version": "2026.10.13",
+    "release": "edu-sdk-2026.10.31",
+    "edu_messages_version": "2026.10.20",
     "cpp": {
-      "version": "2026.10.12",
+      "version": "2026.10.20",
       "abi": 13,
-      "schema_pack": "2026.10.13-v4",
+      "schema_pack": "2026.10.20-v4",
       "reference": "packages/aorta/cpp/README.md"
     }
   },
