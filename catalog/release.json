@@ -1,8 +1,8 @@
 {
   "format_version": 1,
   "workspace": {
-    "branch": "pre_release/V1.6.0.X",
-    "tag": "V1.6.0.15"
+    "branch": "release/V1.6.0",
+    "tag": "Rel/V1.6.0"
   },
   "robots": {
     "foot_quadruped": {

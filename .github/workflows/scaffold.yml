@@ -2,7 +2,7 @@ name: Scaffold checks
 
 on:
   push:
-    branches: [main, 'pre_release/**']
+    branches: [main, 'release/**', 'pre_release/**']
   pull_request:
 
 permissions:

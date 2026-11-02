@@ -14,7 +14,16 @@ SDK 与平台配套见[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 ## 与 Agent 开始开发
 
-在 Codex 或 Claude Code 中打开本仓库，然后提出任务：
+先切换到 V1.6.0 开发分支，再在 Agent 中打开仓库：
+
+```bash
+git clone https://github.com/VitaDynamics/vbot-lab.git &&
+cd vbot-lab &&
+git checkout release/V1.6.0
+```
+
+已有仓库先保留本地修改，执行 `git fetch origin`，再执行 `git checkout release/V1.6.0`。
+本版本更新见[发布说明](CHANGELOG.zh-CN.md)。在 Codex 或 Claude Code 中打开仓库，然后提出任务：
 
 > 检查这台工作站是否具备 VBOT 开发条件。报告已有工具、缺失依赖和发布限制。
 > 不要安装软件，也不要连接机器人。

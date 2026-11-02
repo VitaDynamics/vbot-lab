@@ -30,7 +30,7 @@ bazel test //:model_test
 ```
 
 Prepare verified native and ARM64 SDK artifacts and the common Schema according to the
-[C++ SDK guide](https://github.com/VitaDynamics/vbot-lab/blob/main/packages/aorta/cpp/README.md).
+[C++ SDK guide](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/packages/aorta/cpp/README.md).
 Replace SDK_ARTIFACTS below with their actual parent directory; it does not have to be in
 the reference checkout. First use of Bazel may need network for public build-rule dependencies;
 no SDK or compiler is downloaded by the application's repository rule.
@@ -141,7 +141,7 @@ A new login requires entering the same directory and setting the three runtime v
 no reinstall is needed. Stop with Ctrl+C or let the duration expire. No service, autostart, ACL
 or resource setting is changed.
 
-Use [VBOT Lab](https://github.com/VitaDynamics/vbot-lab) for connection, environment and
-interface documentation. Use the [C++ diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/main/docs/development/diagnostics.md#cpp)
+Use [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0) for connection, environment and
+interface documentation. Use the [C++ diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.md#cpp)
 without installing Python wheels. Bring a reviewed, reproducible report to
 [Vbot 超能社区](https://forum.vbot.cn/); never share credentials or session configuration.

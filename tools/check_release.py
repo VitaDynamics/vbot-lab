@@ -91,12 +91,20 @@ def validate(config, root):
     workspace = fields(config["workspace"], "workspace", ("branch", "tag"))
     branch = workspace["branch"]
     require(isinstance(branch, str) and (branch == "main" or
-            re.fullmatch(r"pre_release/V\d+\.\d+\.\d+\.X", branch) is not None),
-            "workspace.branch: expected main or pre_release/V<major>.<minor>.<patch>.X")
-    tag(workspace["tag"], "workspace.tag", nullable=True)
-    if branch != "main" and workspace["tag"] is not None:
+            re.fullmatch(r"(?:pre_release/V\d+\.\d+\.\d+\.X|release/V\d+\.\d+\.\d+)", branch) is not None),
+            "workspace.branch: expected main, release/V<major>.<minor>.<patch>, "
+            "or pre_release/V<major>.<minor>.<patch>.X")
+    source_tag = workspace["tag"]
+    if isinstance(source_tag, str) and source_tag.startswith("Rel/"):
+        text(source_tag, "workspace.tag", r"Rel/V\d+\.\d+\.\d+")
+    else:
+        tag(source_tag, "workspace.tag", nullable=True)
+    if branch.startswith("release/") and source_tag is not None:
+        require(source_tag == "Rel/" + branch.removeprefix("release/"),
+                "workspace.tag: must match the formal release branch family")
+    elif branch.startswith("pre_release/") and source_tag is not None:
         family = branch.removeprefix("pre_release/").removesuffix(".X")
-        require(re.fullmatch(re.escape(family) + r"\.\d+", workspace["tag"]) is not None,
+        require(re.fullmatch(re.escape(family) + r"\.\d+", source_tag) is not None,
                 "workspace.tag: must match the iteration branch family and numeric iteration")
     robots = config["robots"]
     require(isinstance(robots, dict) and bool(robots), "robots: expected nonempty object")

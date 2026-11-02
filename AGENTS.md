@@ -37,6 +37,7 @@ Resolve a linked Skill to its physical checkout before using its relative resour
 
 ## Facts and scope
 
+- For V1.6.0 application development, use `release/V1.6.0`, following the [quickstart](docs/getting-started/README.md). Check the current branch before setup; preserve local changes and do not silently replace the selected branch with `main`, an iteration branch or a tag. A user-created application branch may be based on this release branch.
 - The current EDU release target is `foot_quadruped`. Other robot types are planned, even when hardware or connection guides are shared.
 - The supported robot application target is `V1.6.0-15`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
 - Use the capability catalog as an index, not proof of live availability. Unknown firmware / SDK versions, routes, and ROS2 mappings stay unknown; do not invent them.
@@ -72,7 +73,9 @@ Read [Contributing](CONTRIBUTING.md) before changing layout or shared robot docu
 Prepare VBOT Lab version iterations on the selected `pre_release/V<major>.<minor>.<patch>.X`
 branch for that version family; do not reuse one family branch for all later versions.
 Iteration branches allow direct commits and pushes without a PR, after user confirmation.
-Keep `main` for formal releases; do not open a release-promotion PR or publish a
+Keep `main` for the latest formal release and `release/V1.6.0` for V1.6.0 development.
+The formal snapshot is `Rel/V1.6.0`; the V1.6.0 iteration is complete.
+Do not open a release-promotion PR or publish a
 release unless explicitly requested. See [collaboration](.github/WORKFLOWS.md).
 Validate with `python3 tests/check_repository.py`, `python3 tests/test_agent_workspace.py`,
 and the applicable Bazel targets. Keep changes local and uncommitted for review first;

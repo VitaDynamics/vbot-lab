@@ -50,7 +50,7 @@ SDK 从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases) 中
 
 | 项目 | 当前可用状态 | 兼容性检查 |
 | --- | --- | --- |
-| 仓库源码 | 源码 tag `V1.6.0.15` | 克隆仓库后，按[快速开始](getting-started/README.zh-CN.md)切换到此 tag；源码引用与 SDK Release 制品分别管理版本 |
+| 仓库源码 | 开发分支 `release/V1.6.0`；正式快照 `Rel/V1.6.0` | 克隆仓库后，按[快速开始](getting-started/README.zh-CN.md)切换到该分支；源码引用与 SDK Release 制品分别管理版本 |
 | 开发镜像 | Compose 与发布配置已固定 dev-v0.0.1 的 digest；运行于 linux/amd64，包含 ARM64 GCC／G++ 交叉编译器 | 设备 C++ 程序使用 ARM64 SDK 与 `bazel build --config=arm64`；默认构建／预览／测试为原生目标；可直接暂存 ARM64 Python wheel |
 | Bazel | 7.6.1 骨架基线 | 与 SDK 和镜像联调 |
 | [Aorta Python SDK](../packages/aorta/python/README.zh-CN.md) | 通过 SDK Release 附件分发（`edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 固定版本与制品 |

@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="WORKFLOWS.zh-CN.md">中文</a></p>
 
-For PRs and pushes to `main` or `pre_release/**`, the workflow separates repository inspection
+For PRs and pushes to `main`, `release/**` or `pre_release/**`, the workflow separates repository inspection
 from application execution. `repository-checks` runs read-only content and mocked tool checks
 on a GitHub-hosted runner. `recipe-checks` runs SDK-free previews and simulated application
 flows inside the development container selected by `docker/compose.yaml`.
@@ -79,14 +79,20 @@ but does not require opening a PR or obtaining a pre-push CI result for each new
    passes against the current target branch. Update the topic branch if the base advances.
 4. Use **Squash and merge**. Protect `main` against direct pushes, force pushes and
    deletion, with no administrator bypass.
+5. From the merged `main` commit, create the approved `release/V<major>.<minor>.<patch>`
+   branch and `Rel/V<major>.<minor>.<patch>` tag. At promotion, all three must resolve to
+   that same commit. Do not create the permanent release branch from the pre-squash
+   topic head or move an existing tag to make the references match.
 
 ## Version iterations and formal promotion
 
 | Reference | Role |
 | --- | --- |
 | `main` | Latest formal release; do not merge work-in-progress version updates |
-| `pre_release/V1.6.0.X` | Long-lived iteration branch for the `V1.6.0` family; the final `X` stays literal |
-| `V1.6.0.15` | Source tag for robot application `V1.6.0-15`; select the exact source tag recorded in the release configuration |
+| `release/V1.6.0` | Development entry for the final `V1.6.0` family release, targeting robot application `V1.6.0-15` |
+| `Rel/V1.6.0` | Immutable formal source snapshot; not the default development checkout |
+| `pre_release/V1.6.0.X` | Completed iteration history for the `V1.6.0` family, not its development entry; the final `X` stays literal |
+| `V1.6.0.15` | Preserved iteration snapshot for robot application `V1.6.0-15` |
 | `edu-sdk-*` | SDK attachment Release tags; independent of source tags and robot application versions |
 
 The `V1.6.0` branch is not shared by all future versions. A new family such as
@@ -105,10 +111,11 @@ The `V1.6.0` branch is not shared by all future versions. A new family such as
    changes or move the existing iteration tag. Record any newly required changes under
    a new tag instead.
 5. After release approval and maintainer review, update VBOT Lab's `main` through its
-   PR process and publish the approved source version and SDK attachments as needed.
+   PR process, then create the formal branch and tag from the merged commit as above.
+   Publish source Release notes and SDK attachments only when requested.
    This workflow does not publish releases automatically. Never reset or force-push `main`.
 
-Tags matching `V*` and `edu-sdk-*` can be created but cannot be moved or deleted.
+Version tags `V*`, `Rel/V*` and `edu-sdk-*` identify immutable snapshots; do not move or delete them.
 Publish corrections under a new tag; do not retarget an existing version.
 Creating a source tag does not create a GitHub Release: this workflow has no tag or
 Release-publishing trigger. SDK download assets remain separate from source tags.

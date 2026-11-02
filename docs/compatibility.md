@@ -53,7 +53,7 @@ Check exact route discovery, message types and the configuration limits below on
 
 | Component | Current availability | Compatibility checks |
 | --- | --- | --- |
-| Repository source | Source tag `V1.6.0.15` | Clone the repository, then select this tag as shown in the [quickstart](getting-started/README.md); source references and SDK Release assets have independent versions |
+| Repository source | Development branch `release/V1.6.0`; formal snapshot `Rel/V1.6.0` | Clone the repository, then select the branch as shown in the [quickstart](getting-started/README.md); source references and SDK Release assets have independent versions |
 | Development image | dev-v0.0.1 pinned by digest in Compose and release configuration; runs on linux/amd64 and includes ARM64 GCC/G++ cross-compilers | Use the ARM64 SDK and `bazel build --config=arm64` for device C++ binaries; default builds/previews/tests are native; stage ARM64 Python wheels directly |
 | Bazel | 7.6.1 scaffold baseline | Validate with the SDK and image |
 | [Aorta Python SDK](../packages/aorta/python/README.md) | Distributed as SDK Release assets (`edu-sdk-*`); the release's `EDU_SDK_MANIFEST.json` records the version pairing | Pin the version and artifacts |

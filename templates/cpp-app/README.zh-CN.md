@@ -29,7 +29,7 @@ APP.json 记录语言、SDK 配套、构建目标和运行配置清单，是项�
 bazel test //:model_test
 ```
 
-按 [C++ SDK 指南](https://github.com/VitaDynamics/vbot-lab/blob/main/packages/aorta/cpp/README.zh-CN.md)
+按 [C++ SDK 指南](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/packages/aorta/cpp/README.zh-CN.md)
 准备已校验的原生与 ARM64 SDK 制品及共用 Schema。
 将 SDK_ARTIFACTS 替换为它们的实际父目录，不必放在参考仓库中。
 首次 Bazel 构建可能需要联网获取公共构建规则；应用的接入规则不下载 SDK 或编译器。
@@ -138,7 +138,7 @@ printf '%s\n' "$LDD_OUTPUT" &&
 重新登录后，进入同一目录并再次设置三个运行变量即可，无需重新安装。
 Ctrl+C 或时长到期即可停止，不修改服务、自启动、ACL 或资源配置。
 
-连接、环境及接口说明见 [VBOT Lab](https://github.com/VitaDynamics/vbot-lab)。
-排障使用 [C++ 路径](https://github.com/VitaDynamics/vbot-lab/blob/main/docs/development/diagnostics.zh-CN.md#cpp)，不需要安装 Python wheel。
+连接、环境及接口说明见 [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0)。
+排障使用 [C++ 路径](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.zh-CN.md#cpp)，不需要安装 Python wheel。
 请在审阅报告后到 [Vbot 超能社区](https://forum.vbot.cn/)反馈可复现问题，
 不分享凭据或会话配置。

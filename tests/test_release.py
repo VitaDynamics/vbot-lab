@@ -53,7 +53,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_current_source_snapshot_is_recorded(self):
         self.assertEqual(self.baseline["workspace"],
-                         {"branch": "pre_release/V1.6.0.X", "tag": "V1.6.0.15"})
+                         {"branch": "release/V1.6.0", "tag": "Rel/V1.6.0"})
         self.assertEqual(release.validate(self.baseline, ROOT), [])
 
     def test_consistent_draft_reports_pending(self):
@@ -191,6 +191,31 @@ class ReleaseTests(unittest.TestCase):
         for value in ("pre_release/V1.6.0.10", "V1.6.0.X", "../main", None):
             self.config["workspace"]["branch"] = value
             self.rejects(self.config, "workspace.branch")
+
+    def test_formal_tag_matches_release_branch_family(self):
+        self.config["workspace"] = {"branch": "release/V1.6.0", "tag": "Rel/V1.6.0"}
+        release.validate(self.config, ROOT)
+        for value in ("Rel/V1.6.1", "Rel/V1.16.0", "V1.6.0.15", "V1.6.0"):
+            self.config["workspace"]["tag"] = value
+            self.rejects(self.config, "formal release branch family")
+
+    def test_formal_branch_has_an_exact_version_family(self):
+        for value in ("release/V1.6.0.X", "release/V1.6", "release/1.6.0", "release/V1.6.0/extra"):
+            self.config["workspace"]["branch"] = value
+            self.rejects(self.config, "workspace.branch")
+
+    def test_formal_tag_namespace_is_narrow(self):
+        self.config["workspace"]["branch"] = "main"
+        self.config["workspace"]["tag"] = "Rel/V1.6.0"
+        release.validate(self.config, ROOT)
+        for value in ("Rel/../V1.6.0", "Rel/V1.6.0/extra", "Rel/V1.6.0.lock",
+                      "Rel/V1.6.0.", "Rel/V1.6.0-15", "Rel//V1.6.0"):
+            self.config["workspace"]["tag"] = value
+            self.rejects(self.config, "workspace.tag")
+
+    def test_sdk_tags_do_not_accept_source_tag_namespaces(self):
+        self.config["sdk"]["release_tag"] = "Rel/V1.6.0"
+        self.rejects(self.config, "sdk.release_tag")
 
     def test_sdk_manifest_pairing_and_hashes(self):
         sdk, schema = self.config["sdk"], self.config["schema"]

@@ -168,7 +168,7 @@ class RepositoryChecks(unittest.TestCase):
     def test_version_iterations_have_a_separate_release_boundary(self):
         workflow = (REPO_ROOT / ".github/workflows/scaffold.yml").read_text()
         config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
-        self.assertIn("branches: [main, 'pre_release/**']", workflow)
+        self.assertIn("branches: [main, 'release/**', 'pre_release/**']", workflow)
         self.assertNotIn("tags:", workflow)
         self.assertNotIn("gh release", workflow)
         for suffix in (".md", ".zh-CN.md"):
@@ -204,12 +204,49 @@ class RepositoryChecks(unittest.TestCase):
                 with self.subTest(document=name, language=suffix):
                     text = (REPO_ROOT / f"{name}{suffix}").read_text()
                     self.assertIn(direct, text)
-            changelog = (REPO_ROOT / f"CHANGELOG{suffix}").read_text().split("## V1.6.0", 1)[0]
-            for value in ("`V1.6.0`", "pre_release/V1.6.0.X", family):
-                self.assertIn(value, changelog)
             workflow = (REPO_ROOT / f".github/WORKFLOWS{suffix}").read_text()
+            self.assertIn(family, workflow)
             self.assertIn("pre_release/V1.6.1.X", workflow)
             self.assertIn(confirm, (REPO_ROOT / f"AGENTS{suffix}").read_text())
+
+    def test_formal_release_notes_cover_the_workspace_history(self):
+        sections = {
+            ".md": ("Development from setup to deployment", "Agent-native workspace and application tools",
+                    "Robot interfaces and data", "RCP composition and reusable device resources",
+                    "Python/C++ examples and complete applications", "Visualization, robot models and hardware references",
+                    "Community, security and collaboration"),
+            ".zh-CN.md": ("从环境搭建到设备部署", "Agent-native 工作区与应用工具", "机器人开放接口与数据",
+                          "RCP 编排与可复用设备资源", "Python／C++ 示例与完整应用", "可视化、机器人模型与硬件资料",
+                          "社区、安全与协作"),
+        }
+        config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
+        for suffix, titles in sections.items():
+            notes = (REPO_ROOT / f"CHANGELOG{suffix}").read_text().split("\n## V1.6.0", 1)[0]
+            self.assertIn("## " + config["workspace"]["tag"], notes)
+            self.assertIn(config["workspace"]["branch"], notes)
+            for title in titles:
+                self.assertIn("### " + title, notes)
+            for feature in ("vbot-dev-setup", "vbot-app-dev", "vbot-diagnose", "/userdata/vbot/init.sh",
+                            "DagPresetRef", "DagSpec", "NodeCommand", "HTTP MCP", "Foxglove", "Vbot Viewer", "Apache-2.0"):
+                self.assertIn(feature, notes)
+            self.assertNotIn(config["sdk"]["aorta_version"], notes)
+            self.assertNotIn(config["sdk"]["release_tag"], notes)
+
+    def test_application_entrypoints_select_the_formal_branch(self):
+        config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
+        branch = config["workspace"]["branch"]
+        for suffix in (".md", ".zh-CN.md"):
+            for name in ("README", "AGENTS", "docs/agents/README", "docs/getting-started/README"):
+                content = (REPO_ROOT / f"{name}{suffix}").read_text()
+                self.assertIn(branch, content)
+                self.assertNotRegex(content, r"git checkout (?:V\d|Rel/|pre_release/)")
+            homepage = (REPO_ROOT / f"README{suffix}").read_text()
+            self.assertIn("git checkout " + branch, homepage)
+            self.assertIn(f"CHANGELOG{suffix}", document_links(homepage))
+            for language in ("python", "cpp"):
+                template = (REPO_ROOT / f"templates/{language}-app/README{suffix}").read_text()
+                self.assertIn("https://github.com/VitaDynamics/vbot-lab/blob/" + branch + "/", template)
+                self.assertNotIn("https://github.com/VitaDynamics/vbot-lab/blob/main/", template)
 
     def test_model_and_mounting_resource_licenses(self):
         notice = (REPO_ROOT / "NOTICE").read_text()
@@ -1505,8 +1542,7 @@ ssh() {
 
     def test_quickstart_checks_out_current_source_ref_and_reuses_container(self):
         config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
-        tag = config["workspace"]["tag"]
-        source_ref = tag or config["workspace"]["branch"]
+        source_ref = config["workspace"]["branch"]
         for suffix in (".md", ".zh-CN.md"):
             page = (REPO_ROOT / f"docs/getting-started/README{suffix}").read_text()
             compatibility = (REPO_ROOT / f"docs/compatibility{suffix}").read_text()
@@ -1516,13 +1552,10 @@ ssh() {
                 "cd vbot-lab &&",
                 f"git checkout {source_ref}",
             ])
-            if tag:
-                self.assertIn(f"git fetch origin tag {tag}", page)
-                self.assertIn("detached HEAD", page)
-            else:
-                self.assertIn("`git fetch origin`", page)
-                self.assertNotIn("git checkout V1.6.0.10", page)
-                self.assertNotIn("git fetch origin tag V1.6.0.10", page)
+            self.assertIn("`git fetch origin`", page)
+            self.assertIn("git branch --show-current", page)
+            self.assertNotIn("git fetch origin tag", page)
+            self.assertNotIn("detached HEAD", page)
             self.assertIn("git switch -c my-edu-app", page)
             self.assertNotIn("git clone --branch", page)
             self.assertNotIn("--single-branch", page)

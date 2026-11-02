@@ -3,7 +3,7 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 默认主路径是 **Python＋四足 EDU＋只读状态订阅**。
-适配机器人应用 `V1.6.0-15`、源码 tag `V1.6.0.15` 和 SDK Release `edu-sdk-2026.10.31`。
+适配机器人应用 `V1.6.0-15`、开发分支 `release/V1.6.0` 和 SDK Release `edu-sdk-2026.10.31`。
 目标是收到三条解码后的 `/locomotion/status` 状态并正常退出，不涉及运动、音视频采集或自启动。
 
 | 步骤 | 执行位置 | 成功结果 | 失败后查看 |
@@ -16,20 +16,20 @@
 ## 1. 选择配套源码——宿主机
 
 先核对[设备类型指南](../robots/README.zh-CN.md)和[兼容矩阵](../compatibility.zh-CN.md)。
-当前软件不包含四轮或双足 EDU 发布。正常克隆，再选择文档指定的源码 tag：
+当前软件不包含四轮或双足 EDU 发布。正常克隆，再切换到 V1.6.0 版本族的正式分支：
 
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout V1.6.0.15
+git checkout release/V1.6.0
 ```
 
-已有仓库缺少该 tag 时，先执行 `git fetch origin tag V1.6.0.15`，切换前保留本地修改。
-如果远程没有该 tag，先停止并选择已提供的源码／应用配套。
-下载 SDK 制品前也要确认配套 Release 已提供；不要改用 `main`、其他 SDK 版本或无关下载来源。
-切换 tag 后的 detached HEAD 是使用版本快照时的正常状态。
+已有仓库先保留本地修改，执行 `git fetch origin`，再执行 `git checkout release/V1.6.0`。
+继续前确认 `git branch --show-current` 输出 `release/V1.6.0`。
+如果远程没有该分支，先停止，不改用 `main`、迭代分支或 tag。
+下载 SDK 制品前也要确认配套 Release 已提供。
 源码与组件配套见[发布配置](../../catalog/release.zh-CN.md)。
-如需修改该仓库，先创建工作分支：
+如需修改该仓库，从正式分支创建工作分支：
 
 ```bash
 git switch -c my-edu-app

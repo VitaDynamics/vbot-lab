@@ -796,12 +796,12 @@
       <origin xyz="0.000463 0.000913 -0.022053" rpy="0 0 0" />
       <mass value="0.000001" />
       <inertia
-                ixx="0.000083"
+                ixx="1.024e-09"
                 ixy="0.000000"
                 ixz="0.000000"
-                iyy="0.000074"
+                iyy="9.128e-10"
                 iyz="0.000000"
-                izz="0.000027"
+                izz="3.331e-10"
             />
     </inertial>
     <visual>
@@ -819,19 +819,19 @@
     <parent link="base" />
     <child link="head_yaw" />
     <axis xyz="0 0 1" />
-    <limit lower="-0.69813" upper="0.69813" effort="0" velocity="0" />
+    <limit lower="-0.69813" upper="0.69813" effort="2.94" velocity="0.5" />
   </joint>
   <link name="head_pitch">
     <inertial>
       <origin xyz="0.014588 0.000575 0.014123" rpy="0 0 0" />
       <mass value="0.00000001" />
       <inertia
-                ixx="0.002536"
-                ixy="0.000035"
-                ixz="0.000079"
-                iyy="0.003283"
-                iyz="0.000012"
-                izz="0.003909"
+                ixx="2.018e-11"
+                ixy="2.786e-13"
+                ixz="6.288e-13"
+                iyy="2.613e-11"
+                iyz="9.551e-14"
+                izz="3.111e-11"
             />
     </inertial>
     <visual>
@@ -855,7 +855,7 @@
     <parent link="head_yaw" />
     <child link="head_pitch" />
     <axis xyz="0 1 0" />
-    <limit lower="-0.5236" upper="0.20944" effort="0" velocity="0" />
+    <limit lower="-0.5236" upper="0.20944" effort="2.94" velocity="0.5" />
   </joint>
   <link name="vita_logo">
     <inertial>

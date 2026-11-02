@@ -36,6 +36,7 @@
 
 ## 事实与范围
 
+- V1.6.0 应用开发使用 `release/V1.6.0`，按[快速开始](docs/getting-started/README.zh-CN.md)操作。搭建前确认当前分支，保留本地修改，不擅自替换为 `main`、迭代分支或 tag；用户自行创建的应用分支可基于该正式分支。
 - 当前 EDU 发布对象为 `foot_quadruped`。其他设备类型处于规划阶段，共用硬件或连接指南不改变这一范围。
 - 当前适配的机器人应用版本为 `V1.6.0-15`，由设备配置的 `application_version` 记录。它与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断更早或后续应用版本兼容。
 - 能力目录是索引，不是在线可用性证明。未知固件／SDK 版本、路由与 ROS2 映射应保持未知，不得猜测。
@@ -69,7 +70,8 @@
 VBOT Lab 版本迭代在选定的 `pre_release/V<major>.<minor>.<patch>.X` 分支准备，
 每个分支只对应一个版本族，不作为所有后续版本的共用分支。
 迭代分支允许在用户确认后直接提交和推送，不要求 PR。
-`main` 只保存正式版本；未明确要求时，不创建正式发布提升 PR，也不发布版本。
+`main` 保存最新正式版本，`release/V1.6.0` 用于 V1.6.0 开发，正式快照为 `Rel/V1.6.0`；
+V1.6.0 的迭代阶段已结束。未明确要求时，不创建正式发布提升 PR，也不发布版本。
 参阅[协作流程](.github/WORKFLOWS.zh-CN.md)。
 运行 `python3 tests/check_repository.py`、`python3 tests/test_agent_workspace.py`
 及适用的 Bazel 目标进行验证。先保留本地未提交修改供审阅，

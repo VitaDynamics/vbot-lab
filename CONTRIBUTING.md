@@ -40,7 +40,8 @@ VBOT Lab version iterations use a separate `pre_release/V<major>.<minor>.<patch>
 branch for each version family. After checks, maintainers may commit and push directly
 to that iteration branch; iteration updates do not require a PR. A topic PR targeting
 the iteration branch remains optional when review is wanted.
-`main` is reserved for formal releases. Open a release-promotion PR only when a formal
+V1.6.0 application development uses `release/V1.6.0`; `Rel/V1.6.0` records the formal snapshot.
+`main` is reserved for the latest formal release. Open a release-promotion PR only when a formal
 release has been explicitly requested; do not create one during ordinary iteration work.
 Do not push directly to `main` or imply support for unreleased capabilities.
 PRs to `main` require approval from another listed maintainer, passing `repository-layout`

@@ -8,7 +8,8 @@ announcement or an installer. Component versions remain independent.
 
 The configuration uses the selected application, SDK, Schema and development image
 references. It records the intended source branch and tag; this does not create Git
-refs or announce a release. The source tag is `V1.6.0.15`, the robot application is
+refs or announce a release. The development branch is `release/V1.6.0`, the formal
+source tag is `Rel/V1.6.0`, the robot application is
 `V1.6.0-15`, and the SDK Release is `edu-sdk-2026.10.31`. The image digest is pinned.
 
 ## Fields
@@ -16,8 +17,8 @@ refs or announce a release. The source tag is `V1.6.0.15`, the robot application
 | Field | Meaning and allowed values |
 | --- | --- |
 | `format_version` | Integer `1`; unknown fields and duplicate JSON keys are rejected |
-| `workspace.branch` | `main` for a formal release, or a long-lived iteration branch such as `pre_release/V1.6.0.X`; `X` is a literal letter, not an iteration number |
-| `workspace.tag` | Source tag for this snapshot: `V1.6.0.15`. Iteration tags match the branch version family and add a numeric iteration; robot application and SDK versions are recorded separately |
+| `workspace.branch` | Development branch for the selected release: `release/V1.6.0`. The format also accepts `main` and long-lived iteration branches such as `pre_release/V1.6.1.X`; `X` is literal |
+| `workspace.tag` | Formal snapshot `Rel/V1.6.0`, matching the `release/V1.6.0` branch family. Iteration branches instead use a matching numeric iteration tag; robot application and SDK versions remain separate |
 | `robots` | Current released robot types from `catalog/robots/`; each records its exact `application_version`, not a minimum version |
 | `sdk.repository`, `sdk.release_tag` | GitHub download repository (`owner/name`) and exact EDU SDK bundle Release tag |
 | `sdk.aorta_version` | Aorta SDK package version, aligned with the Python and C++ SDK |
@@ -39,19 +40,20 @@ SDK binaries have their own Release references and hashes.
 
 ## Source branches and tags
 
-VBOT Lab keeps formal releases on `main`. Prepare changes on the
-`pre_release/V<major>.<minor>.<patch>.X` branch for the selected version family.
-Each family has its own branch; `pre_release/V1.6.0.X` is only for the `V1.6.0` family.
-Iteration updates allow direct commits and pushes and do not require a PR.
-The current pairing is source tag `V1.6.0.15` on `pre_release/V1.6.0.X` for robot
-application `V1.6.0-15`. Iteration tags belong to the selected branch version family;
-record the robot application and exact SDK/Schema pairing separately.
+Develop V1.6.0 applications on `release/V1.6.0`, not on a detached tag or an iteration
+branch. `Rel/V1.6.0` identifies its formal source snapshot, paired with robot application
+`V1.6.0-15`. The earlier `V1.6.0.15` tag remains an iteration snapshot, not the development
+entry point. `main` contains the latest formal release.
 
-Create the iteration tag on the checked source commit. A tag alone does not promote
-the iteration to `main` or create a GitHub Release. Continue iteration work on the
-selected branch; open a promotion PR only when formal release is explicitly requested.
-Existing tags identify immutable snapshots. Record the selected source tag in
-`workspace.tag`; creating it requires an explicit release step. See the
+At formal promotion, merge the reviewed changes to `main` through its PR process, then
+create `release/V1.6.0` and `Rel/V1.6.0` from that same merged commit. This keeps the three
+references aligned without rewriting history. Selecting a branch or creating a tag does
+not automatically create a GitHub Release.
+
+For a new version family, prepare iterations on its own
+`pre_release/V<major>.<minor>.<patch>.X` branch; iteration updates do not require a PR.
+The V1.6.0 iteration is complete. Do not reuse its branch for another family.
+Existing tags identify immutable snapshots. See the
 [collaboration workflow](../.github/WORKFLOWS.md) for review and promotion steps.
 
 The configuration does not replace [capability metadata](README.md), robot profiles,

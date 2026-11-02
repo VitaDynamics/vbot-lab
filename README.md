@@ -14,6 +14,16 @@ See the [compatibility matrix](docs/compatibility.md) for SDK and platform pairi
 
 ## Build with your Agent
 
+Select the V1.6.0 development branch before opening the checkout in your Agent:
+
+```bash
+git clone https://github.com/VitaDynamics/vbot-lab.git &&
+cd vbot-lab &&
+git checkout release/V1.6.0
+```
+
+For an existing checkout, preserve local changes, run `git fetch origin`, then
+`git checkout release/V1.6.0`. See the [release notes](CHANGELOG.md) for this version.
 Open this checkout in Codex or Claude Code, then ask:
 
 > Check this workstation for VBOT development. Report available tools, missing dependencies,

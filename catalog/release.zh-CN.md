@@ -6,7 +6,7 @@
 它是本地、机器可读的配套配置，不是发布公告或安装程序，各组件保留独立版本号。
 
 配置记录所选应用、SDK、Schema 与开发镜像引用，以及计划使用的源码分支和 tag；
-这不会创建 Git 引用，也不表示发布了新版本。源码 tag 为 `V1.6.0.15`，
+这不会创建 Git 引用，也不表示发布了新版本。开发分支为 `release/V1.6.0`，正式源码 tag 为 `Rel/V1.6.0`，
 机器人应用为 `V1.6.0-15`，SDK Release 为 `edu-sdk-2026.10.31`。镜像 digest 已固定。
 
 ## 字段说明
@@ -14,8 +14,8 @@
 | 字段 | 含义与填写范围 |
 | --- | --- |
 | `format_version` | 整数 `1`；拒绝未知字段和重复 JSON 键 |
-| `workspace.branch` | 正式版本使用 `main`，迭代版本使用 `pre_release/V1.6.0.X` 等长期分支；`X` 保留为字母，不替换为迭代号 |
-| `workspace.tag` | 当前源码 tag：`V1.6.0.15`。迭代 tag 与分支版本族一致，并带数字迭代后缀；机器人应用和 SDK 版本分别记录 |
+| `workspace.branch` | 所选正式版的开发分支：`release/V1.6.0`。格式也接受 `main` 与 `pre_release/V1.6.1.X` 等长期迭代分支，`X` 保留为字母 |
+| `workspace.tag` | 正式快照 `Rel/V1.6.0`，与 `release/V1.6.0` 的版本族一致；迭代分支使用配套的数字迭代 tag，机器人应用和 SDK 版本分别记录 |
 | `robots` | `catalog/robots/` 中当前已开放的设备类型；分别记录准确的 `application_version`，不是最低版本 |
 | `sdk.repository`、`sdk.release_tag` | GitHub 下载仓库（`owner/name`）与确切的 EDU SDK 整包 Release tag |
 | `sdk.aorta_version` | 与 Python／C++ SDK 配套的 Aorta SDK 包版本 |
@@ -35,18 +35,16 @@
 
 ## 源码分支与 tag
 
-VBOT Lab 的 `main` 保存正式版本。迭代更新在选定版本族的
-`pre_release/V<major>.<minor>.<patch>.X` 分支中准备。
-每个版本族使用各自的分支；`pre_release/V1.6.0.X` 仅对应 `V1.6.0` 版本族。
-迭代更新允许直接提交和推送，不要求 PR。
-当前配套为 `pre_release/V1.6.0.X` 上的源码 tag `V1.6.0.15`，适配机器人应用
-`V1.6.0-15`。迭代 tag 属于选定的分支版本族；机器人应用版本和
-准确的 SDK／Schema 配套分别记录。
+V1.6.0 应用开发使用 `release/V1.6.0`，不使用 detached tag 或迭代分支。
+`Rel/V1.6.0` 标记正式源码快照，配套机器人应用 `V1.6.0-15`。
+先前的 `V1.6.0.15` tag 保留为迭代快照，不作为开发入口；`main` 保存最新正式版本。
 
-在检查通过的源码提交上创建迭代 tag。仅打 tag 不会将迭代版本提升到 `main`，
-也不会创建 GitHub Release。后续迭代继续在选定分支上进行，只有明确要求正式发布时，
-才创建提升 PR。已有 tag 对应不可变的源码快照；在 `workspace.tag` 中记录选定的源码 tag，
-创建 tag 是需要明确执行的发布步骤。
+正式发布时，经 PR 评审合并到 `main` 后，再从同一合并提交创建 `release/V1.6.0`
+与 `Rel/V1.6.0`，使三者一致，不改写历史。切换分支或创建 tag 不会自动创建 GitHub Release。
+
+新版本族的迭代使用各自的 `pre_release/V<major>.<minor>.<patch>.X` 分支，
+迭代更新不要求 PR。V1.6.0 的迭代阶段已结束，不将它的分支复用于其他版本族。
+已有 tag 对应不可变的源码快照。
 评审和正式发布步骤见[协作流程](../.github/WORKFLOWS.zh-CN.md)。
 
 配置不替代[能力元数据](README.zh-CN.md)、设备配置、生成的 Schema 元数据或 SDK

@@ -35,7 +35,7 @@ without raw exceptions or configuration contents. config_not_found and invalid_c
 to stage=config and stop before SDK/device access; sdk_not_installed, sdk_version_mismatch
 and sdk_load_failed belong to stage=sdk. Environment and subscription failures have their own
 stages; unexpected failures use runtime/unexpected_error. Follow the supplied next_step and
-the [error guide](https://github.com/VitaDynamics/vbot-lab/blob/main/docs/troubleshooting/README.md#application-errors).
+the [error guide](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/troubleshooting/README.md#application-errors).
 
 ## Package — development container
 
@@ -95,7 +95,7 @@ does not establish that an interface is unsupported. Nothing starts automaticall
 For a new login, re-enter APP_DIR, clear the two Python overrides, set the same environment,
 and rerun the last command without reinstalling. Subscribers and the Node close on exit.
 
-Start from [VBOT Lab](https://github.com/VitaDynamics/vbot-lab) for connection, environment
-and interface guides. Use the [Python diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/main/docs/development/diagnostics.md)
+Start from [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0) for connection, environment
+and interface guides. Use the [Python diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.md)
 for environment or missing-data issues. Share reproducible issues in [Vbot 超能社区](https://forum.vbot.cn/),
 after reviewing diagnostic summaries; do not share credentials or session configuration.

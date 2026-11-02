@@ -7,6 +7,10 @@ The initial workflow is a local environment inventory, not automatic robot deplo
 
 ## Work inside VBOT Lab
 
+For V1.6.0 development, follow the [quickstart](../getting-started/README.md) and
+select `release/V1.6.0` before starting the Agent. Check the branch in existing
+checkouts and preserve local changes before switching.
+
 Use a Git checkout that preserves symbolic links. The development container and Linux / WSL
 workspaces are suitable filesystem choices; verify links after copying a checkout or extracting
 an archive. Do not treat a text file containing `../skills` as a working link.

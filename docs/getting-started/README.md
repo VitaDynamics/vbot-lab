@@ -3,7 +3,7 @@
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 The default path is **Python + foot_quadruped EDU + a read-only state subscription**.
-It targets robot application `V1.6.0-15`, source tag `V1.6.0.15` and SDK Release
+It targets robot application `V1.6.0-15`, development branch `release/V1.6.0` and SDK Release
 `edu-sdk-2026.10.31`.
 The goal is three decoded `/locomotion/status` samples followed by
 normal program exit. No motion, audio/video capture or autostart is involved.
@@ -19,22 +19,21 @@ normal program exit. No motion, audio/video capture or autostart is involved.
 
 Check the [robot-type guide](../robots/README.md) and [compatibility matrix](../compatibility.md).
 Four-wheeled and bipedal EDU software are not part of this release. Clone normally, then
-select the documented source tag:
+select the release branch for the V1.6.0 family:
 
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout V1.6.0.15
+git checkout release/V1.6.0
 ```
 
-For an existing checkout, run `git fetch origin tag V1.6.0.15` if the tag is absent.
-If the remote does not provide that tag, stop and select an available source/application
-pairing. Confirm that the matching SDK Release is available before downloading its assets;
-do not substitute `main`, another SDK version, or an unrelated download source.
-Preserve local changes before switching. A tag checkout uses detached HEAD mode,
-which is normal for a version snapshot. See the [release configuration](../../catalog/release.md)
-for the source and component pairing.
-If you want to edit this checkout, create a working branch first:
+For an existing checkout, preserve local changes, run `git fetch origin`, then
+`git checkout release/V1.6.0`. Check that `git branch --show-current` prints
+`release/V1.6.0` before continuing. If the remote does not provide the branch, stop;
+do not substitute `main`, an iteration branch or a tag. Confirm that the matching
+SDK Release is available before downloading its assets. See the
+[release configuration](../../catalog/release.md) for the source and component pairing.
+If you want to edit this checkout, create a working branch from the release branch first:
 
 ```bash
 git switch -c my-edu-app

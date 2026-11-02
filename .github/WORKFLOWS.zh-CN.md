@@ -2,7 +2,7 @@
 
 <p align="center"><a href="WORKFLOWS.md">English</a> | 中文</p>
 
-PR 及 `main`、`pre_release/**` 推送时，工作流将仓库检查与应用执行分开。
+PR 及 `main`、`release/**`、`pre_release/**` 推送时，工作流将仓库检查与应用执行分开。
 `repository-checks` 在 GitHub 托管运行器执行只读内容检查及模拟工具检查；
 `recipe-checks` 在 `docker/compose.yaml` 选定的开发容器内执行不依赖 SDK 的预览和模拟应用流程。
 `sdk-integration` 使用同一套固定镜像配置，执行真实 SDK 集成、全新 venv 安装、所有 Python／C++
@@ -69,14 +69,19 @@ python3 tools/run_checks.py --scope recipes
    目标分支有新提交时，更新工作分支。
 4. 使用 **Squash and merge**。为 `main` 配置保护，禁止直接推送、强推或删除，
    不配置管理员绕过权限。
+5. 从合并后的 `main` 提交创建已确认的 `release/V<major>.<minor>.<patch>` 分支
+   与 `Rel/V<major>.<minor>.<patch>` tag；发布时三者必须指向同一提交。
+   不从 Squash 前的工作分支头创建永久正式分支，也不移动已有 tag 来对齐引用。
 
 ## 版本迭代与正式发布
 
 | 引用 | 用途 |
 | --- | --- |
 | `main` | 最新正式版本，不合入尚未正式发布的版本更新 |
-| `pre_release/V1.6.0.X` | `V1.6.0` 版本族的长期迭代分支，末尾 `X` 保留为字母 |
-| `V1.6.0.15` | 机器人应用 `V1.6.0-15` 配套的源码 tag；以发布配置中明确记录的源码 tag 为准 |
+| `release/V1.6.0` | `V1.6.0` 最终正式版的开发入口，配套机器人应用 `V1.6.0-15` |
+| `Rel/V1.6.0` | 不可变的正式源码快照，不作为默认开发 checkout |
+| `pre_release/V1.6.0.X` | `V1.6.0` 版本族已结束的迭代历史，不作为开发入口，末尾 `X` 保留为字母 |
+| `V1.6.0.15` | 保留的机器人应用 `V1.6.0-15` 迭代快照 |
 | `edu-sdk-*` | SDK 附件 Release tag，与源码 tag 和机器人应用版本分别管理 |
 
 `V1.6.0` 的分支不作为所有后续版本的共用分支。
@@ -91,10 +96,11 @@ python3 tools/run_checks.py --scope recipes
 4. 只有明确要求正式发布时，才选定准确的已检查快照，填齐发布配置，提交提升至 `main` 的 PR。
    不混入其他修改，不移动已有迭代 tag；需要补充修改时使用新 tag。
 5. 得到正式发布确认并完成维护者评审后，才通过 PR 流程更新 VBOT Lab 的 `main`，
-   并按需发布已确认的源码版本和 SDK 附件。本工作流不会自动发布版本，
+   再从合并提交创建上述正式分支与 tag；仅在要求时发布源码 Release 说明或 SDK 附件。
+   本工作流不会自动发布版本，
    不对 `main` 执行 reset 或强推。
 
-匹配 `V*` 和 `edu-sdk-*` 的 tag 允许新增，但不能改写或删除。
+版本 tag `V*`、`Rel/V*` 和 `edu-sdk-*` 标记不可变的快照，不改写或删除。
 需要修正时使用新 tag，不要让已有版本指向另一份内容。
 创建源码 tag 不会自动创建 GitHub Release：本工作流没有 tag 触发器或 Release 发布步骤。
 SDK 下载资产与源码 tag 分别管理。
