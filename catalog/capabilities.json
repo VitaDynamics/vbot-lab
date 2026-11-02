@@ -4,15 +4,15 @@
   "sdk": {
     "name": "Aorta Python SDK",
     "integration": "integrated",
-    "version": "2026.10.12",
+    "version": "2026.10.20",
     "python_import": "aorta",
     "reference": "packages/aorta/python/README.md",
-    "release": "edu-sdk-2026.10.14",
-    "edu_messages_version": "2026.10.13",
+    "release": "edu-sdk-2026.10.31",
+    "edu_messages_version": "2026.10.20",
     "cpp": {
-      "version": "2026.10.12",
+      "version": "2026.10.20",
       "abi": 13,
-      "schema_pack": "2026.10.13-v4",
+      "schema_pack": "2026.10.20-v4",
       "reference": "packages/aorta/cpp/README.md"
     }
   },
@@ -400,6 +400,21 @@
       "execution_location": "device_service",
       "interface_kind": "http",
       "reference": "docs/interfaces/agent/content-api.md",
+      "skill": null,
+      "tool": null,
+      "recipe": null,
+      "requires_sdk": false,
+      "effect": "depends_on_operation",
+      "minimum_firmware": null,
+      "verification": "documentation_only"
+    },
+    {
+      "id": "device.agent.mcp-config",
+      "availability": "documented",
+      "robot_types": ["foot_quadruped"],
+      "execution_location": "device_service",
+      "interface_kind": "http",
+      "reference": "docs/interfaces/agent/mcp-config.md",
       "skill": null,
       "tool": null,
       "recipe": null,

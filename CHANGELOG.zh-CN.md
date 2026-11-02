@@ -4,12 +4,17 @@
 
 ## 未发布
 
-- 适配机器人应用 `V1.6.0-12`，依赖 SDK `2026.10.12`、C++ ABI 13、EDU Schema `2026.10.13-v4` 和 Release `edu-sdk-2026.10.14`，单独说明设备组件版本。
-- 补齐 JPEG 获取与兼容 RCP 提交服务，使服务索引覆盖全部 22 个入口；区分提交受理与 action 完成。
-- 快速开始选择源码 tag `V1.6.0.12`，并说明当前可用的 Blueprint 和 Skill 流程。
+- 补充动态新增外部 HTTP MCP、编辑连接、启停与发现刷新接口，包括请求字段及凭据处理。
+- 无线连接统一在已绑定设备的 Vbot App 中进入设置 → 关于查看 Wi-Fi IP，替换路由器管理界面查询方式。
+- 适配机器人应用 `V1.6.0-15`，依赖 SDK `2026.10.20`、C++ ABI 13、EDU Schema `2026.10.20-v4`、Release `edu-sdk-2026.10.31` 和 FlatBuffers `25.12.19`，单独说明设备组件版本。
+- 通过 `/ota_version` 查询应用版本，并说明构建后缀的处理。
+- 索引新增音频、版本与控制接口；在系统／外设 Recipe 中补充 Python／C++ 应用版本读取。
+- 说明 EDU Schema `2026.10.20` 新增的 `/locomotion/control_enable`、`/ota_version`、`/system/power_saving/enable` 和 `/function/following`。
+- 补齐 JPEG 获取与兼容 RCP 提交服务，使服务索引覆盖全部 25 个入口；区分提交受理与 action 完成。
+- 快速开始选择源码 tag `V1.6.0.15`，并说明当前可用的 Blueprint 和 Skill 流程。
 - 说明 `/audio/play_pcm` 扬声器输入及 `/speech_control` 策略查询／修改，包括字段、ROS 2 映射与操作边界。
 - 添加机器可读的组件配套配置与离线一致性检查。
-- `main` 保留正式版本；`V1.6.0` 版本族内的迭代更新在 `pre_release/V1.6.0.X` 准备，源码 tag 为 `V1.6.0.12`。其他版本族使用各自的迭代分支。
+- `main` 保留正式版本；`V1.6.0` 版本族内的迭代更新在 `pre_release/V1.6.0.X` 准备，源码 tag 为 `V1.6.0.15`。其他版本族使用各自的迭代分支。
 
 ## V1.6.0
 

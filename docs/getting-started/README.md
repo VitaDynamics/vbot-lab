@@ -3,8 +3,8 @@
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 The default path is **Python + foot_quadruped EDU + a read-only state subscription**.
-It targets robot application `V1.6.0-12`, source tag `V1.6.0.12` and SDK Release
-`edu-sdk-2026.10.14`.
+It targets robot application `V1.6.0-15`, source tag `V1.6.0.15` and SDK Release
+`edu-sdk-2026.10.31`.
 The goal is three decoded `/locomotion/status` samples followed by
 normal program exit. No motion, audio/video capture or autostart is involved.
 
@@ -24,10 +24,13 @@ select the documented source tag:
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout V1.6.0.12
+git checkout V1.6.0.15
 ```
 
-For an existing checkout, run `git fetch origin tag V1.6.0.12` if the tag is absent.
+For an existing checkout, run `git fetch origin tag V1.6.0.15` if the tag is absent.
+If the remote does not provide that tag, stop and select an available source/application
+pairing. Confirm that the matching SDK Release is available before downloading its assets;
+do not substitute `main`, another SDK version, or an unrelated download source.
 Preserve local changes before switching. A tag checkout uses detached HEAD mode,
 which is normal for a version snapshot. See the [release configuration](../../catalog/release.md)
 for the source and component pairing.
@@ -72,12 +75,16 @@ From the container checkout root, download the pinned Release assets, build and 
 read-only Recipe, then package it. Existing matching downloads are reused. The package
 output must be new; if it already exists, inspect/reuse it or choose another output path.
 
+Alternatively, download the required ARM64 wheels, manifest, checksums and license through
+the [SDK guide](../../packages/aorta/python/README.md) into the same mounted directory first.
+The helper validates and reuses those files without downloading them again.
+
 ```bash
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.14 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
 python3 tools/in_container.py -- bazel build //recipes/subscribe-state:main &&
 python3 tools/in_container.py -- bazel run //recipes/subscribe-state:main &&
 python3 tools/package_python.py --recipe subscribe-state \
-  --assets-dir artifacts/edu-sdk-2026.10.14 --output artifacts/first-state &&
+  --assets-dir artifacts/edu-sdk-2026.10.31 --output artifacts/first-state &&
 python3 tools/package_python.py --verify artifacts/first-state
 ```
 
@@ -95,7 +102,8 @@ on the robot to work around a failed build/package.
 
 First complete [public-key SSH login](../robots/quadruped-common/connection.md), or reuse your
 working configuration. Wired access normally uses `192.168.126.2`; for Wi-Fi, connect through
-the mobile app, find the robot IP in the router, and replace ROBOT below. An existing vbot SSH
+Vbot App, view the robot IP under **Settings → About** in the app already bound to the robot,
+and replace ROBOT below. An existing vbot SSH
 alias also works. Do not continue after connection, authentication or host-key errors.
 
 Run at the host checkout root, where `artifacts/first-state` is visible through the workspace

@@ -28,6 +28,7 @@ relevant references; this repository is not a device runtime.
 | Find back mounting dimensions or an arm adapter CAD file | [Shared robot-dog back mounting](docs/hardware/quadruped-common/back-mounting.md); applies to foot_quadruped and wheel_quadruped, not foot_humanoid; distinguish mechanical fit from payload or arm-control support |
 | Get help or prepare a feedback report | [Community & Support](docs/community/README.md); draft a minimal, sanitized report for user review, not automatic posting |
 | Author or inject device Skills / AGENTS.md | [device content API](docs/interfaces/agent/content-api.md), not developer-side Skills |
+| Register or configure an external MCP service for the device Agent | [MCP connection API](docs/interfaces/agent/mcp-config.md), then [tool contract](docs/interfaces/agent/http-mcp.md); use a URL reachable from the runtime and verify discovery before a new Turn |
 | Modify VBOT Lab itself | [Contributing](CONTRIBUTING.md) and relevant tests |
 | Diagnose an application environment or a missing telemetry stream | [vbot-diagnose](skills/vbot-diagnose/SKILL.md), then [layered diagnostics](docs/development/diagnostics.md); explicit levels, no automatic device connection |
 
@@ -37,7 +38,7 @@ Resolve a linked Skill to its physical checkout before using its relative resour
 ## Facts and scope
 
 - The current EDU release target is `foot_quadruped`. Other robot types are planned, even when hardware or connection guides are shared.
-- The supported robot application target is `V1.6.0-12`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
+- The supported robot application target is `V1.6.0-15`, recorded as `application_version` in the robot profile. Keep it separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for earlier or later application releases.
 - Use the capability catalog as an index, not proof of live availability. Unknown firmware / SDK versions, routes, and ROS2 mappings stay unknown; do not invent them.
 - Use the published wheel pairing in the Python SDK guide and the checked-in public Schema. Preserve Aorta package names and APIs. Recipes have offline previews and explicit device execution; building a target does not verify live compatibility.
 - Device Aorta CLI access is separate from SDK integration. ROS 2 uses a device-local bridge subset; use documented mappings and limitations, not identical-name assumptions.

@@ -9,7 +9,7 @@
 ## 有线／Wi-Fi 连接与 SSH 登录
 
 本类型与 `foot_quadruped` 的连接方式相同，请按[共用连接指南](../quadruped-common/connection.zh-CN.md)
-选择有线网卡配置或手机 App 无线配网、路由器 IP 查询，并以 `vbot` 账户 SSH 登录。
+选择有线网卡配置或 Vbot App 无线配网，在已绑定设备的 App 中进入设置 → 关于查看 IP，并以 `vbot` 账户 SSH 登录。
 共用连接步骤不扩大当前 EDU 发布范围，也不代表固件、SDK 或 API 兼容。
 
 ## 已有硬件参考

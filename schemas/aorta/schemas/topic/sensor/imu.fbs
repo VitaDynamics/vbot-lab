@@ -1,7 +1,7 @@
 // Sensor - Imu
 //
-// Mirrors ROS2 sensor_msgs/msg/Imu. ROS Header is represented as timestamp +
-// frame_id; covariance arrays are row-major 3x3 matrices.
+// Extends ROS2 sensor_msgs/msg/Imu with optional chip temperature. ROS Header
+// is represented as timestamp + frame_id; covariance arrays are row-major 3x3.
 
 include "schemas/system/aorta_base.fbs";
 include "schemas/topic/foxglove_schema/Quaternion.fbs";
@@ -24,6 +24,11 @@ table Imu {
 
   linear_acceleration: foxglove.Vector3 (id: 8);
   linear_acceleration_covariance: [double] (id: 9);
+
+  // Latest available chip temperature in degrees Celsius; null when unknown.
+  // May update slower than six-axis data. timestamp remains the IMU frame time,
+  // not the temperature conversion time. Producers omit non-finite readings.
+  temperature_deg_c: float = null (id: 10);
 }
 
 root_type Imu;

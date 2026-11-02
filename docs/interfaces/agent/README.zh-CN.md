@@ -2,7 +2,7 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-本章节介绍设备端 `vbot-agent-harness` 的 HTTP MCP 工具、运行时 Skills、
+本章节介绍设备端 `vbot-agent-harness` 的 HTTP MCP 工具与连接配置、运行时 Skills、
 开发者提供的 `AGENTS.md` 指令，以及注入用户内容的 HTTP API。
 适用场景为单设备、单个可信开发者，使用 S100 上的 `vbot` 账户。
 本仓库当前发布范围仅为 [foot_quadruped](../../robots/foot_quadruped/README.zh-CN.md)，
@@ -12,7 +12,7 @@
 
 | 能力 | 开发者负责 | Agent 行为 | 详细说明 |
 | --- | --- | --- | --- |
-| HTTP MCP | 在 S100 上运行开发者自己的 HTTP MCP 服务 | EDU 运行时作为 MCP 客户端，通过固定内网入口发现并调用工具 | [HTTP MCP 契约](http-mcp.zh-CN.md) |
+| HTTP MCP | 运行可信 HTTP MCP 服务，使用额外入口时注册其可达 URL | EDU 运行时作为 MCP 客户端，发现并调用工具 | [工具契约](http-mcp.zh-CN.md)、[连接配置 API](mcp-config.zh-CN.md) |
 | 设备端 Skills | 编写 `SKILL.md`，通过 Skills API 上传 | 发现可复用知识／流程，并在匹配的请求中激活 | [编写规范](customization.zh-CN.md)、[内容 API](content-api.zh-CN.md) |
 | 设备端 AGENTS.md | 编写长期偏好，通过 AGENTS.md API 替换用户层内容 | 在后续 Turn 构建提示时合并指令 | [编写规范](customization.zh-CN.md)、[内容 API](content-api.zh-CN.md) |
 
@@ -31,7 +31,7 @@ Skills 与 `AGENTS.md` 提供指令，不授予额外的操作系统权限。
 
 ## 版本兼容性
 
-这些 API 适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-12**。
+这些 API 适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-15**。
 接入前请查看[兼容矩阵](../../compatibility.zh-CN.md)，并确认设备运行时可用。
 通过[接入指南](../../guides/agent-integration.zh-CN.md)检查 API 响应、内容路径及新 Turn 中的行为。
 在自己的工作区保留源内容及备份，升级固件前阅读对应版本说明。
@@ -40,12 +40,13 @@ Skills 与 `AGENTS.md` 提供指令，不授予额外的操作系统权限。
 
 ## 开放边界
 
-- 约定 MCP 入口为 `http://192.168.127.2:18080/mcp`，内容 API 使用
+- 默认 S100 MCP 入口为 `http://192.168.127.2:18080/mcp`，配置及内容 API 使用
   `http://192.168.127.10:8787`。两者是机器人内部网络上的不同接口契约。
   不得将 `18080` 或 `8787` 端口暴露或转发到校园公网、互联网。
 - 使用 `vbot` 账户及文档列明的访问方式，操作不得超出账户已分配的权限。
 - MCP 仅承诺已列出的工具子集，不承诺 stdio transport、Resources 或 Prompts。
-- 每台设备只有一个约定 MCP 入口。多个工具提供者应在开发者的 S100 服务内聚合，不按多租户托管平台使用。
+- 可通过[连接配置 API](mcp-config.zh-CN.md)新增、编辑、启停及刷新其他 HTTP MCP 服务。
+  地址必须从设备运行时可达，确认发现结果后再开始新的 Turn；不按多租户托管平台使用。
 - MCP 会话请求头只是传输层状态，不是内容 API 的凭证。
 - 用户层 Skills 与 `AGENTS.md` 使用[内容 API](content-api.zh-CN.md)注入。
-- 本章节聚焦 MCP 与用户内容定制，不是完整的应用会话协议，也不暴露服务管理操作。
+- 本章节聚焦 MCP 与用户内容定制，不是完整的应用会话协议，也不包含通用系统服务管理。

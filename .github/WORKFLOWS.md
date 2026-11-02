@@ -9,6 +9,9 @@ flows inside the development container selected by `docker/compose.yaml`.
 `sdk-integration` uses that same pinned container configuration for real SDK integration,
 fresh-venv installation, all Python/C++ Recipe builds, SDK serialization tests and package
 completeness checks. It verifies the assets pinned in `catalog/release.json` before use.
+The job downloads the Release recorded in `catalog/release.json` using its GitHub token.
+Missing authorization, a missing Release or an incomplete attachment inventory fails the job.
+Every downloaded file is checked against its pinned digest before use.
 Each fresh SDK venv explicitly loads the wheel-bundled native library, verifies its origin and
 release ABI, and clear `AORTA_CORE_FFI_LIB`; successful imports alone are not sufficient.
 It also cross-builds the base C++ Recipes for ARM64 and inspects target ELF/dependencies;
@@ -83,7 +86,7 @@ but does not require opening a PR or obtaining a pre-push CI result for each new
 | --- | --- |
 | `main` | Latest formal release; do not merge work-in-progress version updates |
 | `pre_release/V1.6.0.X` | Long-lived iteration branch for the `V1.6.0` family; the final `X` stays literal |
-| `V1.6.0.12` | Source tag for robot application `V1.6.0-12`; select the exact source tag recorded in the release configuration |
+| `V1.6.0.15` | Source tag for robot application `V1.6.0-15`; select the exact source tag recorded in the release configuration |
 | `edu-sdk-*` | SDK attachment Release tags; independent of source tags and robot application versions |
 
 The `V1.6.0` branch is not shared by all future versions. A new family such as

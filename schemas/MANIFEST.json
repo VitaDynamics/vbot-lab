@@ -1,6 +1,6 @@
 {
   "file_counts": {
-    "aorta_fbs": 65,
+    "aorta_fbs": 70,
     "ros2": {
       "aorta_msgs": {
         "action": 1,
@@ -25,7 +25,7 @@
       "function_msgs": {
         "action": 0,
         "msg": 3,
-        "srv": 3
+        "srv": 4
       },
       "lowlevel_msg": {
         "action": 0,
@@ -68,13 +68,13 @@
         "srv": 0
       }
     },
-    "routes": 72
+    "routes": 76
   },
   "format_version": 1,
-  "ros2_bridge_version": "2026.10.12",
+  "ros2_bridge_version": "2026.10.21",
   "schema_pack": {
-    "asset": "aorta-edu-schema-pack-2026.10.13-v4.tar.zst",
-    "sha256": "9e5c3fe8539f5be169e2f08b48b3a84fba58ed298cce07b74d1176cb83b31f35",
-    "version": "2026.10.13"
+    "asset": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst",
+    "sha256": "e6a590fda45d7c27e76f28e79566a5371a40cb065809040d7d378392cfb75e4e",
+    "version": "2026.10.20"
   }
 }

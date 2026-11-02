@@ -70,7 +70,7 @@ scope, `.bashrc` configuration, and separate bounded live checks.
 Run inside the development container, from the checkout root:
 
 ```bash
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.14
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31
 ```
 
 The default `python` profile downloads seven files: four Linux ARM64/base wheels,
@@ -81,13 +81,18 @@ including C++ and Schema archives. Verified existing files are reused; invalid f
 reported without overwriting them. Downloads require network; no SDK installation,
 build or SSH occurs. Prepared assets can be supplied separately for disconnected use.
 
+The default `--transport https` downloads directly over HTTPS without GitHub CLI authentication.
+To use GitHub CLI instead, add `--transport gh`; this uses the container's existing CLI
+authorization without logging in or installing `gh`. Matching existing files are reused
+before either transport is called. Neither path stores access tokens in the checkout.
+
 ## Package a Python Recipe
 
 Build and preview the selected Recipe in the container first. Then package it separately:
 
 ```bash
 python3 tools/package_python.py --recipe subscribe-state \
-  --assets-dir artifacts/edu-sdk-2026.10.14 --output artifacts/first-state &&
+  --assets-dir artifacts/edu-sdk-2026.10.31 --output artifacts/first-state &&
 python3 tools/package_python.py --verify artifacts/first-state
 ```
 
@@ -174,7 +179,7 @@ SDK integration builds/tests this independent workspace too, without device acce
 The generated Python workspace is also built/tested, packaged with real SDK wheels, verified
 and installed in a fresh venv for native-runtime/ABI checks and offline preview/simulation.
 Its ARM64 package is verified separately without executing it.
-`package_app.py --project /tmp/my-monitor --assets-dir artifacts/edu-sdk-2026.10.14 --output /tmp/my-monitor-package`
+`package_app.py --project /tmp/my-monitor --assets-dir artifacts/edu-sdk-2026.10.31 --output /tmp/my-monitor-package`
 packages the Python project's explicit APP.json runtime inventory and four pinned SDK wheels without building or deploying.
 `package_app.py --verify /tmp/my-monitor-package` is read-only and may run on the host/CI.
 Output directories must be new; extra dependencies need a separately prepared application-specific workflow.

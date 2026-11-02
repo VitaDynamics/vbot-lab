@@ -37,7 +37,7 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_unknown_versions_are_not_wildcards(self):
         self.assertEqual(self.catalog["sdk"]["integration"], "integrated")
-        self.assertEqual(self.catalog["sdk"]["version"], "2026.10.12")
+        self.assertEqual(self.catalog["sdk"]["version"], "2026.10.20")
         self.assertEqual(self.catalog["sdk"]["python_import"], "aorta")
         for robot in self.robots.values():
             self.assertEqual(robot["models"], [])
@@ -45,9 +45,9 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_application_target_is_separate_from_sdk_and_release_scope(self):
         result = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")
-        self.assertEqual(result["robot"]["application_version"], "V1.6.0-12")
-        self.assertEqual(result["sdk"]["version"], "2026.10.12")
-        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.14")
+        self.assertEqual(result["robot"]["application_version"], "V1.6.0-15")
+        self.assertEqual(result["sdk"]["version"], "2026.10.20")
+        self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.31")
         self.assertIsNone(result["robot"]["minimum_firmware"])
         self.assertEqual(result["capabilities"][0]["decision"], "requires_device_verification")
         self.assertFalse(result["device_contacted"])
@@ -82,6 +82,22 @@ class AgentWorkspaceTests(unittest.TestCase):
         self.assertEqual(entry["reference"], "docs/interfaces/agent/content-api.md")
         self.assertEqual(entry["verification"], "documentation_only")
         self.assertIsNone(entry["skill"])
+
+    def test_mcp_configuration_is_a_device_http_contract_not_a_server_program(self):
+        entry = query_catalog(ROOT, "foot_quadruped", "device.agent.mcp-config")["capabilities"][0]
+        self.assertEqual(entry["reference"], "docs/interfaces/agent/mcp-config.md")
+        self.assertEqual(entry["execution_location"], "device_service")
+        self.assertEqual(entry["interface_kind"], "http")
+        self.assertEqual(entry["effect"], "depends_on_operation")
+        self.assertEqual(entry["availability"], "documented")
+        self.assertEqual(entry["verification"], "documentation_only")
+        self.assertEqual(entry["decision"], "requires_device_verification")
+        self.assertFalse(entry["requires_sdk"])
+        self.assertIsNone(entry["recipe"])
+        self.assertIsNone(entry["tool"])
+        for robot in ("wheel_quadruped", "foot_humanoid"):
+            self.assertEqual(query_catalog(ROOT, robot, entry["id"])["capabilities"][0]["decision"],
+                             "blocked_release")
 
     def test_implemented_recipe_still_needs_device_checks(self):
         entry = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")["capabilities"][0]

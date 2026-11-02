@@ -14,6 +14,7 @@
     "nav_msgs",
     "sensor_msgs",
     "std_msgs",
+    "std_srvs",
     "tf2_msgs",
     "unique_identifier_msgs"
   ],
@@ -377,6 +378,73 @@
       }
     },
     {
+      "id": "function.following",
+      "row": 62,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/function/following",
+        "schema": "aorta/schemas/service/vln/control_following.fbs",
+        "types": {
+          "request": "aorta.services.vln.ControlFollowingRequest",
+          "response": "aorta.services.vln.ControlFollowingResponse"
+        }
+      },
+      "ros": {
+        "name": "/function/following",
+        "type": "function_msgs/srv/ControlFollowing"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 65536,
+        "enum_domains": [
+          {
+            "field": "target_state",
+            "allowed": [
+              0,
+              1
+            ]
+          },
+          {
+            "field": "mode",
+            "allowed": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        ],
+        "finite_fields": [
+          "x",
+          "y",
+          "yaw",
+          "stop_distance",
+          "max_xvel"
+        ]
+      }
+    },
+    {
       "id": "locomotion.action_report",
       "row": 22,
       "kind": "topic",
@@ -443,6 +511,42 @@
         "durability": "volatile",
         "history": "keep_last",
         "depth": 10
+      }
+    },
+    {
+      "id": "locomotion.control_enable",
+      "row": 59,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/locomotion/control_enable",
+        "schema": "aorta/schemas/service/locomotion/control_enable.fbs",
+        "types": {
+          "request": "aorta.services.locomotion.ControlEnableRequest",
+          "response": "aorta.services.locomotion.ControlEnableResponse"
+        }
+      },
+      "ros": {
+        "name": "/locomotion/control_enable",
+        "type": "std_srvs/srv/SetBool"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 25000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096
       }
     },
     {
@@ -2077,6 +2181,65 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "id": "system.ota_version",
+      "row": 60,
+      "kind": "topic",
+      "direction": "aorta_to_ros",
+      "aorta": {
+        "key": "/ota_version",
+        "schema": "aorta/schemas/topic/system_monitor/ota_version.fbs",
+        "types": {
+          "message": "aorta.topic.system_monitor.OtaVersion"
+        }
+      },
+      "ros": {
+        "name": "/ota_version",
+        "type": "std_msgs/msg/String"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 10
+      }
+    },
+    {
+      "id": "system.power_saving_enable",
+      "row": 61,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/system/power_saving/enable",
+        "schema": "aorta/schemas/service/system/power_saving_enable.fbs",
+        "types": {
+          "request": "aorta.services.system.PowerSavingEnableRequest",
+          "response": "aorta.services.system.PowerSavingEnableResponse"
+        }
+      },
+      "ros": {
+        "name": "/system/power_saving/enable",
+        "type": "std_srvs/srv/SetBool"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096
       }
     },
     {

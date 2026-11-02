@@ -5,21 +5,21 @@
 开发侧 SDK 安装／导入检查、本地 SDK 示例、Bazel 和打包均在配套开发容器内执行，CI 同样遵守；
 参阅[执行位置](../../../docs/development/README.zh-CN.md)。单独标明的设备部署／运行步骤仍在设备 vbot shell 中执行。
 
-Aorta Python SDK 通过 [vbot-lab Release](https://github.com/VitaDynamics/vbot-lab/releases)
+Aorta Python SDK 通过 [GitHub Release](https://github.com/VitaDynamics/vbot-lab/releases)
 附件分发。目前 SDK 安装包需要从 GitHub Releases 下载，克隆仓库不会自动安装 SDK。
-下载需要联网；`edu-sdk-2026.10.14` 的四个必需 wheel 可在本地安装，无需访问 PyPI。本页说明如何安装 SDK、让 EDU 客户端连接机器人并
+下载需要联网；`edu-sdk-2026.10.31` 的四个必需 wheel 可在本地安装，无需访问 PyPI。本页说明如何安装 SDK、让 EDU 客户端连接机器人并
 接收实时状态。支持的机器人镜像见[兼容矩阵](../../../docs/compatibility.zh-CN.md)，
 版本配对见 Release 内的 `EDU_SDK_MANIFEST.json`。
 
-从 [edu-sdk-2026.10.14](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14)
-安装 Python wheel。版本配套以发布清单为准，而不是要求各包版本号相同：
+从 [edu-sdk-2026.10.31](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31)
+安装 Python wheel。版本配套见 [release.json](../../../catalog/release.json)，需安装以下包：
 
 | 发行包 | 版本 | 用途 |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.10.12` | `import aorta`；Python API 与平台相关的原生运行库 |
-| `aorta-msgs` | `2026.10.12` | 基础消息的生成代码与 Schema 元数据 |
-| `vbot-edu-msgs` | `2026.10.13` | EDU 消息的生成代码与 Schema 元数据 |
-| `flatbuffers` | `25.9.23` | 生成的 FlatBuffers 消息所需运行库 |
+| `aorta-sdk` | `2026.10.20` | `import aorta`；Python API 与平台相关的原生运行库 |
+| `aorta-msgs` | `2026.10.20` | 基础消息的生成代码与 Schema 元数据 |
+| `vbot-edu-msgs` | `2026.10.20` | EDU 消息的生成代码与 Schema 元数据 |
+| `flatbuffers` | `25.12.19` | 生成的 FlatBuffers 消息所需运行库 |
 
 Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 `NOTICE`。
 配套 FlatBuffers wheel 在 `.dist-info/LICENSE` 中附带许可证。Release 同时提供内容一致的
@@ -31,28 +31,28 @@ Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 
 
 ## 1. 选择 Release wheel
 
-从 `edu-sdk-2026.10.14` 下载所选平台的以下四个 wheel，
-以及 `SHA256SUMS`、`EDU_SDK_MANIFEST.json` 与 `flatbuffers-25.9.23.LICENSE`：
+从 `edu-sdk-2026.10.31` 下载所选平台的以下四个 wheel，
+以及 `SHA256SUMS`、`EDU_SDK_MANIFEST.json` 与 `flatbuffers-25.12.19.LICENSE`：
 
 | Wheel | 用途 |
 | --- | --- |
 | `aorta_sdk-<ver>-py3-none-<platform>.whl` | 对应平台的 SDK 包与原生运行库 |
 | `aorta_msgs-<ver>-py3-none-any.whl` | Aorta 消息类型 |
 | `vbot_edu_msgs-<ver>-py3-none-any.whl` | EDU 消息类型与生成的 schema 辅助模块 |
-| `flatbuffers-25.9.23-py2.py3-none-any.whl` | FlatBuffers 运行时依赖 |
+| `flatbuffers-25.12.19-py2.py3-none-any.whl` | FlatBuffers 运行时依赖 |
 
 按机器选择 `aorta_sdk` wheel——`linux_aarch64`（S100）、`linux_x86_64` 或
 `macosx_11_0_arm64`。需要 Python 3.10 或更高版本。`linux_*` 标签范围较宽：这两个 wheel
 是 Ubuntu/glibc 构建。
 
-`vbot_edu_msgs` 还依赖 `flatbuffers`。Release 同时附带 `flatbuffers` 25.9.23 wheel，
+`vbot_edu_msgs` 还依赖 `flatbuffers`。Release 同时附带 `flatbuffers` 25.12.19 wheel，
 下方命令直接安装全部四个已下载 wheel，不访问包索引。
 `EDU_SDK_MANIFEST.json` 的 `pairing.wheels` 记录所有 wheel 的版本。
 
 ## 2. 安装已下载的 wheel
 
 不要把二进制加入 Git。将四个配套 wheel、`SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`
-放到 `artifacts/edu-sdk-2026.10.14/`。在实际运行 Python 的环境中，确保 Python 3.10+、
+放到 `artifacts/edu-sdk-2026.10.31/`。在实际运行 Python 的环境中，确保 Python 3.10+、
 venv 支持可用。应用开发使用[开发容器](../../../docker/README.zh-CN.md)。
 从 `artifacts/` 的上一级目录运行以下 Linux 命令链。`&&` 会在失败后跳过后续安装步骤，
 不会退出交互式 shell；处理错误后再继续：
@@ -60,7 +60,7 @@ venv 支持可用。应用开发使用[开发容器](../../../docker/README.zh-C
 ```bash
 uname -m &&
 python3 --version &&
-cd artifacts/edu-sdk-2026.10.14 &&
+cd artifacts/edu-sdk-2026.10.31 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 cd ../.. &&
 python3 -m venv .venv &&
@@ -70,10 +70,10 @@ unset AORTA_CORE_FFI_LIB &&
 export PYTHONNOUSERSITE=1 &&
 SDK_PLATFORM=linux_x86_64 &&
 python -m pip install --no-index \
-  "artifacts/edu-sdk-2026.10.14/aorta_sdk-2026.10.12-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.10.14/aorta_msgs-2026.10.12-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.14/vbot_edu_msgs-2026.10.13-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.14/flatbuffers-25.9.23-py2.py3-none-any.whl &&
+  "artifacts/edu-sdk-2026.10.31/aorta_sdk-2026.10.20-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.10.31/aorta_msgs-2026.10.20-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.31/vbot_edu_msgs-2026.10.20-py3-none-any.whl \
+  artifacts/edu-sdk-2026.10.31/flatbuffers-25.12.19-py2.py3-none-any.whl &&
 python -m pip check &&
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; core = aorta.load_library(); print("SDK imports and native runtime OK; ABI", core.aorta_abi_version())'
 ```

@@ -7,8 +7,10 @@
 当前自动检查的范围见 [CI 与仓库协作说明](.github/WORKFLOWS.zh-CN.md)。
 参与协作请遵循[行为准则](CODE_OF_CONDUCT.zh-CN.md)。
 
-使用问题、应用讨论与新能力建议，优先按[社区与支持](docs/community/README.zh-CN.md)到论坛交流。
+使用问题、应用讨论与新能力建议，优先在论坛搜索已有解答；未解决时，
+按[社区与支持](docs/community/README.zh-CN.md)在相关帖子中补充信息或新建讨论。
 明确的仓库代码或文档修改使用 Issue／PR；已有相关论坛讨论时，附上链接即可。
+技术支持也可联系 [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn)。
 
 - Python／C++ Recipes 与参考应用统一使用 Bazel；SDK API、Schema、代码、文档和 Skill 应保持一致。
 - 纯仓库检查可在宿主机或 CI runner 执行；Bazel 构建／测试、Recipe 预览、SDK 执行检查、依赖准备和打包必须在配套开发容器内进行，CI 同样遵守。参阅[执行位置](docs/development/README.zh-CN.md)；离线操作不等于适合在宿主机运行，不在机器人上构建、打包或执行开发预览。

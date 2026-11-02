@@ -28,7 +28,7 @@ the packaged dependency bundle.
 
 The fetch helper stages the matching Linux aarch64 SDK, aorta-msgs, vbot-edu-msgs and
 FlatBuffers wheels plus release/license metadata from
-[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14).
+[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31).
 It checks their pinned hashes and reuses already-verified files. For a disconnected container,
 bring those same assets into the asset directory first; skip downloading, not verification.
 Downloading assets requires network access but no PyPI download for this base profile.
@@ -38,12 +38,12 @@ If an asset is missing or invalid, stop; do not download dependencies on the rob
 ```bash
 RECIPE=subscribe-state &&
 PREVIEW_ARGS=() &&
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.14 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
 bazel build "//recipes/$RECIPE:main" &&
 bazel run "//recipes/$RECIPE:main" -- "${PREVIEW_ARGS[@]}" &&
 PACKAGE_DIR="artifacts/python-$RECIPE" &&
 python3 tools/package_python.py --recipe "$RECIPE" \
-  --assets-dir artifacts/edu-sdk-2026.10.14 --output "$PACKAGE_DIR" &&
+  --assets-dir artifacts/edu-sdk-2026.10.31 --output "$PACKAGE_DIR" &&
 python3 tools/package_python.py --verify "$PACKAGE_DIR"
 ```
 

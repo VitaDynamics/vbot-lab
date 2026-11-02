@@ -6,8 +6,8 @@
 它是本地、机器可读的配套配置，不是发布公告或安装程序，各组件保留独立版本号。
 
 配置记录所选应用、SDK、Schema 与开发镜像引用，以及计划使用的源码分支和 tag；
-这不会创建 Git 引用，也不表示发布了新版本。源码 tag 为 `V1.6.0.12`，
-机器人应用为 `V1.6.0-12`，SDK Release 为 `edu-sdk-2026.10.14`。镜像 digest 已固定。
+这不会创建 Git 引用，也不表示发布了新版本。源码 tag 为 `V1.6.0.15`，
+机器人应用为 `V1.6.0-15`，SDK Release 为 `edu-sdk-2026.10.31`。镜像 digest 已固定。
 
 ## 字段说明
 
@@ -15,10 +15,10 @@
 | --- | --- |
 | `format_version` | 整数 `1`；拒绝未知字段和重复 JSON 键 |
 | `workspace.branch` | 正式版本使用 `main`，迭代版本使用 `pre_release/V1.6.0.X` 等长期分支；`X` 保留为字母，不替换为迭代号 |
-| `workspace.tag` | 当前源码 tag：`V1.6.0.12`。迭代 tag 与分支版本族一致，并带数字迭代后缀；机器人应用和 SDK 版本分别记录 |
+| `workspace.tag` | 当前源码 tag：`V1.6.0.15`。迭代 tag 与分支版本族一致，并带数字迭代后缀；机器人应用和 SDK 版本分别记录 |
 | `robots` | `catalog/robots/` 中当前已开放的设备类型；分别记录准确的 `application_version`，不是最低版本 |
-| `sdk.repository`、`sdk.release_tag` | 公开 GitHub 下载仓库（`owner/name`）和文档所列依赖配套的准确 SDK Release tag |
-| `sdk.aorta_version` | 与 Python、C++ SDK 配套的 Aorta 版本 |
+| `sdk.repository`、`sdk.release_tag` | GitHub 下载仓库（`owner/name`）与确切的 EDU SDK 整包 Release tag |
+| `sdk.aorta_version` | 与 Python／C++ SDK 配套的 Aorta SDK 包版本 |
 | `sdk.python` | 最低 Python 版本（`major.minor`）、四个 wheel 包的准确版本和可下载的 wheel 平台标签 |
 | `sdk.cpp` | 准确的 SDK 版本、正整数 ABI、发行环境标识和可下载架构；ABI 与 Bazel 的原生库导入保持一致 |
 | `sdk.assets` | 附件清单：准确文件名与 64 位小写 SHA-256，包含校验文件、manifest 和许可证附件；不记录凭据或带签名的下载 URL |
@@ -39,8 +39,8 @@ VBOT Lab 的 `main` 保存正式版本。迭代更新在选定版本族的
 `pre_release/V<major>.<minor>.<patch>.X` 分支中准备。
 每个版本族使用各自的分支；`pre_release/V1.6.0.X` 仅对应 `V1.6.0` 版本族。
 迭代更新允许直接提交和推送，不要求 PR。
-当前配套为 `pre_release/V1.6.0.X` 上的源码 tag `V1.6.0.12`，适配机器人应用
-`V1.6.0-12`。迭代 tag 属于选定的分支版本族；机器人应用版本和
+当前配套为 `pre_release/V1.6.0.X` 上的源码 tag `V1.6.0.15`，适配机器人应用
+`V1.6.0-15`。迭代 tag 属于选定的分支版本族；机器人应用版本和
 准确的 SDK／Schema 配套分别记录。
 
 在检查通过的源码提交上创建迭代 tag。仅打 tag 不会将迭代版本提升到 `main`，

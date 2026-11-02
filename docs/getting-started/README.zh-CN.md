@@ -3,7 +3,7 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 默认主路径是 **Python＋四足 EDU＋只读状态订阅**。
-适配机器人应用 `V1.6.0-12`、源码 tag `V1.6.0.12` 和 SDK Release `edu-sdk-2026.10.14`。
+适配机器人应用 `V1.6.0-15`、源码 tag `V1.6.0.15` 和 SDK Release `edu-sdk-2026.10.31`。
 目标是收到三条解码后的 `/locomotion/status` 状态并正常退出，不涉及运动、音视频采集或自启动。
 
 | 步骤 | 执行位置 | 成功结果 | 失败后查看 |
@@ -21,10 +21,12 @@
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout V1.6.0.12
+git checkout V1.6.0.15
 ```
 
-已有仓库缺少该 tag 时，先执行 `git fetch origin tag V1.6.0.12`，切换前保留本地修改。
+已有仓库缺少该 tag 时，先执行 `git fetch origin tag V1.6.0.15`，切换前保留本地修改。
+如果远程没有该 tag，先停止并选择已提供的源码／应用配套。
+下载 SDK 制品前也要确认配套 Release 已提供；不要改用 `main`、其他 SDK 版本或无关下载来源。
 切换 tag 后的 detached HEAD 是使用版本快照时的正常状态。
 源码与组件配套见[发布配置](../../catalog/release.zh-CN.md)。
 如需修改该仓库，先创建工作分支：
@@ -63,12 +65,15 @@ C++ Recipe 构建范围见 [C++ SDK 指南](../../packages/aorta/cpp/README.zh-C
 从容器内仓库根目录下载固定 Release 制品，构建并预览只读 Recipe，再打包。
 已存在且校验一致的下载会复用。包的输出目录必须是新目录；已有时检查／复用它，或换一个输出路径。
 
+也可先按 [SDK 指南](../../packages/aorta/python/README.zh-CN.md)，通过浏览器把所需 ARM64 wheel、
+清单、校验文件和许可证下载到同一挂载目录；工具会校验并复用已有文件，不重复下载。
+
 ```bash
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.14 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
 python3 tools/in_container.py -- bazel build //recipes/subscribe-state:main &&
 python3 tools/in_container.py -- bazel run //recipes/subscribe-state:main &&
 python3 tools/package_python.py --recipe subscribe-state \
-  --assets-dir artifacts/edu-sdk-2026.10.14 --output artifacts/first-state &&
+  --assets-dir artifacts/edu-sdk-2026.10.31 --output artifacts/first-state &&
 python3 tools/package_python.py --verify artifacts/first-state
 ```
 
@@ -83,7 +88,7 @@ python3 tools/package_python.py --verify artifacts/first-state
 ## 3. 登录并传输——宿主机
 
 先完成[公钥 SSH 登录](../robots/quadruped-common/connection.zh-CN.md)，或复用已有可用配置。
-有线通常使用 `192.168.126.2`；Wi-Fi 先通过手机 App 配网，再从路由器查询 IP，并替换下方 ROBOT。
+有线通常使用 `192.168.126.2`；Wi-Fi 先通过 Vbot App 配网，再在已绑定设备的 App 中进入**设置 → 关于**查看 IP，并替换下方 ROBOT。
 已有 vbot SSH 别名也可使用。连接、认证或主机指纹错误时不要继续。
 
 在宿主机仓库根目录执行，工作区挂载应使 `artifacts/first-state` 可见。

@@ -3,8 +3,8 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 这是基于只读健康监测应用的独立 Bazel 工作区。请在此修改应用，不必修改 VBOT Lab 参考仓库。
-需要 Python 3.10+、Bazel 7.6.1 和 VBOT 开发容器。设备配套为 V1.6.0-12（foot_quadruped），
-SDK Release edu-sdk-2026.10.14 提供固定版本依赖。
+需要 Python 3.10+、Bazel 7.6.1 和 VBOT 开发容器。设备配套为 V1.6.0-15（foot_quadruped），
+SDK Release edu-sdk-2026.10.31 提供固定版本依赖。
 
 ## 构建与测试——开发容器
 
@@ -40,7 +40,7 @@ Python 失败时在 stderr 输出 JSON，包含 status=error、stage、error_cod
 
 ```bash
 python3 /workspace/vbot-lab/tools/package_app.py --project /workspace/my-app \
-  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.10.14 \
+  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.10.31 \
   --output /workspace/my-app-package &&
 python3 /workspace/vbot-lab/tools/package_app.py --verify /workspace/my-app-package
 ```

@@ -36,6 +36,32 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - name: Download pinned SDK assets from the configured repository Release
+        # Missing or unpinned assets fail the check.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=$(python3 -c 'import json; print(json.load(open("catalog/release.json"))["sdk"]["release_tag"])')
+          repository=$(python3 -c 'import json; print(json.load(open("catalog/release.json"))["sdk"]["repository"])')
+          test "$repository" = VitaDynamics/vbot-lab
+          gh api "repos/$repository/releases/tags/$tag" > "$RUNNER_TEMP/sdk-release.json"
+          python3 - "$RUNNER_TEMP/sdk-release.json" > "$RUNNER_TEMP/sdk-assets.txt" <<'EOF'
+          import json, sys
+          pinned = {item["name"] for item in json.load(open("catalog/release.json"))["sdk"]["assets"]}
+          assets = json.load(open(sys.argv[1]))["assets"]
+          missing = pinned - {item["name"] for item in assets}
+          if missing:
+              raise SystemExit("Pinned SDK Release is incomplete: " + ", ".join(sorted(missing)))
+          for asset in assets:
+              if asset["name"] in pinned:
+                  print(asset["id"], asset["name"])
+          EOF
+          mkdir -p artifacts/sdk-ci-assets
+          while read -r id name; do
+            gh api -H "Accept: application/octet-stream" "repos/$repository/releases/assets/$id" \
+              > "artifacts/sdk-ci-assets/$name"
+          done < "$RUNNER_TEMP/sdk-assets.txt"
       - name: Test pinned SDKs and packages in a clean container runtime without robot access
         run: docker compose -f docker/compose.yaml run --rm --no-deps -T dev python3 tools/sdk_ci.py --download --assets-dir artifacts/sdk-ci-assets --work-dir artifacts/sdk-ci-work
 

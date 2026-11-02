@@ -5,8 +5,8 @@
 A standalone C++17 / Bazel workspace starting from the read-only health monitor.
 It subscribes only to /locomotion/status, /bms_state and /system/sm_status.
 It does not publish controls, call services/actions or capture audio/video.
-The supported target is foot_quadruped application V1.6.0-12, C++ SDK 2026.10.12 / ABI 13,
-and Schema pack 2026.10.13-v4 from SDK Release edu-sdk-2026.10.14.
+The supported target is foot_quadruped application V1.6.0-15, C++ SDK 2026.10.20 / ABI 13,
+and Schema pack 2026.10.20-v4 from SDK Release edu-sdk-2026.10.31.
 
 ## Project contents
 
@@ -36,7 +36,7 @@ the reference checkout. First use of Bazel may need network for public build-rul
 no SDK or compiler is downloaded by the application's repository rule.
 
 ```bash
-SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.10.14 &&
+SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.10.31 &&
 export AORTA_CPP_SDK_DIR="$SDK_ARTIFACTS/cpp-sdk-x86_64" &&
 export AORTA_EDU_SCHEMA_DIR="$SDK_ARTIFACTS/edu-schema" &&
 bazel build //:main &&

@@ -19,7 +19,7 @@ Single-task reference programs: a Recipe provides code, a [Skill](../skills/READ
 | Perception | [perception](perception/README.md): object/person boxes and human keypoints | pub/sub |
 | Audio | [audio](audio/README.md): body/UWB audio, ASR and input-end events | pub/sub |
 | Motion | [locomotion](locomotion/README.md): stand/lie-down; [subscribe-state](subscribe-state/README.md): posture and heartbeat | service + pub/sub |
-| System and peripherals | [system-peripherals](system-peripherals/README.md): system/display status; [device-info](device-info/README.md): firmware; [service-call](service-call/README.md): light status | service + pub/sub |
+| System and peripherals | [system-peripherals](system-peripherals/README.md): system/display status and application version; [device-info](device-info/README.md): firmware; [service-call](service-call/README.md): light status | service + pub/sub |
 | RCP | [rcp-task](rcp-task/README.md): Sleep DAG submission, result and cancellation | action |
 | SLAM | [slam](slam/README.md): state, odometry, static transforms | pub/sub |
 
@@ -27,7 +27,7 @@ Categories describe the implemented scope above, not one example for every publi
 SLAM observation does not change modes; use the [mapping workflow](../docs/guides/mapping-localization.md)
 for explicit mapping, saving and localization. Existing helper entry points remain available.
 
-These entries include Python/C++ source and Bazel targets. They target robot application **V1.6.0-12** on foot_quadruped EDU, paired with the edu-sdk-2026.10.14 release; install through [client libraries](../packages/README.md) and [Python SDK](../packages/aorta/python/README.md). SDK imports and a successful build do not establish live interface readiness; check routes and types on the selected firmware first.
+These entries include Python/C++ source and Bazel targets. They target robot application **V1.6.0-15** on foot_quadruped EDU, paired with the edu-sdk-2026.10.31 release; install through [client libraries](../packages/README.md) and [Python SDK](../packages/aorta/python/README.md). SDK imports and a successful build do not establish live interface readiness; check routes and types on the selected firmware first.
 
 ## Python workflow
 

@@ -9,11 +9,11 @@ ROS 2 接口，并非另一套完全等价的机器人接口。请先完成[设�
 
 本参考适用于 `foot_quadruped` EDU 软件。接口是否可用取决于已安装固件，
 使用前请发现确切路由并检查交付的消息类型。
-本文统一适配机器人应用版本 **V1.6.0-12**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
+本文统一适配机器人应用版本 **V1.6.0-15**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
 此软件范围不覆盖其他机器人类型。
 
-本页列出开放 topic 集及受支持的映射，并整理 22 个请求／响应 service 与 RCP action。
-topic 表共包含 47 个不同的 Aorta 路由：43 个订阅输出、4 个控制输入。
+本页列出开放 topic 集及受支持的映射，并整理 25 个请求／响应 service 与 RCP action。
+topic 表共包含 48 个不同的 Aorta 路由：44 个订阅输出、4 个控制输入。
 发现输出路由后，限时获取样本检查发布者；不要通过向控制 topic 发布消息来检查环境。
 Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 设备 CLI 使用不要求安装 Python SDK。
@@ -82,6 +82,7 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 | [运动事件](locomotion.zh-CN.md) | `/locomotion/event` | `/locomotion/event` | pub/sub — 订阅 | `locomotion.LocomotionEvent` | `software_msgs/msg/LocomotionEvent` |
 | [RCP 任务追踪事件](rcp.zh-CN.md) | `/rcp/trace` | `/rcp/trace` | pub/sub — 订阅 | `aorta.topic.rcp.TraceEvent` | `function_msgs/msg/TraceEvent` |
 | [系统状态机](system-peripherals.zh-CN.md) | `/system/sm_status` | `/sm/status` | pub/sub — 订阅 | `sm.SmStatus` | `software_msgs/msg/SystemStateMachineStatus` |
+| [OTA 应用版本](system-peripherals.zh-CN.md) | `/ota_version` | `/ota_version` | pub/sub — 订阅 | `aorta.topic.system_monitor.OtaVersion` | `std_msgs/msg/String` |
 | [显示状态](system-peripherals.zh-CN.md) | `/display_node/status` | `/display_node/status` | pub/sub — 订阅 | `aorta.topic.peripheral.DisplayStatus` | `aorta_msgs/msg/DisplayStatus` |
 | [语音交互事件](audio.zh-CN.md) | `/voice/event` | `/voice/event` | pub/sub — 订阅 | `aorta.voice.VoiceEvent` | `aorta_msgs/msg/VoiceEvent` |
 | [最终识别文本；provider 区分本体／UWB 输入](audio.zh-CN.md) | `/speech/asr_result` | `/speech/asr_result` | pub/sub — 订阅 | `aorta.topic.speech.AsrResult` | `aorta_msgs/msg/AsrResult` |
@@ -155,6 +156,9 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/volume_control` | `/volume_control` | service — 按请求查询／调整音量 |
 | `/speech/set_speak` | `/set_speak` | service — 语音播放／控制 |
 | `/speech_control` | `/speech_control` | service — 按请求类型[查询／修改语音策略](audio.zh-CN.md) |
+| `/locomotion/control_enable` | `/locomotion/control_enable` | service — [暂停／恢复控制与电机通信](locomotion.zh-CN.md) |
+| `/system/power_saving/enable` | `/system/power_saving/enable` | service — [进入／退出低功耗模式](system-peripherals.zh-CN.md) |
+| `/function/following` | `/function/following` | service — [跟随／导航模式控制](locomotion.zh-CN.md) |
 
 固件查询需要正确的 `target_device_type`：MOTOR=`0`、SERVO=`1`、LIDAR=`2`、UWB=`3`。
 调用前检查交付的请求类型，不能对所有设备类型都使用空请求／默认请求。

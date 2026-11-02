@@ -4,12 +4,17 @@
 
 ## Unreleased
 
-- Target robot application `V1.6.0-12` with SDK `2026.10.12`, C++ ABI 13, EDU Schema `2026.10.13-v4`, and Release `edu-sdk-2026.10.14`; document device component versions separately.
-- Complete the 22-service index with JPEG capture and the compatibility RCP submission service; distinguish an accepted submission from task completion.
-- Select source tag `V1.6.0.12` in the quickstart, and document the available Blueprint and Skill workflows.
+- Document dynamic external HTTP MCP registration, connection editing, enable/disable and discovery refresh, including request fields and credential handling.
+- Find the robot's Wi-Fi IP in the bound Vbot App under Settings → About, replacing router-administration lookup instructions.
+- Target robot application `V1.6.0-15` with SDK `2026.10.20`, C++ ABI 13, EDU Schema `2026.10.20-v4`, Release `edu-sdk-2026.10.31`, and FlatBuffers `25.12.19`; document device component versions separately.
+- Query the application version through `/ota_version`, including build-suffix handling.
+- Index the additional public audio, version and control interfaces; add Python/C++ application-version reads to the system/peripherals Recipe.
+- Document `/locomotion/control_enable`, `/ota_version`, `/system/power_saving/enable`, and `/function/following` added in EDU Schema `2026.10.20`.
+- Complete the 25-service index with JPEG capture and the compatibility RCP submission service; distinguish an accepted submission from task completion.
+- Select source tag `V1.6.0.15` in the quickstart, and document the available Blueprint and Skill workflows.
 - Document `/audio/play_pcm` speaker input and `/speech_control` policy queries/changes, including fields, ROS 2 mappings and operation boundaries.
 - Add a machine-readable component pairing configuration and offline consistency checks.
-- Keep `main` for formal releases; prepare iterations within the `V1.6.0` version family on `pre_release/V1.6.0.X`, with source tag `V1.6.0.12`. Other version families use their own iteration branches.
+- Keep `main` for formal releases; prepare iterations within the `V1.6.0` version family on `pre_release/V1.6.0.X`, with source tag `V1.6.0.15`. Other version families use their own iteration branches.
 
 ## V1.6.0
 

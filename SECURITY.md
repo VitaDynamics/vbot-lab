@@ -16,7 +16,9 @@ do not include passwords, tokens, private keys, device session files or personal
 Do not repeat an unsafe robot operation to collect evidence. Coordinate any public
 disclosure with the maintainers through the same email address.
 
-For ordinary setup or development questions, use [Community & Support](docs/community/README.md).
+For ordinary setup or development questions, search and ask in the forum first;
+see [Community & Support](docs/community/README.md). Technical support is also available
+through the same mailbox. Vulnerability details must remain private.
 The repository administrators maintain this project; review ownership is listed in
 [CODEOWNERS](.github/CODEOWNERS).
 

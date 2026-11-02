@@ -27,6 +27,7 @@
 | 查找背部安装尺寸或机械臂转接板 CAD | [机器狗共用背部安装参考](docs/hardware/quadruped-common/back-mounting.zh-CN.md)，适用于 foot_quadruped 与 wheel_quadruped，不适用于 foot_humanoid；不把机械适配等同于负载或机械臂控制支持 |
 | 获取帮助或整理问题反馈 | [社区与支持](docs/community/README.zh-CN.md)，整理最少且脱敏的反馈供用户审阅，不自动发帖 |
 | 编写或注入设备 Skill／AGENTS.md | [设备内容 API](docs/interfaces/agent/content-api.zh-CN.md)，不是开发者侧 Skills |
+| 为设备 Agent 注册或配置外部 MCP 服务 | [MCP 连接配置 API](docs/interfaces/agent/mcp-config.zh-CN.md)，再读[工具契约](docs/interfaces/agent/http-mcp.zh-CN.md)；使用运行时可达的 URL，确认发现结果后再开始新 Turn |
 | 修改 VBOT Lab 仓库 | [贡献说明](CONTRIBUTING.zh-CN.md)与相关测试 |
 | 定位应用环境或收不到数据的问题 | [vbot-diagnose](skills/vbot-diagnose/SKILL.zh-CN.md)，再读[分层诊断](docs/development/diagnostics.zh-CN.md)；显式选择层级，不自动连接设备 |
 
@@ -36,7 +37,7 @@
 ## 事实与范围
 
 - 当前 EDU 发布对象为 `foot_quadruped`。其他设备类型处于规划阶段，共用硬件或连接指南不改变这一范围。
-- 当前适配的机器人应用版本为 `V1.6.0-12`，由设备配置的 `application_version` 记录。它与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断更早或后续应用版本兼容。
+- 当前适配的机器人应用版本为 `V1.6.0-15`，由设备配置的 `application_version` 记录。它与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断更早或后续应用版本兼容。
 - 能力目录是索引，不是在线可用性证明。未知固件／SDK 版本、路由与 ROS2 映射应保持未知，不得猜测。
 - 使用 Python SDK 指南指定的发布版 wheel 配套与已入库的开放 Schema，保留 Aorta 包名与 API。Recipes 提供离线预览及显式设备执行，构建成功不代表在线兼容。
 - 设备 Aorta CLI 访问与 SDK 接入独立。ROS 2 使用设备本机 bridge 子集，遵循已整理的映射与限制，不凭同名推测。

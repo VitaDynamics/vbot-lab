@@ -10,7 +10,7 @@
 
 This type uses the same connection method as `foot_quadruped`. Follow the
 [shared connection guide](../quadruped-common/connection.md) for wired network setup
-or mobile-app Wi-Fi setup, router IP lookup, and `vbot` SSH login.
+or Vbot App Wi-Fi setup, IP lookup in the bound app's Settings → About, and `vbot` SSH login.
 Sharing this procedure does not expand the current EDU release scope or establish
 firmware, SDK, or API compatibility.
 

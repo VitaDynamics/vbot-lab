@@ -36,7 +36,7 @@ class PackagingTests(unittest.TestCase):
         self.config = deepcopy(configuration())
         self.make_assets()
 
-    def make_assets(self, *, license=True, bad_name=False, dependency=""):
+    def make_assets(self, *, license=True, unlicensed=(), bad_name=False, dependency=""):
         versions = self.config["sdk"]["python"]["wheels"]
         for item in self.config["sdk"]["assets"]:
             (self.assets / item["name"]).write_bytes(item["name"].encode())
@@ -49,7 +49,7 @@ class PackagingTests(unittest.TestCase):
                                      + (f"Requires-Dist: {dependency}\n" if dependency and name == "aorta_sdk" else ""))
                     archive.writestr(prefix + "WHEEL", "Wheel-Version: 1.0\nTag: py3-none-"
                                      + (target if name == "aorta_sdk" else "any") + "\n")
-                    if license:
+                    if license and name not in unlicensed:
                         archive.writestr(prefix + "licenses/LICENSE", "Apache License, Version 2.0\n")
         self.refresh_metadata()
 
@@ -118,6 +118,24 @@ class PackagingTests(unittest.TestCase):
         self.make_assets(license=False)
         with self.assertRaisesRegex(ValueError, "license"):
             self.create()
+
+    def test_flatbuffers_wheel_relies_on_the_pinned_license_asset(self):
+        # Upstream FlatBuffers wheels stopped bundling LICENSE (25.12.19); the Release pins
+        # flatbuffers-<ver>.LICENSE and every package carries it under licenses/.
+        self.make_assets(unlicensed={"flatbuffers"})
+        output = self.create()
+        manifest = packaging.verify_package(self.config, output)
+        flatbuffers = next(item for item in manifest["wheels"] if item["name"] == "flatbuffers")
+        self.assertEqual(flatbuffers["license_files_in_wheel"], [])
+        license_name = f'flatbuffers-{self.config["sdk"]["python"]["wheels"]["flatbuffers"]}.LICENSE'
+        self.assertTrue((output / "licenses" / license_name).is_file())
+
+    def test_sdk_wheels_still_require_bundled_licenses(self):
+        for name in ("aorta_sdk", "aorta_msgs", "vbot_edu_msgs"):
+            with self.subTest(wheel=name):
+                self.make_assets(unlicensed={name})
+                with self.assertRaisesRegex(ValueError, "license"):
+                    self.create(name="unused-" + name)
 
     def test_wrong_architecture_metadata_is_rejected(self):
         filename = wheel_names(self.config, "linux_aarch64")["aorta_sdk"]
@@ -298,8 +316,42 @@ class PackagingTests(unittest.TestCase):
             self.create()
 
     def test_fetch_reuses_matching_assets_without_network(self):
-        with patch.object(fetch_sdk, "urlopen", side_effect=AssertionError("network access")):
-            fetch_sdk.fetch(self.config, self.assets)
+        with patch.object(fetch_sdk, "urlopen", side_effect=AssertionError("network access")), \
+             patch.object(fetch_sdk.subprocess, "run", side_effect=AssertionError("external command")):
+            for transport in ("https", "gh"):
+                fetch_sdk.fetch(self.config, self.assets, transport=transport)
+
+    def test_fetch_gh_uses_configured_release_and_checks_hash(self):
+        item = self.config["sdk"]["assets"][0]
+        output = self.directory / "downloaded"
+        calls = []
+        def download(command, **kwargs):
+            calls.append(command)
+            Path(command[command.index("--output") + 1]).write_bytes((self.assets / item["name"]).read_bytes())
+            self.assertEqual(kwargs["timeout"], 120)
+            return SimpleNamespace(returncode=0)
+        with patch.object(fetch_sdk, "urlopen", side_effect=AssertionError("anonymous request")), \
+             patch.object(fetch_sdk.subprocess, "run", side_effect=download):
+            fetch_sdk.fetch(self.config, output, {item["name"]}, transport="gh")
+        self.assertEqual(digest(output / item["name"]), item["sha256"])
+        self.assertEqual(calls[0][:7], ["gh", "release", "download", self.config["sdk"]["release_tag"],
+                                     "--repo", self.config["sdk"]["repository"], "--pattern"])
+
+    def test_fetch_gh_failure_and_corruption_leave_no_published_asset(self):
+        item = self.config["sdk"]["assets"][0]
+        for failure in ("auth", "checksum", "missing", "timeout"):
+            output = self.directory / failure
+            def download(command, **kwargs):
+                if failure == "missing":
+                    raise FileNotFoundError("not installed")
+                if failure == "timeout":
+                    raise fetch_sdk.subprocess.TimeoutExpired(command, 120)
+                Path(command[command.index("--output") + 1]).write_bytes(b"incorrect download")
+                return SimpleNamespace(returncode=1 if failure == "auth" else 0)
+            with self.subTest(failure=failure), \
+                 patch.object(fetch_sdk.subprocess, "run", side_effect=download), self.assertRaises(ValueError):
+                fetch_sdk.fetch(self.config, output, {item["name"]}, transport="gh")
+            self.assertEqual(list(output.iterdir()), [])
 
     def test_fetch_preserves_invalid_existing_asset_for_inspection(self):
         path = self.assets / self.config["sdk"]["assets"][0]["name"]

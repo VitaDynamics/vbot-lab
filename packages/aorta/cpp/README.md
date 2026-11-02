@@ -10,8 +10,8 @@ Run each Bash block as one command chain. `&&` skips the rest of that block afte
 a failure while retaining shell variables for the next step. Fix the error before
 continuing to another block.
 
-Use the [edu-sdk-2026.10.14 release](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.14):
-C++ SDK `2026.10.12`, ABI `13`, with EDU Schema pack `2026.10.13-v4`.
+Use the [edu-sdk-2026.10.31 release](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31):
+C++ SDK `2026.10.20`, ABI `13`, with EDU Schema pack `2026.10.20-v4`.
 The examples use C++17, Bazel 7.6.1 and the release's generated headers.
 They do not require Python wheels or local Schema generation.
 
@@ -46,17 +46,17 @@ target headers; it does not download a compiler or SDK. Do not run ARM64 binarie
 in the AMD64 container. No second container or device-side compilation is needed.
 
 Download the matching SDK archive, the EDU Schema archive and `SHA256SUMS` into
-`artifacts/edu-sdk-2026.10.14/`. From the checkout root on Linux x86_64:
+`artifacts/edu-sdk-2026.10.31/`. From the checkout root on Linux x86_64:
 
 ```bash
-cd artifacts/edu-sdk-2026.10.14 &&
+cd artifacts/edu-sdk-2026.10.31 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-x86_64 edu-schema &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
-tar --zstd -xf aorta-edu-schema-pack-2026.10.13-v4.tar.zst -C edu-schema &&
+tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
+tar --zstd -xf aorta-edu-schema-pack-2026.10.20-v4.tar.zst -C edu-schema &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.14/cpp-sdk-x86_64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema"
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-x86_64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema"
 ```
 
 Both selected archive checksums must pass; the checksum command skips absent assets.
@@ -69,7 +69,7 @@ The local Bazel repository reads these two absolute paths; it does not download
 SDKs or configure a compiler. You can also supply the paths using Bazel
 `--repo_env=AORTA_CPP_SDK_DIR=...` and `--repo_env=AORTA_EDU_SCHEMA_DIR=...`.
 Keep the bundled FlatBuffers headers: C++ generated code checks its exact
-FlatBuffers version (`25.9.23` for this pairing); the Python package version is
+FlatBuffers version (`25.12.19` for this pairing); the Python package version is
 not a replacement for these C++ headers.
 
 ## Build and preview
@@ -153,13 +153,13 @@ Keep the shared Schema directory prepared above. In the same development contain
 extract the ARM64 SDK into a separate new directory and select it for the device build:
 
 ```bash
-cd artifacts/edu-sdk-2026.10.14 &&
+cd artifacts/edu-sdk-2026.10.31 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-aarch64 &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.12-abi13-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
+tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.14/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
 bazel build --config=arm64 //recipes/subscribe-state:main_cpp &&
 file bazel-bin/recipes/subscribe-state/main_cpp &&
 aarch64-linux-gnu-readelf -d bazel-bin/recipes/subscribe-state/main_cpp

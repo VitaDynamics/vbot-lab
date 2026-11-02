@@ -8,9 +8,11 @@ the affected features, validation, and compatibility impact.
 See [CI and repository collaboration](.github/WORKFLOWS.md) for the current automated checks.
 Participation follows the [Code of conduct](CODE_OF_CONDUCT.md).
 
-For usage questions, application discussions and feature ideas, start with
+For usage questions, application discussions and feature ideas, search the forum first,
+then add to a relevant topic or open a focused discussion following
 [Community & Support](docs/community/README.md). Use repository issues/PRs for concrete
 code or documentation changes, and link an existing forum discussion when relevant.
+Technical support is also available at [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.cn).
 
 - Use Bazel for Python and C++ recipes and reference applications; keep SDK APIs, Schema, code, documentation, and Skills consistent.
 - Repository-only checks may run on the host or CI runner. Bazel builds/tests, Recipe previews, SDK execution checks, dependency preparation and packaging must run in the matching development container, including CI. Follow [execution locations](docs/development/README.md); an offline operation is not automatically host-safe. Do not build, package or run development previews on a robot.

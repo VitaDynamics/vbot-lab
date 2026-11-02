@@ -4,8 +4,8 @@
 
 这是[健康监测 Blueprint](../README.zh-CN.md)的 C++17／Aorta C++ SDK 实现，
 组合 `/locomotion/status`、`/bms_state` 与 `/system/sm_status`，不发布控制消息、
-不调用 service／action，也不采集音视频。配套 foot_quadruped 应用 V1.6.0-12，
-以及 Release edu-sdk-2026.10.14 中的 SDK 2026.10.12／ABI 13、Schema pack 2026.10.13-v4。
+不调用 service／action，也不采集音视频。配套 foot_quadruped 应用 V1.6.0-15，
+以及 Release edu-sdk-2026.10.31 中的 SDK 2026.10.20／ABI 13、Schema pack 2026.10.20-v4。
 机器人无需 Python 运行时或 wheel。
 
 ## 构建与预览——开发容器
@@ -57,8 +57,8 @@ RAII 保证先释放订阅再释放 Node，包括部分订阅失败与 Ctrl+C。
 AMD64 容器进行交叉编译，不在其中执行 ARM64 程序或测试。
 
 ```bash
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.14/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.14/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
 bazel build --config=arm64 //blueprints/health-monitor:main_cpp &&
 PACKAGE_DIR=$(mktemp -d /tmp/vbot-health-cpp-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&

@@ -26,6 +26,7 @@ python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.loc
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.system-peripherals
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.rcp
 python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability robot.slam.mapping-localization
+python3 tools/vbot_catalog.py --robot-type foot_quadruped --capability device.agent.mcp-config
 python3 tools/vbot_catalog.py --robot-type wheel_quadruped --capability device.agent.content
 ```
 
@@ -66,7 +67,7 @@ device's interface availability and operating prerequisites before following the
 
 SDK metadata records integration and version separately. Robot profiles distinguish the current
 release target from planned releases; empty `models` means exact models are not recorded.
-The robot profile's `application_version` is the supported application target: `V1.6.0-12`
+The robot profile's `application_version` is the supported application target: `V1.6.0-15`
 for `foot_quadruped`, and `null` for unreleased types. Queries return it under `robot`.
 It is not the SDK or system-image version and does not mean "this version or newer".
 `minimum_firmware` remains a separate optional lower bound; `null` does not remove the
@@ -99,7 +100,7 @@ Its implementations fields provide both source files and their exact Bazel targe
 
 Do not copy topic names, fields, units, or HTTP route lists into this index by hand.
 They remain in the referenced Schema/contract sources; generate structural indexes from those
-sources when integrated. The application target is `V1.6.0-12`; check the installed application
+sources when integrated. The application target is `V1.6.0-15`; check the installed application
 and runtime availability on the selected device.
 
 Cameras, audio, locomotion and RCP remain grouped by interface family; the `recipe` field links to the
