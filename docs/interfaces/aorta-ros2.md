@@ -8,7 +8,7 @@ robot interface. Start with the [device shell setup](../getting-started/device-e
 
 ## Version scope
 
-This reference targets robot application **V1.6.0-15** on `foot_quadruped` EDU.
+This reference targets robot applications **V1.6.0-15** and **V1.6.0-17** on `foot_quadruped` EDU.
 Discover the exact routes and inspect their delivered types before use; configuration
 limits are listed in the [compatibility matrix](../compatibility.md).
 Other robot types are not covered by this software scope.

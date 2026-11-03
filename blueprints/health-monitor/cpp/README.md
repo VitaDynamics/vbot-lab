@@ -5,7 +5,7 @@
 C++17 / Aorta C++ SDK implementation of the [health-monitor Blueprint](../README.md).
 It combines `/locomotion/status`, `/bms_state` and `/system/sm_status`; it never publishes
 control messages, calls services/actions, or records audio/video. Use foot_quadruped
-application V1.6.0-15, SDK 2026.10.20 / ABI 13 and Schema pack 2026.10.20-v4 from
+applications V1.6.0-15 and V1.6.0-17, SDK 2026.10.20 / ABI 13 and Schema pack 2026.10.20-v4 from
 Release edu-sdk-2026.10.31. No Python runtime or wheel is needed on the robot.
 
 ## Build and preview — development container

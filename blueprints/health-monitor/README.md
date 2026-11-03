@@ -6,7 +6,7 @@ A complete Python / C++ application combining [locomotion state](../../docs/inte
 [battery telemetry](../../docs/interfaces/sensors.md) and [system state](../../docs/interfaces/system-peripherals.md).
 It reports data freshness and a configurable low-battery advisory, not physical safety or hardware health.
 It never sends motion, service or RCP commands, and does not capture audio/video.
-Use foot_quadruped application V1.6.0-15 and SDK Release edu-sdk-2026.10.31.
+Use foot_quadruped applications V1.6.0-15 and V1.6.0-17, paired with SDK Release edu-sdk-2026.10.31.
 
 ## Develop — container
 

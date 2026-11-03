@@ -9,8 +9,8 @@ announcement or an installer. Component versions remain independent.
 The configuration uses the selected application, SDK, Schema and development image
 references. It records the intended source branch and tag; this does not create Git
 refs or announce a release. The development branch is `release/V1.6.0`, the formal
-source tag is `Rel/V1.6.0`, the robot application is
-`V1.6.0-15`, and the SDK Release is `edu-sdk-2026.10.31`. The image digest is pinned.
+source tag is `Rel/V1.6.0`, the supported robot applications are
+`V1.6.0-15` and `V1.6.0-17`, and the SDK Release is `edu-sdk-2026.10.31`. The image digest is pinned.
 
 ## Fields
 
@@ -19,7 +19,9 @@ source tag is `Rel/V1.6.0`, the robot application is
 | `format_version` | Integer `1`; unknown fields and duplicate JSON keys are rejected |
 | `workspace.branch` | Development branch for the selected release: `release/V1.6.0`. The format also accepts `main` and long-lived iteration branches such as `pre_release/V1.6.1.X`; `X` is literal |
 | `workspace.tag` | Formal snapshot `Rel/V1.6.0`, matching the `release/V1.6.0` branch family. Iteration branches instead use a matching numeric iteration tag; robot application and SDK versions remain separate |
-| `robots` | Current released robot types from `catalog/robots/`; each records its exact `application_version`, not a minimum version |
+| `robots` | Current released robot types from `catalog/robots/`; default pairing and supported versions must match their profiles |
+| `robots.<type>.application_version` | Default application pairing, currently `V1.6.0-17`; retained as a single version for package metadata |
+| `robots.<type>.supported_application_versions` | Optional nonempty list of unique exact versions, currently `V1.6.0-15` and `V1.6.0-17`; must include the default and match the robot profile. Omission means only the default, not a range |
 | `sdk.repository`, `sdk.release_tag` | GitHub download repository (`owner/name`) and exact EDU SDK bundle Release tag |
 | `sdk.aorta_version` | Aorta SDK package version, aligned with the Python and C++ SDK |
 | `sdk.python` | Minimum Python version (`major.minor`), exact versions of the four wheel packages, and available wheel platform tags |
@@ -41,8 +43,8 @@ SDK binaries have their own Release references and hashes.
 ## Source branches and tags
 
 Develop V1.6.0 applications on `release/V1.6.0`, not on a detached tag or an iteration
-branch. `Rel/V1.6.0` identifies its formal source snapshot, paired with robot application
-`V1.6.0-15`. The earlier `V1.6.0.15` tag remains an iteration snapshot, not the development
+branch. `Rel/V1.6.0` identifies its formal source snapshot, paired with robot applications
+`V1.6.0-15` and `V1.6.0-17`. The earlier `V1.6.0.15` tag remains an iteration snapshot, not the development
 entry point. `main` contains the latest formal release.
 
 At formal promotion, merge the reviewed changes to `main` through its PR process, then

@@ -4,9 +4,10 @@
 
 ## Robot application version
 
-The application version targeted by this repository's device guides, interfaces and
-Recipes is **V1.6.0-15**, for `foot_quadruped` EDU. This is an application-version target,
-not a minimum-version range or a guarantee for earlier/later releases.
+The application versions targeted by this repository's device guides, interfaces and
+Recipes are **V1.6.0-15** and **V1.6.0-17**, for `foot_quadruped` EDU. This is an explicit compatibility list,
+not a minimum-version range or a guarantee for unlisted releases.
+Only these two application identifiers are supported; do not infer compatibility for builds between them.
 Version pairing and artifact checksums are recorded in [release.json](../catalog/release.json).
 Follow the [release configuration guide](../catalog/release.md) to check the combination.
 
@@ -46,7 +47,7 @@ For `foot_quadruped` EDU, follow the [vbot shell configuration](getting-started/
 and [available Aorta / ROS 2 interface mappings](interfaces/aorta-ros2.md).
 Device CLI availability and workstation SDK installation are separate requirements.
 
-The interface reference for application `V1.6.0-15` includes the public topic set, native system state,
+The interface reference for applications `V1.6.0-15` and `V1.6.0-17` includes the public topic set, native system state,
 static TF, command topics, and the RCP action, alongside
 [perception outputs](interfaces/perception.md) and [audio/voice input](interfaces/audio.md).
 Check exact route discovery, message types and the configuration limits below on the selected device.
@@ -60,15 +61,15 @@ Check exact route discovery, message types and the configuration limits below on
 | Python / ABI | Python 3.10 or newer; SDK wheels are available for macOS arm64, Linux x86_64, and Linux aarch64. Download all four required wheels, including `flatbuffers`, from the SDK Release recorded in the release configuration. The `linux_*` wheels are Ubuntu/glibc builds | Check architecture and native dependencies separately for workstation and device; installation can run offline after the matching wheels are downloaded; optional capture/decode dependencies are prepared separately |
 | Workstation native runtime | Distributed as SDK Release assets (`edu-sdk-*`) as Ubuntu 22.04 archives for x86_64 and aarch64; the release's `EDU_SDK_MANIFEST.json` records the version pairing | Match architecture, system, and SDK; the tested bundle needs glibc 2.34 or newer |
 | Off-robot router | Not released. Install Eclipse zenoh `zenohd` 1.10.x from the [official releases](https://github.com/eclipse-zenoh/zenoh/releases), the zenoh minor the SDK is built on; 1.10.1 is the tested version | Match the router minor with the SDK; the robot image provides its own router |
-| Device Aorta / ROS 2 tools | Configuration and selected available bridge routes documented for application `V1.6.0-15` | Check public files, shell variables, types, discovery, and actual samples separately |
+| Device Aorta / ROS 2 tools | Configuration and selected available bridge routes documented for applications `V1.6.0-15` and `V1.6.0-17` | Check public files, shell variables, types, discovery, and actual samples separately |
 | [Interface Definitions — public Aorta Schema](../schemas/README.md) | Distributed as SDK Release assets (`edu-sdk-*`); the release's `EDU_SDK_MANIFEST.json` records the version pairing | Match the SDK version, dependencies, and generated bindings |
 | [Recipes](../recipes/README.md) | Python and C++ examples organized by capability, with Bazel targets and offline tests | Validate Python dependencies, Bazel targets, documented interfaces, and expected results |
 | [VBOT Blueprints](../blueprints/README.md) | Runnable read-only health monitor in Python and C++, with independent project generation and packaging | Follow the selected language's SDK pairing, configuration, deployment and stopping instructions; synthetic tests do not establish live data availability |
-| [Agent HTTP MCP](interfaces/agent/http-mcp.md) | Contract documented for application `V1.6.0-15` | Check runtime availability and Agent-to-tool calls; no server executable is included here |
-| [Device Skills / AGENTS.md API](interfaces/agent/content-api.md) | Authoring and HTTP content contract documented for application `V1.6.0-15` | Check route availability and user-content paths; back up before writing, compare readback, and use the content in a new Turn |
+| [Agent HTTP MCP](interfaces/agent/http-mcp.md) | Contract documented for applications `V1.6.0-15` and `V1.6.0-17` | Check runtime availability and Agent-to-tool calls; no server executable is included here |
+| [Device Skills / AGENTS.md API](interfaces/agent/content-api.md) | Authoring and HTTP content contract documented for applications `V1.6.0-15` and `V1.6.0-17` | Check route availability and user-content paths; back up before writing, compare readback, and use the content in a new Turn |
 | [Coding Agent Skills](../skills/README.md) | `vbot-dev-setup`, `vbot-app-dev` and `vbot-diagnose` cover setup, application development and scoped diagnosis; shared Codex / Claude Code discovery links | Confirm discovery and invocation in the harness you use |
 | [Capability catalog](../catalog/README.md) | Local JSON query and validation | Versioned format, references, release gating; not live device discovery |
-| Robot application | `V1.6.0-15` | Confirm the installed application version and required interfaces; component versions are separate |
+| Robot application | `V1.6.0-15` and `V1.6.0-17` | Confirm the installed application version and required interfaces; component versions are separate |
 
 ## Device configuration and schema-pack rows
 
@@ -77,7 +78,7 @@ The EDU schema pack numbers its public routes with stable row identifiers; the s
 decides which of those rows its access control admits, so match the image against the rows
 your application uses.
 
-For application `V1.6.0-15`, the public surface includes the enabled bridge routes for
+For applications `V1.6.0-15` and `V1.6.0-17`, the public surface includes the enabled bridge routes for
 `/audio/play_pcm` (row 57, pub/sub input) and `/speech_control` (row 58, service), plus
 `/locomotion/control_enable` (row 59, service), `/ota_version` (row 60, pub/sub output),
 `/system/power_saving/enable` (row 61, service), and `/function/following` (row 62, service).
@@ -106,7 +107,7 @@ application version through the public, read-only topic:
 timeout 15s aorta topic echo /ota_version --count 1
 ```
 
-Check the received `version` field against `V1.6.0-15`. The string may include a
+Check that the received `version` identifies either `V1.6.0-15` or `V1.6.0-17`. The string may include a
 `~` build suffix; compare the application identifier before that suffix and retain the
 full string when reporting a problem. A discovered topic or a waiting subscription banner
 is not a received version. If no sample arrives, leave the installed version unconfirmed;

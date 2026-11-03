@@ -3,7 +3,7 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 这是基于只读健康监测应用的独立 Bazel 工作区。请在此修改应用，不必修改 VBOT Lab 参考仓库。
-需要 Python 3.10+、Bazel 7.6.1 和 VBOT 开发容器。设备配套为 V1.6.0-15（foot_quadruped），
+需要 Python 3.10+、Bazel 7.6.1 和 VBOT 开发容器。设备配套为 V1.6.0-15、V1.6.0-17（foot_quadruped），
 SDK Release edu-sdk-2026.10.31 提供固定版本依赖。
 
 ## 构建与测试——开发容器

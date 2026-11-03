@@ -5,7 +5,7 @@
 这是以只读健康监测为起点的独立 C++17／Bazel 工作区。
 只订阅 /locomotion/status、/bms_state 与 /system/sm_status，
 不发布控制指令、不调用 service／action，也不采集音视频。
-配套 foot_quadruped 应用 V1.6.0-15、C++ SDK 2026.10.20／ABI 13，
+配套 foot_quadruped 应用 V1.6.0-15、V1.6.0-17、C++ SDK 2026.10.20／ABI 13，
 以及 SDK Release edu-sdk-2026.10.31 中的 Schema pack 2026.10.20-v4。
 
 ## 项目内容

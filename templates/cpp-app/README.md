@@ -5,7 +5,7 @@
 A standalone C++17 / Bazel workspace starting from the read-only health monitor.
 It subscribes only to /locomotion/status, /bms_state and /system/sm_status.
 It does not publish controls, call services/actions or capture audio/video.
-The supported target is foot_quadruped application V1.6.0-15, C++ SDK 2026.10.20 / ABI 13,
+The supported targets are foot_quadruped applications V1.6.0-15 and V1.6.0-17, C++ SDK 2026.10.20 / ABI 13,
 and Schema pack 2026.10.20-v4 from SDK Release edu-sdk-2026.10.31.
 
 ## Project contents

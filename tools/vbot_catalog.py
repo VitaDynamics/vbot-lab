@@ -66,6 +66,16 @@ def validate_catalog(root, catalog, robots):
             isinstance(application_version, str)
             and re.fullmatch(r"V\d+\.\d+\.\d+(?:-\d+)?", application_version) is not None),
             "Invalid robot application version")
+        if "supported_application_versions" in robot:
+            supported = robot["supported_application_versions"]
+            require(isinstance(supported, list) and all(
+                isinstance(value, str) and re.fullmatch(r"V\d+\.\d+\.\d+(?:-\d+)?", value)
+                for value in supported), "Invalid supported robot application versions")
+            require(len(supported) == len(set(supported)), "Duplicate supported robot application version")
+            require((application_version is None and not supported) or application_version in supported,
+                    "Default robot application version must be supported")
+            require(robot["release_scope"] == "current_target" or not supported,
+                    "Planned robot types cannot advertise supported application versions")
         require(isinstance(robot.get("models"), list) and all(
             isinstance(model, str) and model for model in robot["models"]), "Invalid model list")
         require(robot.get("minimum_firmware") is None or isinstance(robot["minimum_firmware"], str),

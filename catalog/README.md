@@ -67,9 +67,12 @@ device's interface availability and operating prerequisites before following the
 
 SDK metadata records integration and version separately. Robot profiles distinguish the current
 release target from planned releases; empty `models` means exact models are not recorded.
-The robot profile's `application_version` is the supported application target: `V1.6.0-15`
-for `foot_quadruped`, and `null` for unreleased types. Queries return it under `robot`.
-It is not the SDK or system-image version and does not mean "this version or newer".
+The robot profile's `supported_application_versions` explicitly lists `V1.6.0-15` and
+`V1.6.0-17` for `foot_quadruped`. `application_version` remains the default pairing
+(`V1.6.0-17`), including package metadata; it is `null` for unreleased types.
+Queries return these fields under `robot`. A profile without a support list declares
+only its non-null default version. These are application versions, not SDK or system-image
+versions, a continuous range or "this version or newer" compatibility.
 `minimum_firmware` remains a separate optional lower bound; `null` does not remove the
 declared application target or establish compatibility with other versions.
 Hardware applicability is not software support. Both robot-dog profiles reference the same
@@ -100,7 +103,7 @@ Its implementations fields provide both source files and their exact Bazel targe
 
 Do not copy topic names, fields, units, or HTTP route lists into this index by hand.
 They remain in the referenced Schema/contract sources; generate structural indexes from those
-sources when integrated. The application target is `V1.6.0-15`; check the installed application
+sources when integrated. The supported applications are `V1.6.0-15` and `V1.6.0-17`; check the installed application
 and runtime availability on the selected device.
 
 Cameras, audio, locomotion and RCP remain grouped by interface family; the `recipe` field links to the

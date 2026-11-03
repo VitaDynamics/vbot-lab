@@ -4,7 +4,7 @@
 
 A standalone Bazel workspace based on the read-only health monitor. Keep application changes
 here rather than editing your VBOT Lab reference checkout. Requires Python 3.10+, Bazel 7.6.1
-and the VBOT development container. The supported robot application is V1.6.0-15 (foot_quadruped);
+and the VBOT development container. The supported robot applications are V1.6.0-15 and V1.6.0-17 (foot_quadruped);
 SDK Release edu-sdk-2026.10.31 supplies the pinned requirements.
 
 ## Build and test — development container

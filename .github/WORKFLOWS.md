@@ -89,7 +89,7 @@ but does not require opening a PR or obtaining a pre-push CI result for each new
 | Reference | Role |
 | --- | --- |
 | `main` | Latest formal release; do not merge work-in-progress version updates |
-| `release/V1.6.0` | Development entry for the final `V1.6.0` family release, targeting robot application `V1.6.0-15` |
+| `release/V1.6.0` | Development entry for the final `V1.6.0` family release, targeting robot applications `V1.6.0-15` and `V1.6.0-17` |
 | `Rel/V1.6.0` | Immutable formal source snapshot; not the default development checkout |
 | `pre_release/V1.6.0.X` | Completed iteration history for the `V1.6.0` family, not its development entry; the final `X` stays literal |
 | `V1.6.0.15` | Preserved iteration snapshot for robot application `V1.6.0-15` |

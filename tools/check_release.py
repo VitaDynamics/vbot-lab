@@ -112,10 +112,26 @@ def validate(config, root):
     targets = {name for name, profile in profiles.items() if profile["release_scope"] == "current_target"}
     require(set(robots) == targets, "robots: must match current_target profiles")
     for name, robot in robots.items():
-        fields(robot, f"robots.{name}", ("application_version",))
+        require(isinstance(robot, dict), f"robots.{name}: expected object")
+        robot_fields = ("application_version",)
+        if "supported_application_versions" in robot:
+            robot_fields += ("supported_application_versions",)
+        fields(robot, f"robots.{name}", robot_fields)
         text(robot["application_version"], f"robots.{name}.application_version", r"V\d+\.\d+\.\d+(?:-\d+)?")
         require(robot["application_version"] == profiles[name]["application_version"],
                 f"robots.{name}: application version differs from robot profile")
+        supported = robot.get("supported_application_versions", [robot["application_version"]])
+        require(isinstance(supported, list) and bool(supported) and all(
+            isinstance(value, str) and re.fullmatch(r"V\d+\.\d+\.\d+(?:-\d+)?", value)
+            for value in supported), f"robots.{name}.supported_application_versions: expected exact versions")
+        require(len(supported) == len(set(supported)),
+                f"robots.{name}.supported_application_versions: duplicate version")
+        require(robot["application_version"] in supported,
+                f"robots.{name}: default application version must be supported")
+        profile_versions = profiles[name].get("supported_application_versions", [profiles[name]["application_version"]])
+        require(isinstance(profile_versions, list) and all(isinstance(value, str) for value in profile_versions)
+                and len(profile_versions) == len(supported) and set(supported) == set(profile_versions),
+                f"robots.{name}: supported application versions differ from robot profile")
 
     sdk = fields(config["sdk"], "sdk", ("repository", "release_tag", "aorta_version", "python", "cpp", "assets"))
     text(sdk["repository"], "sdk.repository", r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")
