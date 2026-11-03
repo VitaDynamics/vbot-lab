@@ -6,7 +6,7 @@
 与[系统状态](../../docs/interfaces/system-peripherals.zh-CN.md)的完整 Python／C++ 应用。
 它报告数据新鲜度和可配置的低电量提示，不判断物理安全或硬件健康。
 不发送运动、service 或 RCP 指令，也不采集音视频。
-配套 foot_quadruped 应用 V1.6.0-15 与 SDK Release edu-sdk-2026.10.31。
+配套 foot_quadruped 应用 V1.6.0-15、V1.6.0-17 与 SDK Release edu-sdk-2026.10.31。
 
 ## 开发——容器
 

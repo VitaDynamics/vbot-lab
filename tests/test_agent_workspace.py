@@ -45,7 +45,9 @@ class AgentWorkspaceTests(unittest.TestCase):
 
     def test_application_target_is_separate_from_sdk_and_release_scope(self):
         result = query_catalog(ROOT, "foot_quadruped", "robot.state.subscribe")
-        self.assertEqual(result["robot"]["application_version"], "V1.6.0-15")
+        self.assertEqual(result["robot"]["application_version"], "V1.6.0-17")
+        self.assertEqual(result["robot"]["supported_application_versions"], ["V1.6.0-15", "V1.6.0-17"])
+        self.assertNotIn("V1.6.0-16", result["robot"]["supported_application_versions"])
         self.assertEqual(result["sdk"]["version"], "2026.10.20")
         self.assertEqual(result["sdk"]["release"], "edu-sdk-2026.10.31")
         self.assertIsNone(result["robot"]["minimum_firmware"])
@@ -62,6 +64,23 @@ class AgentWorkspaceTests(unittest.TestCase):
             robots["foot_quadruped"]["application_version"] = value
             with self.subTest(value=value), self.assertRaises(CatalogError):
                 validate_catalog(ROOT, self.catalog, robots)
+
+    def test_supported_application_versions_are_exact_unique_and_include_default(self):
+        for value in (None, "V1.6.0-15/V1.6.0-17", [], [None], [True], [{}],
+                      ["V1.6.0-15", "V1.6.0-15", "V1.6.0-17"],
+                      ["V1.6.0-15"], [">=V1.6.0-15"], ["V1.6.0-15..V1.6.0-17"]):
+            robots = deepcopy(self.robots)
+            robots["foot_quadruped"]["supported_application_versions"] = value
+            with self.subTest(value=value), self.assertRaises(CatalogError):
+                validate_catalog(ROOT, self.catalog, robots)
+        robots = deepcopy(self.robots)
+        del robots["foot_quadruped"]["supported_application_versions"]
+        validate_catalog(ROOT, self.catalog, robots)
+        robots = deepcopy(self.robots)
+        robots["wheel_quadruped"]["application_version"] = "V1.6.0-17"
+        robots["wheel_quadruped"]["supported_application_versions"] = ["V1.6.0-17"]
+        with self.assertRaises(CatalogError):
+            validate_catalog(ROOT, self.catalog, robots)
 
     def test_no_robot_is_inferred(self):
         result = query_catalog(ROOT)

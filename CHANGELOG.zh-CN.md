@@ -5,7 +5,7 @@
 ## Rel/V1.6.0 — 2026-11-02
 
 V1.6.0 最终正式版汇总 VBOT Lab 自建仓以来提供的能力。
-当前支持 `foot_quadruped` EDU，适配机器人应用 **V1.6.0-15**。
+当前支持 `foot_quadruped` EDU，适配机器人应用 **V1.6.0-15**、**V1.6.0-17**。
 开发请从 **`release/V1.6.0`** 分支开始，操作见[快速开始](docs/getting-started/README.zh-CN.md)。
 `Rel/V1.6.0` 标记正式源码快照；组件配套见 [release.json](catalog/release.json)及其关联的 SDK 指南。
 

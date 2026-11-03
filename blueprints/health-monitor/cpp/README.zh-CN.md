@@ -4,7 +4,7 @@
 
 这是[健康监测 Blueprint](../README.zh-CN.md)的 C++17／Aorta C++ SDK 实现，
 组合 `/locomotion/status`、`/bms_state` 与 `/system/sm_status`，不发布控制消息、
-不调用 service／action，也不采集音视频。配套 foot_quadruped 应用 V1.6.0-15，
+不调用 service／action，也不采集音视频。配套 foot_quadruped 应用 V1.6.0-15、V1.6.0-17，
 以及 Release edu-sdk-2026.10.31 中的 SDK 2026.10.20／ABI 13、Schema pack 2026.10.20-v4。
 机器人无需 Python 运行时或 wheel。
 

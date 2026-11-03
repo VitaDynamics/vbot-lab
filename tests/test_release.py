@@ -102,6 +102,41 @@ class ReleaseTests(unittest.TestCase):
         self.config["robots"]["foot_quadruped"]["application_version"] = "V1.6.1"
         self.rejects(self.config, "robot profile")
 
+    def test_supported_applications_match_profile_without_implying_a_range(self):
+        robot = self.config["robots"]["foot_quadruped"]
+        self.assertEqual(robot["supported_application_versions"], ["V1.6.0-15", "V1.6.0-17"])
+        self.assertNotIn("V1.6.0-16", robot["supported_application_versions"])
+        for value in (None, "V1.6.0-15/V1.6.0-17", [], [None], [True], [{}],
+                      ["V1.6.0-15", "V1.6.0-15", "V1.6.0-17"], ["V1.6.0-15"],
+                      ["V1.6.0-17"], ["V1.6.0-15", "V1.6.0-16", "V1.6.0-17"],
+                      [">=V1.6.0-15"], ["V1.6.0-15..V1.6.0-17"]):
+            config = copy.deepcopy(self.config)
+            config["robots"]["foot_quadruped"]["supported_application_versions"] = value
+            with self.subTest(value=value):
+                self.rejects(config, "application")
+        config = copy.deepcopy(self.config)
+        del config["robots"]["foot_quadruped"]["supported_application_versions"]
+        self.rejects(config, "robot profile")
+
+        original_read = release.read_json
+        for versions in (["V1.6.0-15", "V1.6.0-17", "V1.6.0-17"],
+                         ["V1.6.0-15", "V1.6.0-16", "V1.6.0-17"]):
+            def changed_profile(path):
+                data = original_read(path)
+                if path.name == "foot_quadruped.json":
+                    data["supported_application_versions"] = versions
+                return data
+            with patch.object(release, "read_json", side_effect=changed_profile):
+                self.rejects(self.config, "robot profile")
+
+        def legacy_profile(path):
+            data = original_read(path)
+            if path.name == "foot_quadruped.json":
+                data.pop("supported_application_versions")
+            return data
+        with patch.object(release, "read_json", side_effect=legacy_profile):
+            self.assertEqual(release.validate(config, ROOT), ["workspace.tag", "development.image.digest"])
+
     def test_catalog_release_mismatch(self):
         self.config["sdk"]["release_tag"] = "edu-sdk-2099.1.1"
         self.rejects(self.config, "catalog mismatch")

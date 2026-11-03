@@ -3,7 +3,7 @@
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 The default path is **Python + foot_quadruped EDU + a read-only state subscription**.
-It targets robot application `V1.6.0-15`, development branch `release/V1.6.0` and SDK Release
+It targets robot applications `V1.6.0-15` and `V1.6.0-17`, development branch `release/V1.6.0` and SDK Release
 `edu-sdk-2026.10.31`.
 The goal is three decoded `/locomotion/status` samples followed by
 normal program exit. No motion, audio/video capture or autostart is involved.

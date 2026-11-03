@@ -6,7 +6,11 @@
   },
   "robots": {
     "foot_quadruped": {
-      "application_version": "V1.6.0-15"
+      "application_version": "V1.6.0-17",
+      "supported_application_versions": [
+        "V1.6.0-15",
+        "V1.6.0-17"
+      ]
     }
   },
   "sdk": {

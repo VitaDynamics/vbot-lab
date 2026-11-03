@@ -38,7 +38,7 @@
 
 - V1.6.0 应用开发使用 `release/V1.6.0`，按[快速开始](docs/getting-started/README.zh-CN.md)操作。搭建前确认当前分支，保留本地修改，不擅自替换为 `main`、迭代分支或 tag；用户自行创建的应用分支可基于该正式分支。
 - 当前 EDU 发布对象为 `foot_quadruped`。其他设备类型处于规划阶段，共用硬件或连接指南不改变这一范围。
-- 当前适配的机器人应用版本为 `V1.6.0-15`，由设备配置的 `application_version` 记录。它与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断更早或后续应用版本兼容。
+- 当前适配的机器人应用版本为 `V1.6.0-15`、`V1.6.0-17`，由设备配置的 `supported_application_versions` 明确列出；`application_version` 记录默认配套版本 `V1.6.0-17`，不代表完整兼容清单。应用版本与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断未列出版本或连续范围兼容。
 - 能力目录是索引，不是在线可用性证明。未知固件／SDK 版本、路由与 ROS2 映射应保持未知，不得猜测。
 - 使用 Python SDK 指南指定的发布版 wheel 配套与已入库的开放 Schema，保留 Aorta 包名与 API。Recipes 提供离线预览及显式设备执行，构建成功不代表在线兼容。
 - 设备 Aorta CLI 访问与 SDK 接入独立。ROS 2 使用设备本机 bridge 子集，遵循已整理的映射与限制，不凭同名推测。

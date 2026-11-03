@@ -5,7 +5,7 @@
 ## Rel/V1.6.0 — 2026-11-02
 
 The final V1.6.0 release brings together the capabilities added since VBOT Lab was created.
-It supports robot application **V1.6.0-15** on `foot_quadruped` EDU.
+It supports robot applications **V1.6.0-15** and **V1.6.0-17** on `foot_quadruped` EDU.
 Start development on **`release/V1.6.0`** using the [quickstart](docs/getting-started/README.md).
 `Rel/V1.6.0` identifies the formal source snapshot. For component pairing, see
 [release.json](catalog/release.json) and the linked SDK guides.

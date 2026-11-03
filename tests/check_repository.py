@@ -343,9 +343,11 @@ class RepositoryChecks(unittest.TestCase):
 
     def test_documented_application_target_matches_catalog(self):
         profile = json.loads((REPO_ROOT / "catalog/robots/foot_quadruped.json").read_text())
-        self.assertEqual(profile["application_version"], "V1.6.0-15")
+        self.assertEqual(profile["application_version"], "V1.6.0-17")
+        self.assertEqual(profile["supported_application_versions"], ["V1.6.0-15", "V1.6.0-17"])
         pages = (
             "README", "AGENTS", "catalog/README", "docs/compatibility", "recipes/README",
+            "catalog/release", "CHANGELOG", ".github/WORKFLOWS",
             "docs/robots/foot_quadruped/README", "docs/interfaces/README",
             "docs/interfaces/aorta-ros2", "docs/interfaces/audio", "docs/interfaces/perception",
             "docs/interfaces/agent/README", "docs/interfaces/agent/customization",
@@ -357,7 +359,13 @@ class RepositoryChecks(unittest.TestCase):
             for name in pages:
                 with self.subTest(page=name, language=suffix):
                     content = (REPO_ROOT / f"{name}{suffix}").read_text()
-                    self.assertIn(profile["application_version"], content)
+                    if name == ".github/WORKFLOWS":
+                        content = "\n".join(
+                            line for line in content.splitlines()
+                            if not line.startswith("| `V1.6.0.15` |")
+                        )
+                    for version in profile["supported_application_versions"]:
+                        self.assertIn(version, content)
                     self.assertNotRegex(content, r"(?:minimum[^\n]*version[^\n]*not yet published|最低[^\n]*版本尚未公布|尚未公布最低)")
             matrix = (REPO_ROOT / f"docs/compatibility{suffix}").read_text()
             self.assertNotIn("v5.0.21-", matrix)

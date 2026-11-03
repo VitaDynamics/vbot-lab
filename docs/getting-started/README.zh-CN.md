@@ -3,7 +3,7 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 默认主路径是 **Python＋四足 EDU＋只读状态订阅**。
-适配机器人应用 `V1.6.0-15`、开发分支 `release/V1.6.0` 和 SDK Release `edu-sdk-2026.10.31`。
+适配机器人应用 `V1.6.0-15`、`V1.6.0-17`、开发分支 `release/V1.6.0` 和 SDK Release `edu-sdk-2026.10.31`。
 目标是收到三条解码后的 `/locomotion/status` 状态并正常退出，不涉及运动、音视频采集或自启动。
 
 | 步骤 | 执行位置 | 成功结果 | 失败后查看 |
