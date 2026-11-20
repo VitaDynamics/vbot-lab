@@ -5,8 +5,8 @@
 A standalone C++17 / Bazel workspace starting from the read-only health monitor.
 It subscribes only to /locomotion/status, /bms_state and /system/sm_status.
 It does not publish controls, call services/actions or capture audio/video.
-The supported targets are foot_quadruped applications V1.6.0-15 and V1.6.0-17, C++ SDK 2026.10.20 / ABI 13,
-and Schema pack 2026.10.20-v4 from SDK Release edu-sdk-2026.10.31.
+The supported targets are foot_quadruped application V1.7.0-6, C++ SDK 2026.11.15 / ABI 14,
+and Schema pack 2026.11.18-v4 from SDK Release edu-sdk-2026.11.18.
 
 ## Project contents
 
@@ -30,13 +30,13 @@ bazel test //:model_test
 ```
 
 Prepare verified native and ARM64 SDK artifacts and the common Schema according to the
-[C++ SDK guide](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/packages/aorta/cpp/README.md).
+[C++ SDK guide](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/packages/aorta/cpp/README.md).
 Replace SDK_ARTIFACTS below with their actual parent directory; it does not have to be in
 the reference checkout. First use of Bazel may need network for public build-rule dependencies;
 no SDK or compiler is downloaded by the application's repository rule.
 
 ```bash
-SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.10.31 &&
+SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.11.18 &&
 export AORTA_CPP_SDK_DIR="$SDK_ARTIFACTS/cpp-sdk-x86_64" &&
 export AORTA_EDU_SCHEMA_DIR="$SDK_ARTIFACTS/edu-schema" &&
 bazel build //:main &&
@@ -77,14 +77,14 @@ PACKAGE_DIR=$(mktemp -d /tmp/vbot-cpp-app-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
 cp -L bazel-bin/main "$PACKAGE_DIR/bin/health-monitor" &&
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
 cp config.json APP.json "$PACKAGE_DIR/" &&
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
   "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
-file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/bin/health-monitor" &&
 (cd "$PACKAGE_DIR" && find bin lib licenses config.json APP.json -type f -exec sha256sum {} + > SHA256SUMS) &&
 printf 'Package directory: %s\n' "$PACKAGE_DIR"
@@ -141,7 +141,7 @@ A new login requires entering the same directory and setting the three runtime v
 no reinstall is needed. Stop with Ctrl+C or let the duration expire. No service, autostart, ACL
 or resource setting is changed.
 
-Use [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0) for connection, environment and
-interface documentation. Use the [C++ diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.md#cpp)
+Use [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/pre_release/V1.7.0.X) for connection, environment and
+interface documentation. Use the [C++ diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/docs/development/diagnostics.md#cpp)
 without installing Python wheels. Bring a reviewed, reproducible report to
 [Vbot 超能社区](https://forum.vbot.cn/); never share credentials or session configuration.

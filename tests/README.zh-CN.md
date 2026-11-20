@@ -160,6 +160,17 @@ DAG union／依赖、service header、FlatBuffer 验证、超时、中断及文�
 bazel test //tests:recipe_cpp_decoder_test
 ```
 
+S100 生命周期测试使用配套原生 SDK 头文件及链接期测试替身，不加载厂商二进制，
+也不打开 `/dev/vpu`。按[相机 Recipe](../recipes/camera/README.zh-CN.md#c-s100-硬件解码)
+设置 `VBOT_S100_MULTIMEDIA_DIR`，在开发容器内使用**本机架构** Aorta SDK 与编译器：
+
+```bash
+bazel test //tests:recipe_s100_decoder_test
+```
+
+该测试检查关键帧启动、异步输出就绪、输入／输出缓冲区所有权、失败清理和 CLI 许可保护。
+这不能证明硬件解码成功，实机运行须另按流程获得明确授权。
+
 依赖 SDK 的目标均为 manual，在开发容器内运行。独立的 CI SDK 任务显式选择三个基础 SDK 目标，
 可选解码仍需单独检查；各任务均不操作设备，不能把未运行记为通过。
 

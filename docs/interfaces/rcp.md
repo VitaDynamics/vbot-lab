@@ -3,7 +3,7 @@
 <p align="center">English | <a href="rcp.zh-CN.md">中文</a></p>
 
 This family contains the task action, a compatibility submission service and read-only trace output. Complete
-[device shell setup](../getting-started/device-environment.md) on `foot_quadruped` EDU.
+[device shell setup](../getting-started/device-environment.md) on `foot_quadruped` EDU / DEV.
 Task execution can change device state; observing traces or inspecting the provider does
 not submit a task. See the [interface table](aorta-ros2.md) for the mapping overview.
 

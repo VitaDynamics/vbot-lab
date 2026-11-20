@@ -50,7 +50,7 @@ CSV 标识见[头部轨迹资源](../resources/head-trajectories.zh-CN.md)。
 | --- | --- | --- | --- |
 | `method` | `HeadMethod` | ANGLE_CONTROL | ANGLE_CONTROL 或 STREAM；当前实际分派由角度／路径字段决定，method 应与所填内容一致。 |
 | `pre_check` | `bool` | false | 布尔值。轨迹预检查会将头部回正，可能运动；没有轨迹时预检查提前返回。 |
-| `duration_ms` | `int` | 0 | 目标角度动作时长，毫秒；当前 RCP 将小于 5000 的值提升为 5000，不是轨迹播放超时。 |
+| `duration_ms` | `int` | 0 | ANGLE_CONTROL 的毫秒时间预算：正值原样透传，省略／非正值使用 5000 ms；时间到不证明已到达目标，也不提高运动速度。不是轨迹播放超时。 |
 | `loop_enabled` | `bool` | false | true 时循环头部轨迹；需提供显式取消与有限阶段，不依赖自然结束。 |
 | `playback_rate` | `float` | 1.0 | schema 中为 float；当前 RCP 头部任务不使用该字段，保持 1.0，不依赖它调速。 |
 | `target_angles` | `[float]` | 省略 | 填写两个有限弧度值 [pitch, yaw]。物理范围依赖机器人配置，schema 没有给出通用安全范围，不猜测限位。 |
@@ -114,6 +114,7 @@ method 枚举：`MACHINE_LANGUAGE`, `HUMAN_VOICE`.
 | `y` | `float` | 0.0 | NAV_TO_POINT 的有限 y 坐标，米，由 frame 解释。 |
 | `frame` | `string` | 省略 | NAV_TO_POINT 坐标系字符串，省略保留任务默认 local；使用服务明确约定的坐标系，不假定 ROS map／odom 别名。 |
 | `stop_distance` | `float` | 0.0 | 导航停止容差，有限非负米数；0 是编码默认，不代表保证零误差到达。 |
+| `max_xvel` | `float` | 0.0 | 仅 NAV_TO_POINT，米／秒。0 保持原 0.5 m/s 上限；正值设置本任务前向速度上限，仍受 VLN 与运控限制；负值或非有限值视为无效输入。不修改持久跟随速度，其他方法忽略。 |
 
 method 枚举：`FOLLOW`, `ROAM`, `NAV_TO_POINT`, `COME_TO_ME`, `WALK`, `STOP`, `WALK_WITH_MPC`.
 
@@ -128,9 +129,22 @@ method 枚举：`FOLLOW`, `ROAM`, `NAV_TO_POINT`, `COME_TO_ME`, `WALK`, `STOP`, 
 | `y` | `float` | 0.0 | NAV_TO_POINT 的有限 y 坐标，米，由 frame 解释。 |
 | `frame` | `string` | 省略 | NAV_TO_POINT 坐标系字符串，省略保留任务默认 local；使用服务明确约定的坐标系，不假定 ROS map／odom 别名。 |
 | `stop_distance` | `float` | 0.0 | 导航停止容差，有限非负米数；0 是编码默认，不代表保证零误差到达。 |
+| `max_xvel` | `float` | 0.0 | 与 VlnCommand.max_xvel 相同的 NAV_TO_POINT 速度约定；仅 method 为 NAV_TO_POINT 时生效，其他方法忽略。 |
 | `prompt` | `string` | 省略 | SYNC_SEMANTIC_NAV／ASYNC_SEMANTIC_NAV 的非空文本，其他方法不传递。 |
 
 method 枚举：`FOLLOW`, `ROAM`, `NAV_TO_POINT`, `COME_TO_ME`, `WALK`, `SYNC_SEMANTIC_NAV`, `ASYNC_SEMANTIC_NAV`.
+
+### 导航限速的作用范围
+
+这两种命令的原生 JSON 字段为 `max_xvel`，Python 生成对象使用 `maxXvel`，
+C++ 消息对象使用 `max_xvel`。它是单次 `NAV_TO_POINT` 请求的前向速度上限，单位米／秒，
+不是恒速指令，也不修改持久 FOLLOW 设置。省略／零保留原 0.5 m/s 上限及其与跟随速度设置的既有交互。
+正上限仍受导航／运控配置限制，实际速度可能因启动、转弯、避障或到达策略进一步降低。
+
+RCP 对 NAV 请求拒绝负数、非有限值及非数值（包括布尔值）；其他方法忽略该字段。
+较小的正上限不会被启动最低速度抬高。零表示使用默认值，**不是**停止操作。
+`VlnSessionCommand` 还负责模式进入／恢复；给 `VlnCommand` 加限速不会赋予同样的生命周期。
+保留有限节点超时并等待 RCP 终态，不能仅检查请求已受理。
 
 ## LocomotionCommand
 

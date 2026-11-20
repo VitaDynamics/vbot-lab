@@ -2,7 +2,7 @@
 
 <p align="center"><a href="rcp-presets.md">English</a> | 中文</p>
 
-本目录提供四足 EDU 的预设标识与资源声明，配合 [DAG 编写指南](rcp-dag.zh-CN.md)使用。
+本目录提供四足 EDU／DEV 的预设标识与资源声明，配合 [DAG 编写指南](rcp-dag.zh-CN.md)使用。
 设备服务加载预设，用户无需读取安装目录；调用时使用 `DagPresetRef.relative_path`。
 资源存在不代表所有姿态下都能执行；实际准入取决于当前状态与资源。不同软件版本的集合可能不同。
 

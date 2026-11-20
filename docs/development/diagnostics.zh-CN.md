@@ -95,7 +95,7 @@ test -r "$AORTA_CPP_SDK_DIR/lib/libaorta_cpp.a" &&
 test -r "$AORTA_EDU_SCHEMA_DIR/include/locomotion_status_generated.h" &&
 g++ -dumpmachine &&
 aarch64-linux-gnu-g++ -dumpmachine &&
-file "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13"
+file "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14"
 ```
 
 默认 g++ 生成容器原生代码，aarch64-linux-gnu-g++ 应输出 aarch64-linux-gnu。
@@ -123,7 +123,7 @@ printf '%s\n' "$LDD_OUTPUT" &&
 ```
 
 预期校验通过、架构为 aarch64、没有缺失依赖。Aorta 运行库应来自此应用的 lib 目录。
-缺少 libaorta_core.so.13 时检查完整部署包与 LD_LIBRARY_PATH。
+缺少 libaorta_core.so.14 时检查完整部署包与 LD_LIBRARY_PATH。
 Exec format error、GLIBC_* 或 GLIBCXX_* 表示需要核对编译器／SDK／系统运行库；
 重新打包，不替换设备系统库。
 其他 C++ 应用使用其文档中的可执行文件路径和完整部署清单。

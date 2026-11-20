@@ -184,8 +184,21 @@ encoder; it generates only local synthetic frames:
 bazel test //tests:recipe_cpp_decoder_test
 ```
 
+The S100 lifecycle test instead uses matching native SDK headers and link-time
+test doubles, without loading vendor binaries or opening `/dev/vpu`. Prepare
+`VBOT_S100_MULTIMEDIA_DIR` as in the [camera Recipe](../recipes/camera/README.md#c-s100-hardware-decoding)
+and use the **native** Aorta SDK/compiler in the development container:
+
+```bash
+bazel test //tests:recipe_s100_decoder_test
+```
+
+It checks keyframe startup, asynchronous output readiness, input/output ownership,
+failure cleanup and CLI consent guards. It does not establish hardware decoding;
+that requires the separate, explicitly authorized device workflow.
+
 All SDK-dependent targets are manual and run in the development container. The separate
-CI SDK job explicitly selects the three base SDK targets; the optional decoder remains a
+CI SDK job explicitly selects the three base SDK targets; optional decoders remain a
 separate check. Neither job operates devices. Do not report unexecuted tests as passing.
 
 ## Clean SDK integration and Python packages

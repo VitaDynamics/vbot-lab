@@ -1,0 +1,88 @@
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+include "display_imgs.fbs";
+
+namespace aorta.services.peripheral;
+
+// Register an immutable, persistent JPEG sequence. complete=true means ready
+// to play; registration does not change the display. Same content is idempotent.
+table AddImagesRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  custom_images_name: string (id: 1);
+  images: [ShowImg] (id: 2);
+  fps: ushort = 30 (id: 3);
+  // Optional batched registration, at most 4 MiB JPEG data per request.
+  // For a single request leave these fields at their defaults. For batches,
+  // use one unique upload_id and repeat total_frames/total_bytes on every call.
+  upload_id: string (id: 4);
+  frame_offset: uint (id: 5);
+  total_frames: uint (id: 6);
+  total_bytes: ulong (id: 7);
+}
+
+table AddImagesResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  // OK, INVALID_ARGUMENT, ALREADY_EXISTS, STORAGE_FULL, NO_SPACE, BUSY, OFFSET_MISMATCH, IO_ERROR.
+  error_code: string (id: 3);
+  used_bytes: ulong (id: 4);
+  requested_bytes: ulong (id: 5);
+  limit_bytes: ulong (id: 6);
+  // False acknowledges a batch, true means the whole sequence is ready.
+  complete: bool (id: 7);
+  next_frame_offset: uint (id: 8);
+}
+
+table DelImagesRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  custom_images_name: string (id: 1);
+}
+
+table DelImagesResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  // OK, NOT_FOUND, BUSY (in use), IO_ERROR.
+  error_code: string (id: 3);
+  used_bytes: ulong (id: 4);
+  limit_bytes: ulong (id: 5);
+}
+
+table CustomImageSequenceStatus {
+  custom_images_name: string (id: 0);
+  frame_count: uint (id: 1);
+  fps: ushort (id: 2);
+  jpeg_bytes: ulong (id: 3);
+  // Includes first-frame preparation; deletion returns BUSY while in use.
+  in_use: bool (id: 4);
+}
+
+table GetImagesStatusRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  // Empty returns all registered custom sequences.
+  custom_images_name: string (id: 1);
+}
+
+table GetImagesStatusResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  error_code: string (id: 3);
+  sequences: [CustomImageSequenceStatus] (id: 4);
+  // Persistent JPEG usage includes incomplete data until cleanup succeeds.
+  used_bytes: ulong (id: 5);
+  limit_bytes: ulong (id: 6);
+  // Physical allocation also includes filesystem block rounding and metadata.
+  disk_bytes: ulong (id: 7);
+  disk_limit_bytes: ulong (id: 8);
+  cache_bytes: ulong (id: 9);
+  cache_limit_bytes: ulong (id: 10);
+  // At most one incomplete upload. It expires after 120 seconds of inactivity.
+  uploading_seq_name: string (id: 11);
+  uploaded_frames: uint (id: 12);
+  total_frames: uint (id: 13);
+  reserved_bytes: ulong (id: 14);
+}
+
+root_type AddImagesRequest;

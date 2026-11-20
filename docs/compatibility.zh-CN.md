@@ -4,9 +4,9 @@
 
 ## 机器人应用版本
 
-本仓库设备指南、接口与 Recipes 统一适配 **V1.6.0-15**、**V1.6.0-17** 应用版本，适用设备为 `foot_quadruped` EDU。
+本仓库设备指南、接口与 Recipes 统一适配 **V1.7.0-6** 应用版本，适用设备为 `foot_quadruped` EDU／DEV。
 这是应用适配版本，不代表最低版本范围，也不保证更早或后续版本兼容。
-仅支持明确列出的两个应用标识，不推断两个编号之间的其他版本兼容。
+仅支持明确列出的应用标识，不推断编号之间的其他版本兼容。
 版本配套与制品校验值统一记录在 [release.json](../catalog/release.json)，
 按[发布配置指南](../catalog/release.zh-CN.md)检查配套。
 
@@ -27,13 +27,21 @@ SDK 从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases) 中
 
 设备 Skill／AGENTS.md 与 Coding Agent Skill 的兼容性分别记录。
 
-## 设备类型与 EDU 发布范围
+## 产品系列与设备类型
 
-| 设备类型 | EDU 发布范围 | 传感器参考 | 开发入口 |
+EDU 与 DEV 提供相同的开放软件接口，包括 Aorta topic、service、action、Schema、
+ROS 2 映射及设备 Agent API。在支持的设备类型与应用版本下，两个系列共用 SDK、
+Recipes 和环境配置流程。产品系列与 `robot_type` 分别描述不同维度：四足 EDU、DEV
+设备在能力索引与工具中均选择 `foot_quadruped`。
+
+`edu-sdk-*`、`vbot_edu_msgs`、`/opt/vita/aorta/edu/` 等已发布名称适用于两个系列，
+使用时保留原样。硬件规格与已安装资源按所选设备的型号和配置核对。
+
+| 设备类型 | EDU／DEV 发布范围 | 传感器参考 | 开发入口 |
 | --- | --- | --- | --- |
-| [foot_quadruped](robots/foot_quadruped/README.zh-CN.md) | 当前发布对象 | [机器狗共用规格](hardware/quadruped-common/sensors.zh-CN.md) | 已提供连接、shell 配置、Aorta／ROS 2 与 Agent 接口指南；组件可用性见下表 |
-| [wheel_quadruped](robots/wheel_quadruped/README.zh-CN.md) | 后续发布；指南未发布 | [同一份机器狗共用规格](hardware/quadruped-common/sensors.zh-CN.md) | 尚未开放 EDU |
-| [foot_humanoid](robots/foot_humanoid/README.zh-CN.md) | 后续发布；指南未发布 | 待补充；不适用机器狗参数 | 尚未开放 EDU |
+| [foot_quadruped](robots/foot_quadruped/README.zh-CN.md) | EDU 与 DEV | [机器狗共用规格](hardware/quadruped-common/sensors.zh-CN.md) | 已提供连接、shell 配置、Aorta／ROS 2 与 Agent 接口指南；组件可用性见下表 |
+| [wheel_quadruped](robots/wheel_quadruped/README.zh-CN.md) | 后续发布；指南未发布 | [同一份机器狗共用规格](hardware/quadruped-common/sensors.zh-CN.md) | 尚未开放 EDU／DEV |
+| [foot_humanoid](robots/foot_humanoid/README.zh-CN.md) | 后续发布；指南未发布 | 待补充；不适用机器狗参数 | 尚未开放 EDU／DEV |
 
 此处尚未登记具体产品型号与硬件修订版本。
 选择版本时需核对设备类型、型号／硬件版本、固件、开发镜像、SDK、Schema 集合及示例／接口覆盖范围。
@@ -41,32 +49,32 @@ SDK 从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases) 中
 
 ## 组件接入状态
 
-`foot_quadruped` EDU 使用 [vbot shell 配置](getting-started/device-environment.zh-CN.md)与
+`foot_quadruped` EDU／DEV 使用 [vbot shell 配置](getting-started/device-environment.zh-CN.md)与
 [Aorta／ROS 2 可用接口映射](interfaces/aorta-ros2.zh-CN.md)。
 设备 CLI 可用性与工作站 SDK 安装是不同的前置条件。
 
-应用版本 `V1.6.0-15`、`V1.6.0-17` 的接口参考包含开放 topic 集、原生系统状态、静态 TF、控制 topic 与 RCP action，
+应用版本 `V1.7.0-6` 的接口参考包含开放 topic 集、原生系统状态、静态 TF、控制 topic 与 RCP action，
 以及[感知输出](interfaces/perception.zh-CN.md)和[音频／语音输入](interfaces/audio.zh-CN.md)。
 请在选定设备上检查确切路由、消息类型及下文列出的配置限制。
 
 | 项目 | 当前可用状态 | 兼容性检查 |
 | --- | --- | --- |
-| 仓库源码 | 开发分支 `release/V1.6.0`；正式快照 `Rel/V1.6.0` | 克隆仓库后，按[快速开始](getting-started/README.zh-CN.md)切换到该分支；源码引用与 SDK Release 制品分别管理版本 |
+| 仓库源码 | 开发分支 `pre_release/V1.7.0.X` | 克隆仓库后，按[快速开始](getting-started/README.zh-CN.md)切换到该分支；源码引用与 SDK Release 制品分别管理版本 |
 | 开发镜像 | Compose 与发布配置已固定 dev-v0.0.1 的 digest；运行于 linux/amd64，包含 ARM64 GCC／G++ 交叉编译器 | 设备 C++ 程序使用 ARM64 SDK 与 `bazel build --config=arm64`；默认构建／预览／测试为原生目标；可直接暂存 ARM64 Python wheel |
 | Bazel | 7.6.1 骨架基线 | 与 SDK 和镜像联调 |
 | [Aorta Python SDK](../packages/aorta/python/README.zh-CN.md) | 通过 SDK Release 附件分发（`edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 固定版本与制品 |
 | Python / ABI | 需要 Python 3.10 或更高版本；SDK wheel 提供 macOS arm64、Linux x86_64 与 Linux aarch64 版本。从发布配置记录的 SDK Release 下载全部四个必需 wheel，包括 `flatbuffers`。`linux_*` wheel 是 Ubuntu/glibc 构建 | 分别检查工作站与设备的架构、原生依赖；配套 wheel 下载完成后可离线安装；可选采集／解码依赖另行准备 |
 | 工作站原生运行库 | 通过 SDK Release 附件分发（`edu-sdk-*`），提供 x86_64 与 aarch64 的 Ubuntu 22.04 压缩包；版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 匹配架构、系统与 SDK；已验证的包需要 glibc 2.34 或更高版本 |
 | 离机路由器 | 不随 Release 分发。请从[官方 Release 页面](https://github.com/eclipse-zenoh/zenoh/releases)安装 Eclipse zenoh `zenohd` 1.10.x（SDK 所基于的 zenoh minor），已验证版本为 1.10.1 | 路由器 minor 与 SDK 保持一致；机器人镜像自带路由器 |
-| 设备 Aorta／ROS 2 工具 | 已整理应用版本 `V1.6.0-15`、`V1.6.0-17` 的配置和部分可用 bridge 路由 | 分别检查公开文件、shell 变量、类型、发现与实际收数 |
+| 设备 Aorta／ROS 2 工具 | 已整理应用版本 `V1.7.0-6` 的配置和部分可用 bridge 路由 | 分别检查公开文件、shell 变量、类型、发现与实际收数 |
 | [Interface Definitions — 开放 Aorta Schema](../schemas/README.zh-CN.md) | 通过 SDK Release 附件分发（`edu-sdk-*`），版本配对见 Release 内 `EDU_SDK_MANIFEST.json` | 匹配 SDK 版本、依赖及生成的绑定 |
 | [Recipes](../recipes/README.zh-CN.md) | 按能力组织的 Python 与 C++ 示例，包含 Bazel 目标与离线测试 | 验证 Python 依赖、Bazel 目标、文档列明的接口及预期结果 |
 | [VBOT Blueprints](../blueprints/README.zh-CN.md) | 已提供 Python 与 C++ 只读健康监测应用，支持生成独立项目和打包 | 按所选语言指南确认 SDK 配套、配置、部署和停止方式；合成数据测试不代表设备数据可用 |
-| [Agent HTTP MCP](interfaces/agent/http-mcp.zh-CN.md) | 已整理应用版本 `V1.6.0-15`、`V1.6.0-17` 的契约 | 检查运行时可用性与 Agent 到工具调用；本仓不包含服务可执行代码 |
-| [设备端 Skills／AGENTS.md API](interfaces/agent/content-api.zh-CN.md) | 已整理应用版本 `V1.6.0-15`、`V1.6.0-17` 的编写规范与 HTTP 内容契约 | 检查路由可用性及用户内容路径；写入前备份、写入后比较读回，并在新 Turn 使用内容 |
+| [Agent HTTP MCP](interfaces/agent/http-mcp.zh-CN.md) | 已整理应用版本 `V1.7.0-6` 的契约 | 检查运行时可用性与 Agent 到工具调用；本仓不包含服务可执行代码 |
+| [设备端 Skills／AGENTS.md API](interfaces/agent/content-api.zh-CN.md) | 已整理应用版本 `V1.7.0-6` 的编写规范与 HTTP 内容契约 | 检查路由可用性及用户内容路径；写入前备份、写入后比较读回，并在新 Turn 使用内容 |
 | [Coding Agent Skills](../skills/README.zh-CN.md) | `vbot-dev-setup`、`vbot-app-dev` 与 `vbot-diagnose` 分别覆盖环境配置、应用开发和限定范围排障；共享 Codex／Claude Code 发现链接 | 在使用的 harness 中确认发现与调用 |
 | [能力索引](../catalog/README.zh-CN.md) | 本地 JSON 查询与校验 | 格式版本、引用及发布范围检查，不是在线设备发现 |
-| 机器人应用 | `V1.6.0-15`、`V1.6.0-17` | 确认已安装应用版本及所需接口；组件版本分别核对 |
+| 机器人应用 | `V1.7.0-6` | 确认已安装应用版本及所需接口；组件版本分别核对 |
 
 ## 设备配置与 schema pack 行
 
@@ -74,16 +82,18 @@ EDU schema pack 用稳定的行号标识公开路由；随包分发的 `manifest
 在 `map_rows` 中列出这些行。机器人镜像决定其访问控制允许哪些行，因此请按应用使用的行
 核对镜像。
 
-应用 `V1.6.0-15`、`V1.6.0-17` 的公开接口包含已启用的 `/audio/play_pcm`（行 57，pub/sub 输入）
+应用 `V1.7.0-6` 的公开接口包含已启用的 `/audio/play_pcm`（行 57，pub/sub 输入）
 和 `/speech_control`（行 58，service）bridge 路由，以及 `/locomotion/control_enable`（行 59，service）、
 `/ota_version`（行 60，pub/sub 输出）、`/system/power_saving/enable`（行 61，service）
 和 `/function/following`（行 62，service）。
-配套 pack 有 62 个编号公开行；`schemas/ros2/routes.json` 有 76 条映射，因为别名与派生
+应用 `V1.7.0-6` 另提供 `/light_node/fill_light`（行 66）、`/system/power_saving/set_policy`（行 67）
+与地图资产服务（行 68–72）。
+配套 pack 有 72 个编号公开行；`schemas/ros2/routes.json` 有 83 条映射，因为别名与派生
 ROS 输出可能形成多条记录。更早的通信配置可能采用不同子集，其排除项不是当前版本的接口清单。
 使用前按已安装应用与路由发现结果核对[接口参考](interfaces/aorta-ros2.zh-CN.md)。
 
 带 EDU 路由器的软件会发布 `/opt/vita/aorta/edu/edu_session_peer.json5`，可用
-`test -r /opt/vita/aorta/edu/edu_session_peer.json5` 检查。有该文件时，EDU 程序之间还可以
+`test -r /opt/vita/aorta/edu/edu_session_peer.json5` 检查。有该文件时，用户程序之间还可以
 使用其他任意话题、服务和动作名，client 与 peer 模式均可，并可用
 `/opt/vita/aorta/edu/foxglove_bridge.yaml` 配置 Foxglove bridge。没有该文件时，会话只支持
 client 模式，允许行以外的名称会被丢弃。
@@ -100,7 +110,7 @@ Schema 存在不等于提供方或发布者正在运行。请在选定设备上�
 timeout 15s aorta topic echo /ota_version --count 1
 ```
 
-确认收到的 `version` 字段属于 `V1.6.0-15` 或 `V1.6.0-17`。字符串可能带 `~` 构建后缀；
+确认收到的 `version` 字段属于 `V1.7.0-6`。字符串可能带 `~` 构建后缀；
 比较后缀之前的应用标识，反馈问题时保留完整版本字符串。
 发现话题或显示等待订阅的提示不代表已收到版本。没有收到样本时，已安装版本应保持未确认，
 不要根据 SDK、源码 checkout 或 CLI 版本推断。

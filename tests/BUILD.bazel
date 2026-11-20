@@ -81,6 +81,18 @@ cc_test(
     tags = ["manual"],
 )
 
+cc_test(
+    name = "recipe_s100_decoder_test",
+    srcs = [
+        "recipe_s100_decoder_test.cc",
+        "//recipes/camera:h265_start.h",
+        "//recipes/camera:s100_decoder.h",
+    ],
+    deps = ["//recipes:cpp_common", "@s100_multimedia//:headers"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)
+
 py_test(
     name = "recipe_cpp_test",
     srcs = ["test_cpp_recipes.py"],

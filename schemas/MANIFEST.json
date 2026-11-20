@@ -1,11 +1,11 @@
 {
   "file_counts": {
-    "aorta_fbs": 70,
+    "aorta_fbs": 75,
     "ros2": {
       "aorta_msgs": {
         "action": 1,
-        "msg": 104,
-        "srv": 1
+        "msg": 107,
+        "srv": 10
       },
       "camera_msgs": {
         "action": 0,
@@ -35,7 +35,7 @@
       "peripheral_msgs": {
         "action": 0,
         "msg": 1,
-        "srv": 6
+        "srv": 7
       },
       "slam_msgs": {
         "action": 0,
@@ -45,7 +45,7 @@
       "software_msgs": {
         "action": 0,
         "msg": 4,
-        "srv": 1
+        "srv": 2
       },
       "speech_msgs": {
         "action": 0,
@@ -68,13 +68,13 @@
         "srv": 0
       }
     },
-    "routes": 76
+    "routes": 87
   },
   "format_version": 1,
-  "ros2_bridge_version": "2026.10.21",
+  "ros2_bridge_version": "2026.11.18",
   "schema_pack": {
-    "asset": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst",
-    "sha256": "e6a590fda45d7c27e76f28e79566a5371a40cb065809040d7d378392cfb75e4e",
-    "version": "2026.10.20"
+    "asset": "aorta-edu-schema-pack-2026.11.18-v4.tar.zst",
+    "sha256": "5e304b09c0d3669130a4c3f0159a52bf2093ca70164ad129414b15f4688086ff",
+    "version": "2026.11.18"
   }
 }

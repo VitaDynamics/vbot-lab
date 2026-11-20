@@ -2,10 +2,9 @@
   "format_version": 1,
   "robot_type": "foot_quadruped",
   "release_scope": "current_target",
-  "application_version": "V1.6.0-17",
+  "application_version": "V1.7.0-6",
   "supported_application_versions": [
-    "V1.6.0-15",
-    "V1.6.0-17"
+    "V1.7.0-6"
   ],
   "models": [],
   "minimum_firmware": null,

@@ -12,13 +12,15 @@
 [内容 API 准备步骤](../interfaces/agent/content-api.zh-CN.md)，不需要运行开发者自建的 MCP 服务。
 
 自行提供满足 [HTTP MCP 契约](../interfaces/agent/http-mcp.zh-CN.md)的服务，
-默认 S100 入口以 `vbot` 身份监听 `192.168.127.2:18080`，开发者文件位于 `/userdata/vbot`。
+在 S100 上，以 `vbot` 身份监听可达的可信网卡，例如 `192.168.127.2:18081`，
+开发者文件位于 `/userdata/vbot`。
 使用 `vbot` 账户及其已分配的权限。先确认端口可用，不要为占用端口终止未知服务或改动系统服务。
 
 新增服务时，通过 [MCP 连接配置 API](../interfaces/agent/mcp-config.zh-CN.md)注册真实可达 URL。
 先读取已有列表，再新增自己拥有且名称唯一的连接，等待发现完成。
-该 API 也说明编辑、启停、凭据及刷新方式，但不会启动服务。
-下文 `MCP_URL` 应与需要检查的入口一致。
+该 API 也说明编辑、启停、凭据、删除及刷新方式，但不会启动服务。
+执行下文检查前，将 `MCP_URL` 设置并导出为已注册的入口；例如服务实际位于示例地址时，执行
+`export MCP_URL=http://192.168.127.2:18081/mcp`。不要依赖某个预置连接已经启用。
 
 以下检查要求服务提供 `edu_echo`、`edu_add` 两个无副作用演示工具，请求与响应格式见接口契约。
 不要将检查直接用于有实际副作用的任意工具。
@@ -30,7 +32,7 @@
 ## 检查完整 MCP 交互
 
 服务已监听后，在装有 `curl`、`jq` 的 S100 Bash 终端执行。
-脚本默认访问 S100 入口；检查其他服务时，将 `MCP_URL` 设置为自己注册的入口。
+脚本要求通过 `MCP_URL` 明确指定要检查的已注册服务。
 脚本不会启动、安装或配置服务。
 
 检查要求返回本文示例格式的 JSON，初始化通知返回 HTTP `202`。
@@ -40,7 +42,7 @@
 ```bash
 set -euo pipefail
 
-MCP_URL="${MCP_URL:-http://192.168.127.2:18080/mcp}"
+MCP_URL="${MCP_URL:?Set MCP_URL to your registered MCP service URL}"
 MCP_HEADER_FILE=$(mktemp)
 MCP_BODY_FILE=$(mktemp)
 trap 'unlink "$MCP_HEADER_FILE"; unlink "$MCP_BODY_FILE"' EXIT
@@ -133,6 +135,6 @@ curl 检查通过仅证明开发者服务能处理这些请求。
   发现或执行失败时按上表排查。
 - 使用 Skill 或 AGENTS.md 时，确认 API 读回与预期内容一致，再开启新 Turn 使用；
   保留备份，便于后续修改与恢复。
-- 将 `18080` 与 `8787` 端口保留在可信网络内，不暴露或转发至校园公网或互联网。
+- 将 MCP 服务使用的端口与 API 端口 `8787` 保留在可信网络内，不暴露或转发至校园公网或互联网。
 
 本接入流程不需要重启或升级设备。

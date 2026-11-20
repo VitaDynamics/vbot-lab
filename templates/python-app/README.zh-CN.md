@@ -3,8 +3,8 @@
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
 这是基于只读健康监测应用的独立 Bazel 工作区。请在此修改应用，不必修改 VBOT Lab 参考仓库。
-需要 Python 3.10+、Bazel 7.6.1 和 VBOT 开发容器。设备配套为 V1.6.0-15、V1.6.0-17（foot_quadruped），
-SDK Release edu-sdk-2026.10.31 提供固定版本依赖。
+需要 Python 3.10+、Bazel 7.6.1 和 VBOT 开发容器。设备配套为 V1.7.0-6（foot_quadruped），
+SDK Release edu-sdk-2026.11.18 提供固定版本依赖。
 
 ## 构建与测试——开发容器
 
@@ -31,7 +31,7 @@ Python 失败时在 stderr 输出 JSON，包含 status=error、stage、error_cod
 不输出原始异常或配置内容。config_not_found、invalid_config 属于 stage=config，
 在 SDK／设备访问前停止；sdk_not_installed、sdk_version_mismatch、sdk_load_failed 属于 stage=sdk。
 环境与订阅失败使用各自阶段；未知错误使用 runtime/unexpected_error。
-按 next_step 及[错误说明](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/troubleshooting/README.zh-CN.md#application-errors)处理。
+按 next_step 及[错误说明](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/docs/troubleshooting/README.zh-CN.md#application-errors)处理。
 
 ## 打包——开发容器
 
@@ -40,7 +40,7 @@ Python 失败时在 stderr 输出 JSON，包含 status=error、stage、error_cod
 
 ```bash
 python3 /workspace/vbot-lab/tools/package_app.py --project /workspace/my-app \
-  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.10.31 \
+  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.11.18 \
   --output /workspace/my-app-package &&
 python3 /workspace/vbot-lab/tools/package_app.py --verify /workspace/my-app-package
 ```
@@ -87,6 +87,6 @@ low_battery 仅作提示，不触发任何控制；超时不能证明接口不�
 重新登录后，进入 APP_DIR、清除两个 Python 覆盖变量、设置相同环境，执行最后一条命令即可，无需重新安装。
 退出时关闭订阅和 Node。
 
-连接、环境和接口说明见 [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0)。
-环境或无数据问题可按 [Python 诊断路径](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.zh-CN.md)检查。
+连接、环境和接口说明见 [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/pre_release/V1.7.0.X)。
+环境或无数据问题可按 [Python 诊断路径](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/docs/development/diagnostics.zh-CN.md)检查。
 请在检查诊断摘要后，到 [Vbot 超能社区](https://forum.vbot.cn/)反馈可复现问题，不分享凭据或会话配置。

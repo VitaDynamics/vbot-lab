@@ -5,28 +5,28 @@
 [release.json](release.json) 记录一个 VBOT Lab 源码快照的组件组合。
 它是本地、机器可读的配套配置，不是发布公告或安装程序，各组件保留独立版本号。
 
-配置记录所选应用、SDK、Schema 与开发镜像引用，以及计划使用的源码分支和 tag；
-这不会创建 Git 引用，也不表示发布了新版本。开发分支为 `release/V1.6.0`，正式源码 tag 为 `Rel/V1.6.0`，
-机器人应用为 `V1.6.0-15`、`V1.6.0-17`，SDK Release 为 `edu-sdk-2026.10.31`。镜像 digest 已固定。
+配置记录所选应用、SDK、Schema 与开发镜像引用，以及开发分支和可选的源码快照 tag；
+这不会创建 Git 引用，也不表示发布了新版本。开发分支为 `pre_release/V1.7.0.X`，
+机器人应用为 `V1.7.0-6`，SDK Release 为 `edu-sdk-2026.11.18`。镜像 digest 已固定。
 
 ## 字段说明
 
 | 字段 | 含义与填写范围 |
 | --- | --- |
 | `format_version` | 整数 `1`；拒绝未知字段和重复 JSON 键 |
-| `workspace.branch` | 所选正式版的开发分支：`release/V1.6.0`。格式也接受 `main` 与 `pre_release/V1.6.1.X` 等长期迭代分支，`X` 保留为字母 |
-| `workspace.tag` | 正式快照 `Rel/V1.6.0`，与 `release/V1.6.0` 的版本族一致；迭代分支使用配套的数字迭代 tag，机器人应用和 SDK 版本分别记录 |
+| `workspace.branch` | 当前开发分支为 `pre_release/V1.7.0.X`，`X` 保留为字母。格式也接受 `main` 与正式版本使用的 `release/V<major>.<minor>.<patch>` |
+| `workspace.tag` | 迭代阶段的可选源码快照；按版本族分支开发时省略。填写时，迭代 tag 须匹配分支版本族并使用数字迭代号。正式发布配置要求源码 tag，正式分支使用 `Rel/V<major>.<minor>.<patch>`；应用和 SDK 版本分别记录 |
 | `robots` | `catalog/robots/` 中当前已开放的设备类型；默认配套与支持版本须与对应设备配置一致 |
-| `robots.<type>.application_version` | 默认应用配套版本，当前为 `V1.6.0-17`；保留单一版本形式用于打包元数据 |
-| `robots.<type>.supported_application_versions` | 可选的非空、无重复准确版本清单，当前为 `V1.6.0-15`、`V1.6.0-17`；须包含默认版本且与设备配置一致。省略时仅声明默认版本，不表示范围 |
+| `robots.<type>.application_version` | 默认应用配套版本，当前为 `V1.7.0-6`；保留单一版本形式用于打包元数据 |
+| `robots.<type>.supported_application_versions` | 可选的非空、无重复准确版本清单，当前为 `V1.7.0-6`；须包含默认版本且与设备配置一致。省略时仅声明默认版本，不表示范围 |
 | `sdk.repository`、`sdk.release_tag` | GitHub 下载仓库（`owner/name`）与确切的 EDU SDK 整包 Release tag |
 | `sdk.aorta_version` | 与 Python／C++ SDK 配套的 Aorta SDK 包版本 |
 | `sdk.python` | 最低 Python 版本（`major.minor`）、四个 wheel 包的准确版本和可下载的 wheel 平台标签 |
 | `sdk.cpp` | 准确的 SDK 版本、正整数 ABI、发行环境标识和可下载架构；ABI 与 Bazel 的原生库导入保持一致 |
 | `sdk.assets` | 附件清单：准确文件名与 64 位小写 SHA-256，包含校验文件、manifest 和许可证附件；不记录凭据或带签名的下载 URL |
-| `schema` | 来自生成文件 `schemas/MANIFEST.json` 的 Schema 版本、pack 修订、归档名／校验值及 ROS 2 bridge 配套版本；pack 修订与 Schema 版本可不同 |
+| `schema` | 下载的 Schema 归档版本／修订／名称／校验值及所选 SDK Release 记录的 bridge 配套信息；仓库当前 ROS 定义版本另由 `schemas/MANIFEST.json` 记录 |
 | `development.bazel_version` | `.bazelversion` 中的准确值 |
-| `development.image` | Compose 默认镜像的带 tag 引用及 `sha256:<64 位小写十六进制>` digest；`null` 表示尚未记录 digest |
+| `development.image` | Compose 默认镜像的带 tag 引用及 `sha256:<64 位小写十六进制>` digest，与所选开发镜像一致 |
 
 包版本使用三段数字，可追加 `-v4` 等修订后缀；应用版本使用 `V<major>.<minor>.<patch>`，可追加 `-10` 等数字构建后缀。
 兼容关系未知时，不要复制其他组件的版本号来填充。
@@ -37,15 +37,20 @@
 
 ## 源码分支与 tag
 
-V1.6.0 应用开发使用 `release/V1.6.0`，不使用 detached tag 或迭代分支。
-`Rel/V1.6.0` 标记正式源码快照，配套机器人应用 `V1.6.0-15`、`V1.6.0-17`。
+当前 V1.7.0-6 应用开发使用 `pre_release/V1.7.0.X`，不使用 detached tag 或先前的 V1.6.0 分支。
+迭代配置直接选择该分支。
+
+先前 V1.6.0 应用开发使用 `release/V1.6.0`，`Rel/V1.6.0` 标记其正式源码快照，
+配套机器人应用 `V1.6.0-15`、`V1.6.0-17`。
 先前的 `V1.6.0.15` tag 保留为迭代快照，不作为开发入口；`main` 保存最新正式版本。
 
-正式发布时，经 PR 评审合并到 `main` 后，再从同一合并提交创建 `release/V1.6.0`
-与 `Rel/V1.6.0`，使三者一致，不改写历史。切换分支或创建 tag 不会自动创建 GitHub Release。
+正式发布时，经 PR 评审合并到 `main` 后，再从同一合并提交创建匹配的
+`release/V<major>.<minor>.<patch>` 与 `Rel/V<major>.<minor>.<patch>`，使三者一致，不改写历史。
+切换分支或创建 tag 不会自动创建 GitHub Release。
 
-新版本族的迭代使用各自的 `pre_release/V<major>.<minor>.<patch>.X` 分支，
-迭代更新不要求 PR。V1.6.0 的迭代阶段已结束，不将它的分支复用于其他版本族。
+新版本族的迭代使用各自的 `pre_release/V<major>.<minor>.<patch>.X` 分支。
+只有仓库维护者可以向仓库分支提交和推送更新。
+V1.6.0 的迭代阶段已结束，不将它的分支复用于其他版本族。
 已有 tag 对应不可变的源码快照。
 评审和正式发布步骤见[协作流程](../.github/WORKFLOWS.zh-CN.md)。
 
@@ -62,18 +67,19 @@ python3 tests/test_release.py
 ```
 
 工具仅使用标准库和本地文件，不访问 GitHub、Docker 或设备，不安装依赖、创建 tag
-或发布 Release。输出为 JSON：退出码 `0` 表示本地配套一致（仍可能有 `pending` 字段）；
-`1` 表示要求严格完整检查但仍有未填写字段；`2` 表示输入错误或配套不一致。
+或发布 Release。输出为 JSON：退出码 `0` 表示本地配套一致；
+`1` 表示要求严格完整检查但必需元数据不完整；`2` 表示输入错误或配套不一致。
 命令行参数错误也返回 `2`，argparse 信息输出至 stderr。
 
-要求填齐源码 tag 和镜像 digest：
+按所选源码模式检查必需元数据与镜像 digest：
 
 ```bash
 python3 tools/check_release.py --require-complete
 ```
 
 完整检查只确认语法和记录的配套关系，不证明 tag 已存在、
-下载可见性、镜像身份或设备兼容性。镜像 digest 或源码 tag 未填齐时，会按预期无法通过严格检查。
+下载可见性、镜像身份或设备兼容性。按分支迭代不要求源码 tag；
+缺少镜像 digest，或正式发布配置缺少源码 tag 时，无法通过严格检查。
 
 按 [SDK 指南](../packages/aorta/python/README.zh-CN.md)下载 SDK 附件后，
 可选地比较发布 manifest 并计算本地附件校验值：

@@ -13,15 +13,18 @@ AGENTS.md without adding tools, go directly to [content API preparation](../inte
 No developer-owned MCP server is required for content API calls.
 
 Provide your own service implementing the [HTTP MCP contract](../interfaces/agent/http-mcp.md).
-For the default S100 endpoint, run it as `vbot` at `192.168.127.2:18080`, with
-developer files under `/userdata/vbot`. Use the `vbot` account and its assigned permissions.
+On S100, run it as `vbot` on a reachable trusted interface, for example
+`192.168.127.2:18081`, with developer files under `/userdata/vbot`.
+Use the `vbot` account and its assigned permissions.
 Ensure the port is available; do not kill an unknown listener or alter system services to claim it.
 
-For an additional service, follow the [MCP connection API](../interfaces/agent/mcp-config.md)
+Follow the [MCP connection API](../interfaces/agent/mcp-config.md)
 to register its actual reachable URL. Read the existing list first, add your own uniquely named
 connection, and wait for discovery to finish. That API also covers edits, enable/disable,
-credentials and refresh; it does not launch the service. Keep `MCP_URL` below aligned
-with the endpoint being checked.
+credentials, deletion and refresh; it does not launch the service. Set and export
+`MCP_URL` to that registered endpoint before running the checks below, for example
+`export MCP_URL=http://192.168.127.2:18081/mcp` when that is your service's actual address.
+Do not rely on a preconfigured connection being enabled.
 
 The checks below assume a server exposing two harmless demonstration tools, `edu_echo`
 and `edu_add`, with the request and response shapes documented in the contract.
@@ -34,8 +37,8 @@ This endpoint is optional and does not establish MCP discovery or Agent integrat
 ## Check the complete MCP exchange
 
 Run the following in Bash on S100 with `curl` and `jq` installed, after your service is listening.
-The script defaults to the S100 endpoint; set `MCP_URL` to your registered endpoint when
-checking another service. It does not start, install, or configure a service.
+The script requires `MCP_URL` to identify the registered service being checked.
+It does not start, install, or configure a service.
 
 This check expects the documented example JSON responses and HTTP `202` for
 the initialization notification. It is not an SSE decoder: for `text/event-stream`
@@ -46,7 +49,7 @@ that behavior separately instead of ignoring all status codes.
 ```bash
 set -euo pipefail
 
-MCP_URL="${MCP_URL:-http://192.168.127.2:18080/mcp}"
+MCP_URL="${MCP_URL:?Set MCP_URL to your registered MCP service URL}"
 MCP_HEADER_FILE=$(mktemp)
 MCP_BODY_FILE=$(mktemp)
 trap 'unlink "$MCP_HEADER_FILE"; unlink "$MCP_BODY_FILE"' EXIT
@@ -146,7 +149,7 @@ Software cancellation or timeout is not a substitute for it.
   the expected result. Use the error table above if discovery or execution fails.
 - For Skills or AGENTS.md, confirm API readback matches the intended content, then start a
   new Turn to use it. Keep backups for later edits and restoration.
-- Keep ports `18080` and `8787` on the trusted network; do not expose or forward them to
+- Keep your MCP service port and API port `8787` on the trusted network; do not expose or forward them to
   campus public networks or the Internet.
 
 Rebooting or upgrading the device is not part of this integration procedure.

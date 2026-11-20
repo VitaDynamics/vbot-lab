@@ -4,8 +4,8 @@
 
 本功能域用于图像接收／解码、带标定的图像处理和标签交互。
 
-Python SDK 实现见 [camera Recipe](../../recipes/camera/README.zh-CN.md)，包含源码、Bazel 目标、离线预览与显式设备运行。接口语义以下文为准。
-下方 topic 表列出 `foot_quadruped` EDU 的只读 pub/sub 输出。
+Python／C++ 实现见 [camera Recipe](../../recipes/camera/README.zh-CN.md)，包含源码、Bazel 目标、部署与显式设备运行。接口语义以下文为准。
+下方 topic 表列出 `foot_quadruped` EDU／DEV 的只读 pub/sub 输出。
 登录并完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)，
 准确的 Aorta／ROS 消息类型及映射见[接口表](aorta-ros2.zh-CN.md)。
 
@@ -31,6 +31,38 @@ Python SDK 实现见 [camera Recipe](../../recipes/camera/README.zh-CN.md)，包
 - 标签结果分别使用 `left_valid`、`right_valid`，仅在对应侧有效时读取标签 ID／角点。
   判决裕量不是人体检测置信度。标签消息本身不提供机器人米制位姿；
   估算位姿还需要标签实际尺寸、匹配的标定和坐标变换。
+
+## S100 硬件解码
+
+设备端 H.265 硬件解码推荐直接使用**地瓜 S100 原生多媒体 SDK** 的
+MediaCodec 接口（`hb_mm_mc_*`）。解码配置、输入／输出缓冲区及资源释放方式见官方
+[S100 编解码指南](https://developer.d-robotics.cc/rdk_s_doc/Advanced_development/multimedia_development/S100/codec)。
+Aorta SDK 负责接收压缩视频，解码由应用单独完成。
+
+设备镜像向 `vbot` 账户提供 `/dev/vpu` 的读写权限，通过 `vpu` 用户组实现。
+SSH 登录后，可检查当前会话的实际权限；以下命令不会访问编解码器或修改权限：
+
+```sh
+id -nG
+stat -c 'device=%n mode=%a group=%G' /dev/vpu
+if [ -c /dev/vpu ] && [ -r /dev/vpu ] && [ -w /dev/vpu ]; then
+  printf '%s\n' '/dev/vpu is readable and writable'
+else
+  printf '%s\n' '/dev/vpu is missing or not readable/writable' >&2
+  exit 1
+fi
+```
+
+预期当前会话的用户组包含 `vpu`，设备节点也属于该组，且权限检查成功。
+这只检查访问权限；应用仍需成功初始化解码器、分配缓冲区并输出图像。
+若权限检查失败，请保留输出并联系支持，不要修改设备权限。
+
+使用与设备软件配套的原生 SDK 头文件及库，在开发容器内构建 ARM64 应用，
+按 [C++ 部署流程](../../packages/aorta/cpp/README.zh-CN.md#在机器人上运行)部署可执行文件及依赖库。
+每个解码器只接收所订阅的一路 H.265 码流，遵循 SDK 的缓冲区所有权、输出格式及行跨度。
+退出时停止并释放自己的解码器，不中断设备已有的相机服务。
+[S100 C++ 硬件解码示例](../../recipes/camera/README.zh-CN.md#c-s100-硬件解码)提供完整构建／部署流程
+及 NV12 借用缓冲区的处理方式；独立的 PyAV／FFmpeg 路径不会选择该原生后端。
 
 ## JPEG 单帧尺寸约束
 

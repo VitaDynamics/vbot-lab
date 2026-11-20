@@ -1,17 +1,17 @@
-# Four-wheeled robot dog EDU — future release
+# Four-wheeled robot dog — future release
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 - Build identifier: `wheel_quadruped`.
-- EDU scope: reserved for a future release; outside the current EDU release scope.
-- Guide status: shared connection and hardware references available; the complete EDU development guide is not released.
+- Software scope: reserved for a future release; outside the current EDU / DEV release scope.
+- Guide status: shared connection and hardware references available; the complete development guide is not released.
 
 ## Wired / Wi-Fi connection and SSH login
 
 This type uses the same connection method as `foot_quadruped`. Follow the
 [shared connection guide](../quadruped-common/connection.md) for wired network setup
 or Vbot App Wi-Fi setup, IP lookup in the bound app's Settings → About, and `vbot` SSH login.
-Sharing this procedure does not expand the current EDU release scope or establish
+Sharing this procedure does not expand the current software release scope or establish
 firmware, SDK, or API compatibility.
 
 ## Available hardware reference
@@ -22,7 +22,7 @@ This type shares these hardware references with `foot_quadruped`:
 - [Back mounting and arm adapter plate](../../hardware/quadruped-common/back-mounting.md):
   common mounting dimensions, CAD files and illustrated fasteners.
 
-Hardware applicability is separate from EDU SDK, firmware, public-interface, and example availability.
+Hardware applicability is separate from SDK, firmware, public-interface, and example availability.
 
 Do not apply four-legged robot-dog firmware, deployment instructions, or motion-control
 examples to this type solely because the hardware is shared.

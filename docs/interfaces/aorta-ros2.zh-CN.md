@@ -2,18 +2,19 @@
 
 <p align="center"><a href="aorta-ros2.md">English</a> | 中文</p>
 
-Aorta 是 VBOT EDU 机器人的原生通信层。`aorta_ros2_bridge` 保留部分此前已公开的
+Aorta 是 VBOT EDU／DEV 机器人的原生通信层。`aorta_ros2_bridge` 保留部分此前已公开的
 ROS 2 接口，并非另一套完全等价的机器人接口。请先完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)。
 
 ## 版本范围
 
-本参考适用于 `foot_quadruped` EDU 软件。接口是否可用取决于已安装固件，
+本参考适用于 `foot_quadruped` EDU／DEV 软件。接口是否可用取决于已安装固件，
 使用前请发现确切路由并检查交付的消息类型。
-本文统一适配机器人应用版本 **V1.6.0-15**、**V1.6.0-17**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
+本文统一适配机器人应用版本 **V1.7.0-6**，配置限制见[兼容矩阵](../compatibility.zh-CN.md)；
 此软件范围不覆盖其他机器人类型。
 
-本页列出开放 topic 集及受支持的映射，并整理 25 个请求／响应 service 与 RCP action。
-topic 表共包含 48 个不同的 Aorta 路由：44 个订阅输出、4 个控制输入。
+本页列出开放 topic 集及受支持的映射，并整理 35 个 Aorta service、36 个 ROS 2 service 入口
+（表情播放具有兼容入口和完整字段入口）与 RCP action。
+topic 表共包含 46 个不同的 Aorta 路由：42 个订阅输出、4 个控制输入。
 发现输出路由后，限时获取样本检查发布者；不要通过向控制 topic 发布消息来检查环境。
 Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 设备 CLI 使用不要求安装 Python SDK。
@@ -30,7 +31,7 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 | [传感器与硬件遥测](sensors.zh-CN.md) | 电池、IMU、雷达、UWB、GNSS、舵机反馈 |
 | [相机与 AprilTag](cameras.zh-CN.md) | 标定、压缩视频、标签检测 |
 | [Perception](perception.zh-CN.md) | 目标检测与人体关键点 |
-| [Audio](audio.zh-CN.md) | 音频帧、ASR 文本、语音事件、UWB 输入结束、PCM 播放及语音策略 service |
+| [Audio](audio.zh-CN.md) | 音频帧、UWB 输入结束、PCM 播放及语音策略 service |
 | [运动](locomotion.zh-CN.md) | 状态、终态报告、摇杆／速度输入 |
 | [系统与外设](system-peripherals.zh-CN.md) | 系统状态、显示、耳灯调制 |
 | [RCP](rcp.zh-CN.md) | 任务 action 与追踪事件 |
@@ -84,8 +85,6 @@ Python SDK wheel 安装与已入库的 Schema 源码有独立说明，
 | [系统状态机](system-peripherals.zh-CN.md) | `/system/sm_status` | `/sm/status` | pub/sub — 订阅 | `sm.SmStatus` | `software_msgs/msg/SystemStateMachineStatus` |
 | [OTA 应用版本](system-peripherals.zh-CN.md) | `/ota_version` | `/ota_version` | pub/sub — 订阅 | `aorta.topic.system_monitor.OtaVersion` | `std_msgs/msg/String` |
 | [显示状态](system-peripherals.zh-CN.md) | `/display_node/status` | `/display_node/status` | pub/sub — 订阅 | `aorta.topic.peripheral.DisplayStatus` | `aorta_msgs/msg/DisplayStatus` |
-| [语音交互事件](audio.zh-CN.md) | `/voice/event` | `/voice/event` | pub/sub — 订阅 | `aorta.voice.VoiceEvent` | `aorta_msgs/msg/VoiceEvent` |
-| [最终识别文本；provider 区分本体／UWB 输入](audio.zh-CN.md) | `/speech/asr_result` | `/speech/asr_result` | pub/sub — 订阅 | `aorta.topic.speech.AsrResult` | `aorta_msgs/msg/AsrResult` |
 | [本体麦克风音频帧](audio.zh-CN.md) | `/raw_audio_dump` | `/raw_audio_dump` | pub/sub — 订阅 | `foxglove.RawAudio` | `foxglove_msgs/msg/RawAudio` |
 | [遥控器经 UWB 信令传入的音频帧](audio.zh-CN.md) | `/audio/uwb_adpcm_segment` | `/audio/uwb_adpcm_segment` | pub/sub — 订阅 | `foxglove.RawAudio` | `foxglove_msgs/msg/RawAudio` |
 | [UWB 音频输入结束事件](audio.zh-CN.md) | `/uwb/audio_done` | `/uwb/audio_done` | pub/sub — 订阅 | `aorta.uwb.AudioDoneEvent` | `aorta_msgs/msg/AudioDoneEvent` |
@@ -141,7 +140,11 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/get_jpeg_images` | `/get_jpeg_images` | service — [获取 JPEG 图像](cameras.zh-CN.md)，以响应的实际尺寸为准 |
 | `/display_node/get_supported_emotions` | `/display_node/get_supported_emotions` | service — 查询可用表情 |
 | `/display_node/play_emotion` | `/display_node/play_emotion` | service — 播放表情 |
+| `/display_node/play_emotion` | `/display_node/play_emotion_native` | service — [携带原生字段播放注册序列](system-peripherals.zh-CN.md#注册图片序列) |
 | `/display_node/display_imgs` | `/display_node/display_imgs` | service — 显示图片 |
+| `/display_node/add_images` | `/display_node/add_images` | service — [注册持久化 JPEG 序列](system-peripherals.zh-CN.md#注册图片序列) |
+| `/display_node/get_images_status` | `/display_node/get_images_status` | service — [查询注册序列及上传／存储状态](system-peripherals.zh-CN.md#注册图片序列) |
+| `/display_node/del_images` | `/display_node/del_images` | service — [删除注册序列或取消未完成上传](system-peripherals.zh-CN.md#注册图片序列) |
 | `/light_node/status` | `/light_node/status` | service — 查询耳灯状态，尽管名称为 `status` |
 | `/light_node/control` | `/light_node/control` | service — 控制耳灯灯效 |
 | `/light_node/gradient` | `/light_node/gradient` | service — 设置耳灯渐变 |
@@ -159,6 +162,13 @@ Service 是请求／响应接口，不是用于订阅的 topic。
 | `/locomotion/control_enable` | `/locomotion/control_enable` | service — [暂停／恢复控制与电机通信](locomotion.zh-CN.md) |
 | `/system/power_saving/enable` | `/system/power_saving/enable` | service — [进入／退出低功耗模式](system-peripherals.zh-CN.md) |
 | `/function/following` | `/function/following` | service — [跟随／导航模式控制](locomotion.zh-CN.md) |
+| `/light_node/fill_light` | `/light_node/fill_light` | service — [控制补光灯](system-peripherals.zh-CN.md#补光灯)（应用 `V1.7.0-6`） |
+| `/system/power_saving/set_policy` | `/system/power_saving/set_policy` | service — [设置低功耗策略](system-peripherals.zh-CN.md#自动低功耗策略)（应用 `V1.7.0-6`） |
+| `/slam/map_asset/list` | `/slam/map_asset/list` | service — [列出已存地图](../guides/mapping-localization.zh-CN.md#9-管理已存地图资产)（应用 `V1.7.0-6`） |
+| `/slam/map_asset/get_metadata` | `/slam/map_asset/get_metadata` | service — [查询单张地图元数据](../guides/mapping-localization.zh-CN.md#9-管理已存地图资产)（应用 `V1.7.0-6`） |
+| `/slam/map_asset/set_active_map` | `/slam/map_asset/set_active_map` | service — [选择当前地图](../guides/mapping-localization.zh-CN.md#9-管理已存地图资产)，会修改设备状态（应用 `V1.7.0-6`） |
+| `/slam/map_asset/remove` | `/slam/map_asset/remove` | service — [删除已存地图](../guides/mapping-localization.zh-CN.md#9-管理已存地图资产)，不可撤销（应用 `V1.7.0-6`） |
+| `/slam/map_asset/move` | `/slam/map_asset/move` | service — [移动／重命名已存地图](../guides/mapping-localization.zh-CN.md#9-管理已存地图资产)，会修改设备状态（应用 `V1.7.0-6`） |
 
 固件查询需要正确的 `target_device_type`：MOTOR=`0`、SERVO=`1`、LIDAR=`2`、UWB=`3`。
 调用前检查交付的请求类型，不能对所有设备类型都使用空请求／默认请求。

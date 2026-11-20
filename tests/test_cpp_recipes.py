@@ -30,7 +30,7 @@ class CppRecipeTests(unittest.TestCase):
     def test_motion_and_voice_need_explicit_confirmation(self):
         for slug, args in (("locomotion", ["--mode", "stand", "--execute"]),
                            ("audio", ["--execute"]), ("camera", ["--output", "private.h265"]),
-                           ("audio", ["--source", "asr", "--output", "private.bin"])):
+                           ("audio", ["--source", "uwb-end", "--output", "private.bin"])):
             with self.subTest(slug=slug):
                 self.assertEqual(self.execute(slug, *args).returncode, 2)
 
@@ -53,6 +53,7 @@ class CppRecipeTests(unittest.TestCase):
         for slug, args in (("subscribe-state", ["--count", "0"]), ("subscribe-state", ["--count", "1.5"]),
                            ("camera", ["--timeout", "nan"]), ("camera", ["--camera", "other"]),
                            ("audio", ["--source", "uwb", "--provider", "tag"]),
+                           ("audio", ["--source", "asr"]),
                            ("rcp-task", ["--duration-ms", "10001"]),
                            ("rcp-task", ["--cancel-after", "10", "--timeout", "10"]),
                            ("service-call", ["--unknown"]), ("service-call", ["--timeout"])):

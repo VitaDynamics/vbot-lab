@@ -3,14 +3,14 @@
 <p align="center">English | <a href="http-mcp.zh-CN.md">中文</a></p>
 
 Scope and compatibility follow the [Agent capability overview](README.md).
-For a local service, run the server on S100 as `vbot`; the EDU runtime is the MCP client.
+For a local service, run the server on S100 as `vbot`; the device runtime is the MCP client.
 This is an HTTP request / response interface, not Aorta or ROS2 pub/sub.
 
 ## Endpoint and protocol
 
 | Item | Contract |
 | --- | --- |
-| Default S100 endpoint | `http://192.168.127.2:18080/mcp` |
+| Example S100 endpoint | `http://192.168.127.2:18081/mcp`; replace with your registered service URL |
 | Transport | HTTP POST carrying JSON-RPC `2.0` |
 | Protocol version | `2025-06-18` |
 | Request Content-Type | `application/json` |
@@ -19,10 +19,10 @@ This is an HTTP request / response interface, not Aorta or ROS2 pub/sub.
 | Optional transport session | Preserve `Mcp-Session-Id` if returned by initialization |
 | Environment | S100, `vbot` account, writable user directory `/userdata/vbot` |
 
-The address above is the default developer-service endpoint. For an additional
-S100 service or another reachable, trusted HTTP MCP service, register its actual URL
-through the [connection API](mcp-config.md). Changing a test client's `MCP_URL`
-alone does not change where the device runtime connects. Loopback in a registered URL
+The address above is an example, not a built-in listener or automatically enabled
+connection. Start your S100 service or another reachable, trusted HTTP MCP service,
+then register its actual URL through the [connection API](mcp-config.md).
+Changing a test client's `MCP_URL` alone does not change where the device runtime connects. Loopback in a registered URL
 refers to the machine running the Agent runtime, not the workstation.
 Keep a device listener on the intended trusted interface; do not expose or forward
 the service to untrusted networks, campus public networks, or the Internet.
@@ -44,7 +44,7 @@ version or missing tool capability. These lifecycle rules follow the pinned
 [HTTP transport](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports) specifications.
 
 Resources, Prompts, and stdio transport are outside
-the EDU contract even if a general-purpose MCP framework supports them.
+the documented device contract even if a general-purpose MCP framework supports them.
 
 ## Tool definitions and results
 
@@ -95,7 +95,7 @@ Example success response:
 }
 ```
 
-`structuredContent` is shown as optional example output, not as an additional EDU-wide
+`structuredContent` is shown as optional example output, not as an additional device-wide
 requirement. Keep `content` usable and inspect `isError`; HTTP `200` alone is not tool success.
 Protocol errors use a JSON-RPC `error` object. Tool execution failures should retain useful
 error details in `content` and set `isError=true`, as described by the

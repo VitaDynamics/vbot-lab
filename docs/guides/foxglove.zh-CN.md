@@ -84,11 +84,11 @@ aorta-foxglove-bridge \
 
 ### 有线：使用发布的配置
 
-此配置和下面的完整话题列表都包含音频、ASR 与相机流。
+此配置和下面的完整话题列表都包含音频与相机流。
 使用这两种方式前，应取得被采集人员的音视频授权。
 
 带 EDU 路由器的机器人软件会发布 `/opt/vita/aorta/edu/foxglove_bridge.yaml`。它选中
-EDU 程序可读取的全部机器人话题，以及你自己的 EDU 程序发布的全部话题：
+EDU／DEV 用户程序可读取的全部机器人话题，以及你自己的程序发布的全部话题：
 
 ```bash
 aorta-foxglove-bridge \
@@ -104,7 +104,7 @@ EDU 路由器，请使用下面的话题列表。
 ### 有线：使用话题列表
 
 只列出需要的话题以降低设备和网络负载，尤其避免同时订阅多种视频分辨率与大量点云。
-不需要音频、ASR 与相机数据时移除对应项。
+不需要音频与相机数据时移除对应项。
 
 ```bash
 aorta-foxglove-bridge \
@@ -149,7 +149,6 @@ aorta-foxglove-bridge \
   --include slam/grid_map/compressed \
   --include slam/static_transforms \
   --include slam/status \
-  --include speech/asr_result \
   --include stereo_apriltag/detection \
   --include stereo_left/camera_info \
   --include stereo_right/camera_info \
@@ -157,8 +156,7 @@ aorta-foxglove-bridge \
   --include uwb/audio_done \
   --include uwb/head_touch \
   --include uwb/ranging \
-  --include uwb/state \
-  --include voice/event
+  --include uwb/state
 ```
 
 - `--group default`：选择 Aorta group。

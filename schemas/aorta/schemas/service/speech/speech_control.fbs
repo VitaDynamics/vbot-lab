@@ -3,7 +3,8 @@
 // 4=set chat, 5=query continuous listening, 6=set continuous listening;
 // 7/8=action on/off, 9/10=avatar on/off, 11/12=navigation on/off,
 // 13/14=low-power voice suppression on/off, 15/16=RTC session on/off,
-// 17=proactive-interaction request state.
+// 17=proactive-interaction request state, 18=close current MIC output,
+// 19=set V3 MIC silence timeout.
 // Mode notifications affect speech policy, not robot motion or power state.
 
 include "schemas/system/aorta_base.fbs";
@@ -13,7 +14,7 @@ namespace aorta.services.speech;
 
 table SpeechControlRequest {
   aorta_header: aorta.sys.AortaHeader (id: 0);
-  /// Request type from the service contract above (1..17).
+  /// Request type from the service contract above (1..19).
   request_type: ubyte = 0 (id: 1);
   /// Switch state (true=enable, false=disable).
   enable: bool = false (id: 2);
@@ -21,6 +22,12 @@ table SpeechControlRequest {
   /// enable=false selects off; enable=true selects local mode 1.
   /// Modes: 0=off, 1=local speech service, 2=cloud ASR.
   mode: ubyte = 0 (id: 3);
+  /// Type 18 only: true closes the current V3 MIC output stream. A new
+  /// accepted wake may open another stream. False is not a close request.
+  close_mic_output: bool = false (id: 4);
+  /// Type 19 only: VAD silence timeout in seconds (1..3600).
+  /// Zero is invalid, including when an older caller omits this field.
+  val: uint = 0 (id: 5);
 }
 
 table SpeechControlResponse {

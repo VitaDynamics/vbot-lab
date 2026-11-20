@@ -97,11 +97,14 @@ def main(argv=None):
             try:
                 if args.mode == "stand":
                     from aorta.topic.task.TaskReport import TaskReport
+                    from aorta.topic.task.TaskReportKind import TaskReportKind
                     from aorta.topic.task.TaskResultPayload import TaskResultPayload
                     from aorta.topic.task.LocomotionTaskResult import LocomotionTaskResult
                     from aorta.topic.task.LocomotionTaskStage import LocomotionTaskStage
                     while True:
                         terminal = TaskReport.GetRootAs(report(deadline), 0)
+                        if terminal.Kind() != TaskReportKind.TERMINAL:
+                            continue
                         if text(terminal.ReqId()) != request_id:
                             continue
                         if terminal.ResultType() != TaskResultPayload.LocomotionTaskResult:

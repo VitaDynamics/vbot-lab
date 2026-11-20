@@ -2,7 +2,7 @@
 
 <p align="center"><a href="rcp.md">English</a> | 中文</p>
 
-本功能域包含任务 action、兼容提交 service 和只读追踪输出。先在 `foot_quadruped` EDU 上完成
+本功能域包含任务 action、兼容提交 service 和只读追踪输出。先在 `foot_quadruped` EDU／DEV 上完成
 [设备 shell 配置](../getting-started/device-environment.zh-CN.md)。任务执行可能改变设备状态；
 查看追踪与检查 provider 不会提交任务。类型及映射总览见[接口表](aorta-ros2.zh-CN.md)。
 

@@ -1,4 +1,4 @@
-exports_files(["decoder.h"])
+exports_files(["decoder.h", "h265_start.h", "s100_decoder.h"])
 
 py_binary(
     name = "main",
@@ -9,7 +9,7 @@ py_binary(
 
 filegroup(
     name = "repository_files",
-    srcs = glob(["*.md", "*.py", "*.bazel", "*.cc", "*.h"]),
+    srcs = glob(["*.md", "*.py", "*.bazel", "*.bzl", "*.cc", "*.h"]),
     visibility = ["//visibility:public"],
 )
 
@@ -28,5 +28,14 @@ cc_binary(
     deps = ["//recipes:cpp_common", "@aorta_release//:ffmpeg"],
     defines = ["VBOT_CAMERA_DECODE"],
     copts = ["-std=c++17", "-Wall", "-Wextra"],
+    tags = ["manual"],
+)
+
+cc_binary(
+    name = "main_cpp_s100_decode",
+    srcs = ["main_s100.cc", "s100_decoder.h", "h265_start.h"],
+    deps = ["//recipes:cpp_common", "@s100_multimedia//:codec"],
+    copts = ["-std=c++17", "-Wall", "-Wextra"],
+    target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
     tags = ["manual"],
 )

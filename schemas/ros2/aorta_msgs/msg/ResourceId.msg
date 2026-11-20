@@ -3,7 +3,7 @@
 #
 # fbs type:  aorta.services.rcp.ResourceId [enum]
 # fbs path:  schemas/service/rcp/function_input.fbs
-# sha256:    98a537a9c943483df02dd5dc10a14468d9bb2e7ae7a55d33fbc76cecac8f1d0d
+# sha256:    2fb74890e17fb290de73201875411ffee46468301f3f8111992c229c0d6f425d
 # root type: no
 #
 # FlatBuffers enum values are reproduced unchanged, gaps included.

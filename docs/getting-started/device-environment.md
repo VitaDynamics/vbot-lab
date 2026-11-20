@@ -3,7 +3,7 @@
 <p align="center">English | <a href="device-environment.zh-CN.md">中文</a></p>
 
 Configure the `vbot` account's Bash environment before using Aorta or ROS 2 tools on the
-robot. This guide targets the current `foot_quadruped` EDU software with the public
+robot. This guide targets the current `foot_quadruped` EDU / DEV software with the public
 `/opt/vita` tool paths. Check the [version scope](../compatibility.md) first;
 shared robot-dog connection instructions do not imply identical software support.
 

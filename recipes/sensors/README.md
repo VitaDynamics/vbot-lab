@@ -10,6 +10,14 @@
 
 Battery output converts mV/mA to V/A while retaining signed current, SOC, alarm and charger connection. IMU output preserves acquisition time, frame, quaternion and covariance; angular velocity and acceleration are emitted as raw values without inferred unit conversion. Confirm the selected firmware/stream units before numerical integration. orientation_unit_length only checks a finite quaternion norm within 0.01 of one; it is not a validity guarantee. Do not use invalid orientation or silently normalize it. Covariance -1 denotes an unavailable estimate; zero covariance does not prove perfect certainty. Point clouds expose byte length, stride and field layout, not a guessed XYZ structure. This example does not copy or save raw point bytes.
 
+Battery JSON also includes `charge_state`, `charge_source`, `pd_role`, `alarm_full`,
+`effective_alarm`, `p_positive_voltage_mv`, `recharge_thresh_percent`, `record_counts_start`,
+`record_counts_end`, `smart_charge_soc_limit` and `smart_charge_enabled`.
+`effective_alarm` uses `alarm_full` when present and otherwise `alarm`; zero does not
+trigger fallback. Missing optional values remain `null`, including on legacy messages;
+present zero counters and a disabled `false` setting remain valid values.
+See [battery field meanings](../../docs/interfaces/sensors.md#battery-fields-and-missing-values).
+
 ## Build and offline preview
 
 Python and C++ accept the same arguments. Defaults print a plan without creating a Node. C++ builds and previews require matching SDK/Schema artifacts.

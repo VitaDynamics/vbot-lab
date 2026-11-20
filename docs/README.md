@@ -2,14 +2,14 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-Environment setup, device connection, and application development for VBOT EDU robots.
+Environment setup, device connection, and application development for VBOT EDU and DEV robots.
 Follow the chapters below. For Codex or Claude Code setup, see [Build with your Agent](agents/README.md).
 
 Check [Versions and compatibility](compatibility.md) for the supported application version,
 SDK downloads and component pairing before setup or upgrades.
 
 1. [Platform overview](overview/README.md): supported scope and architecture.
-2. [Robot-type guides](robots/README.md): choose a device type and check its EDU release scope.
+2. [Robot-type guides](robots/README.md): choose a device type and check its EDU / DEV release scope.
 3. [Hardware reference](hardware/README.md): specifications with explicit applicability, shared where appropriate.
 4. [Quickstart](getting-started/README.md): shared environment setup and the first-run workflow.
 5. [Development workflow](development/README.md): Bazel, device connectivity, and deployment.
@@ -18,7 +18,7 @@ SDK downloads and component pairing before setup or upgrades.
 8. [Troubleshooting](troubleshooting/README.md): environment, connectivity, and version issues.
 9. [Community & Support](community/README.md): ask questions, share applications, and provide reproducible feedback.
 
-The current EDU release scope is `foot_quadruped` only. Start with its
+The current EDU / DEV release scope is `foot_quadruped` only. Start with its
 [type-specific guide](robots/foot_quadruped/README.md); the other type directories are future-release placeholders.
 Common chapters stay in their existing paths, type-specific differences live under
 `robots/<robot_type>/`, and reusable hardware specifications stay under `hardware/`.

@@ -1,0 +1,134 @@
+// Map asset short-operation WRITE / semantic-mutation services.
+//
+// Split out of map_asset_service.fbs (EDU read/write split, decision E3): the
+// read half (ListMaps / GetMapMetadata / SetActiveMap) stays there, this file
+// carries the remove/move/set-metadata and semantic-map operations plus the
+// two enums only they use (MapAssetType, OverwritePolicy).
+//
+// This is a file-level regrouping only. Every table/enum name, field name and
+// field id below is byte-identical to the pre-split definitions, so the
+// already-deployed service keys
+//   /slam/map_asset/{remove,move,set_metadata}
+//   /slam/map_asset/{get_semantic_map,get_active_semantic_map,
+//                    update_semantic_area_description}
+// are wire-unchanged. Only the generated header / crate a caller must depend
+// on changes.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+include "schemas/service/slam/map_asset_service.fbs";
+
+namespace aorta.services.slam;
+
+enum MapAssetType : ubyte {
+  UNSPECIFIED = 0,
+  MAP_BUNDLE = 1,
+  MCAP = 2,
+  METADATA = 3,
+}
+
+enum OverwritePolicy : ubyte {
+  UNSPECIFIED = 0,
+  REJECT = 1,
+  REPLACE = 2,
+  KEEP_EXISTING = 3,
+}
+
+table RemoveMapRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  map_name: string (id: 1);
+  version_id: string (id: 2);
+  scope: MapAssetScope = LOCAL (id: 3);
+  remove_artifacts: bool = true (id: 4);
+}
+
+table RemoveMapResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+}
+
+table MoveMapRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  from_map_name: string (id: 1);
+  to_map_name: string (id: 2);
+  overwrite_policy: OverwritePolicy = REJECT (id: 3);
+  scope: MapAssetScope = LOCAL (id: 4);
+}
+
+table MoveMapResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  metadata: MapAssetMetadata (id: 2);
+  message: string (id: 3);
+}
+
+table SetMapMetadataRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  map_name: string (id: 1);
+  version_id: string (id: 2);
+  tags: [string] (id: 3);
+}
+
+table SetMapMetadataResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  metadata: MapAssetMetadata (id: 2);
+  message: string (id: 3);
+}
+
+table GetSemanticMapRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  map_name: string (id: 1);
+  version_id: string (id: 2);
+}
+
+table GetSemanticMapResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  map_name: string (id: 3);
+  version_id: string (id: 4);
+  map_id: string (id: 5);
+  frame_id: string (id: 6);
+  semantic_map_json: string (id: 7);
+  revision: ulong = 0 (id: 8);
+}
+
+table GetActiveSemanticMapRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+}
+
+table GetActiveSemanticMapResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  map_name: string (id: 3);
+  version_id: string (id: 4);
+  map_id: string (id: 5);
+  frame_id: string (id: 6);
+  semantic_map_json: string (id: 7);
+  revision: ulong = 0 (id: 8);
+}
+
+
+table UpdateSemanticAreaDescriptionRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  map_name: string (id: 1);
+  version_id: string (id: 2);
+  area_id: string (id: 3);
+  description: string (id: 4);
+  expected_version_id: string (id: 5);
+}
+
+table UpdateSemanticAreaDescriptionResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+  map_name: string (id: 3);
+  version_id: string (id: 4);
+  area_id: string (id: 5);
+  description: string (id: 6);
+}
+
+root_type RemoveMapRequest;

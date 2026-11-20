@@ -68,7 +68,7 @@ python3 tools/check_device_environment.py
 在开发容器的仓库根目录执行：
 
 ```bash
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.11.18
 ```
 
 默认 `python` 配套下载七个文件：四个 Linux ARM64／基础 wheel、`EDU_SDK_MANIFEST.json`、
@@ -88,7 +88,7 @@ python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31
 
 ```bash
 python3 tools/package_python.py --recipe subscribe-state \
-  --assets-dir artifacts/edu-sdk-2026.10.31 --output artifacts/first-state &&
+  --assets-dir artifacts/edu-sdk-2026.11.18 --output artifacts/first-state &&
 python3 tools/package_python.py --verify artifacts/first-state
 ```
 
@@ -163,7 +163,7 @@ C++ 项目包含已迁移路径的源码／辅助代码、本地 SDK 规则与 A
 SDK 集成也会独立构建／测试此工作区，不访问设备。
 生成的 Python 工作区也会构建／测试，使用真实 SDK wheel 打包、校验，
 在全新 venv 安装并检查原生运行库／ABI，执行离线预览／模拟；ARM64 包仅单独校验不执行。
-`package_app.py --project /tmp/my-monitor --assets-dir artifacts/edu-sdk-2026.10.31 --output /tmp/my-monitor-package`
+`package_app.py --project /tmp/my-monitor --assets-dir artifacts/edu-sdk-2026.11.18 --output /tmp/my-monitor-package`
 按 Python 项目的 APP.json 显式清单打包运行文件及四个固定 SDK wheel，不构建或部署。
 `package_app.py --verify /tmp/my-monitor-package` 仅校验，可在宿主机／CI 执行。
 输出必须为新目录，新增依赖需要单独准备适合应用的流程。

@@ -173,9 +173,13 @@ class RepositoryChecks(unittest.TestCase):
         self.assertNotIn("gh release", workflow)
         for suffix in (".md", ".zh-CN.md"):
             guide = (REPO_ROOT / f".github/WORKFLOWS{suffix}").read_text()
-            for value in (config["workspace"]["branch"], config["workspace"]["tag"],
+            for value in (config["workspace"]["branch"], config["workspace"].get("tag"),
                           config["robots"]["foot_quadruped"]["application_version"]):
-                self.assertIn(value, guide)
+                if value is not None:
+                    self.assertIn(value, guide)
+            for name in (".github/WORKFLOWS", "catalog/release", "docs/compatibility"):
+                document = (REPO_ROOT / f"{name}{suffix}").read_text()
+                self.assertNotRegex(document, r"`null`|no source tag recorded|source tag (?:is )?not yet recorded|尚未登记源码 tag|源码 tag 尚未登记|待定")
             for name in ("AGENTS", "CONTRIBUTING", "catalog/release"):
                 document = (REPO_ROOT / f"{name}{suffix}").read_text()
                 self.assertIn("pre_release/V<major>.<minor>.<patch>.X", document)
@@ -195,19 +199,40 @@ class RepositoryChecks(unittest.TestCase):
         release = json.loads((REPO_ROOT / "catalog/release.json").read_text())
         self.assertEqual(release["sdk"]["repository"], "VitaDynamics/vbot-lab")
 
-    def test_iteration_updates_are_direct_and_scoped_to_a_version_family(self):
-        for suffix, direct, family, confirm in (
-            (".md", "do not require a PR", "version family", "user confirmation"),
-            (".zh-CN.md", "不要求 PR", "版本族", "用户确认"),
+    def test_iteration_updates_are_maintainer_managed_and_scoped_to_a_version_family(self):
+        for suffix, permission, family, confirm in (
+            (".md", "Only repository maintainers may commit and push updates to repository branches.",
+             "version family", "repository maintainer confirms"),
+            (".zh-CN.md", "只有仓库维护者可以向仓库分支提交和推送更新",
+             "版本族", "仓库维护者确认"),
         ):
-            for name in ("CONTRIBUTING", "catalog/release", ".github/WORKFLOWS"):
+            for name in ("AGENTS", "CONTRIBUTING", "catalog/release", ".github/WORKFLOWS"):
                 with self.subTest(document=name, language=suffix):
                     text = (REPO_ROOT / f"{name}{suffix}").read_text()
-                    self.assertIn(direct, text)
+                    self.assertIn(permission, text)
+                    self.assertNotRegex(text, r"direct commits and pushes|may commit and push directly|"
+                                        r"may be committed directly|do not require a PR|without a required PR|"
+                                        r"不要求 PR|可直接提交|允许[^\n]*直接提交")
+                    if name != "catalog/release":
+                        self.assertIn("fork", text)
             workflow = (REPO_ROOT / f".github/WORKFLOWS{suffix}").read_text()
             self.assertIn(family, workflow)
             self.assertIn("pre_release/V1.6.1.X", workflow)
             self.assertIn(confirm, (REPO_ROOT / f"AGENTS{suffix}").read_text())
+
+    def test_current_changelog_consolidates_the_v17_iteration(self):
+        for suffix in (".md", ".zh-CN.md"):
+            text = (REPO_ROOT / f"CHANGELOG{suffix}").read_text()
+            headings = re.findall(r"^## (?:Robot application |机器人应用 )V1\.7\.0[^\n]*", text, re.MULTILINE)
+            self.assertEqual(len(headings), 1)
+            self.assertIn("V1.7.0-6", headings[0])
+            current = text.split("\n## Rel/V1.6.0", 1)[0]
+            self.assertNotIn("V1.7.0-5", current)
+            self.assertNotIn("V1.6.0-17", current)
+            for feature in ("pre_release/V1.7.0.X", "/light_node/fill_light", "/system/power_saving/set_policy",
+                            "/slam/map_asset/", "VlnCommand.max_xvel", "VlnSessionCommand.max_xvel",
+                            "NAV_TO_POINT", "JPEG", "/speech/asr_result", "/voice/event", "Python", "C++"):
+                self.assertIn(feature, current)
 
     def test_formal_release_notes_cover_the_workspace_history(self):
         sections = {
@@ -222,8 +247,9 @@ class RepositoryChecks(unittest.TestCase):
         config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
         for suffix, titles in sections.items():
             notes = (REPO_ROOT / f"CHANGELOG{suffix}").read_text().split("\n## V1.6.0", 1)[0]
-            self.assertIn("## " + config["workspace"]["tag"], notes)
-            self.assertIn(config["workspace"]["branch"], notes)
+            # Historical formal notes stay intact while the next family is in development.
+            self.assertIn("## Rel/V1.6.0", notes)
+            self.assertIn("release/V1.6.0", notes)
             for title in titles:
                 self.assertIn("### " + title, notes)
             for feature in ("vbot-dev-setup", "vbot-app-dev", "vbot-diagnose", "/userdata/vbot/init.sh",
@@ -232,14 +258,16 @@ class RepositoryChecks(unittest.TestCase):
             self.assertNotIn(config["sdk"]["aorta_version"], notes)
             self.assertNotIn(config["sdk"]["release_tag"], notes)
 
-    def test_application_entrypoints_select_the_formal_branch(self):
+    def test_application_entrypoints_select_the_configured_branch(self):
         config = json.loads((REPO_ROOT / "catalog/release.json").read_text())
         branch = config["workspace"]["branch"]
         for suffix in (".md", ".zh-CN.md"):
             for name in ("README", "AGENTS", "docs/agents/README", "docs/getting-started/README"):
                 content = (REPO_ROOT / f"{name}{suffix}").read_text()
                 self.assertIn(branch, content)
-                self.assertNotRegex(content, r"git checkout (?:V\d|Rel/|pre_release/)")
+                self.assertNotRegex(content, r"git checkout (?:V\d|Rel/)")
+                checkouts = re.findall(r"git checkout ([A-Za-z0-9_./-]+)", content)
+                self.assertTrue(all(ref == branch for ref in checkouts), checkouts)
             homepage = (REPO_ROOT / f"README{suffix}").read_text()
             self.assertIn("git checkout " + branch, homepage)
             self.assertIn(f"CHANGELOG{suffix}", document_links(homepage))
@@ -343,8 +371,8 @@ class RepositoryChecks(unittest.TestCase):
 
     def test_documented_application_target_matches_catalog(self):
         profile = json.loads((REPO_ROOT / "catalog/robots/foot_quadruped.json").read_text())
-        self.assertEqual(profile["application_version"], "V1.6.0-17")
-        self.assertEqual(profile["supported_application_versions"], ["V1.6.0-15", "V1.6.0-17"])
+        self.assertEqual(profile["application_version"], "V1.7.0-6")
+        self.assertEqual(profile["supported_application_versions"], ["V1.7.0-6"])
         pages = (
             "README", "AGENTS", "catalog/README", "docs/compatibility", "recipes/README",
             "catalog/release", "CHANGELOG", ".github/WORKFLOWS",
@@ -778,8 +806,10 @@ class RepositoryChecks(unittest.TestCase):
             launch = next(script for script in launches
                           if "--include " in script and "--host 192.168.126.2" in script)
             topics = re.findall(r"--include ([^\s\\]+)", launch)
-            self.assertEqual(len(topics), 46)
-            self.assertEqual(len(set(topics)), 46)
+            self.assertEqual(len(topics), 44)
+            self.assertEqual(len(set(topics)), 44)
+            self.assertNotIn("speech/asr_result", topics)
+            self.assertNotIn("voice/event", topics)
             self.assertTrue(all(not topic.startswith("/") for topic in topics))
             for required in ("--group default", "--host 192.168.126.2", "--port 8765",
                              "--zenoh-config /opt/vita/aorta/edu/edu_session.json5"):
@@ -844,6 +874,7 @@ ssh() { printf '%s\\n' "$@"; }
         self.assertEqual(re.findall(r"`([^`\n]+)`", documents[0]),
                          re.findall(r"`([^`\n]+)`", documents[1]))
         requests = []
+        map_list_requests = []
         for block in blocks[0]:
             result = subprocess.run(["bash", "-n"], input=block, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -854,9 +885,12 @@ ssh() { printf '%s\\n' "$@"; }
                 self.assertEqual(args[2], "aorta")
                 self.assertNotIn("--once", args)
                 if args[3:5] == ["service", "call"]:
-                    self.assertEqual(args[5], "/slam/set_slam_mode")
                     self.assertEqual(args[7:], ["--timeout", "5"])
-                    requests.append(json.loads(args[6]))
+                    if args[5] == "/slam/set_slam_mode":
+                        requests.append(json.loads(args[6]))
+                    else:
+                        self.assertEqual(args[5], "/slam/map_asset/list")
+                        map_list_requests.append(json.loads(args[6]))
         self.assertEqual(requests, [
             {"mode": 1, "map_name": ""},
             {"mode": 2, "map_name": ""},
@@ -864,6 +898,7 @@ ssh() { printf '%s\\n' "$@"; }
             {"mode": 3, "request_reloc": True, "map_name": "edu_lab_1f"},
             {"mode": 3, "request_reloc": True, "map_name": ""},
         ])
+        self.assertEqual(map_list_requests, [{"scope": "LOCAL", "include_artifacts": False}])
 
     def test_device_environment_shell_examples(self):
         for suffix in (".md", ".zh-CN.md"):
@@ -912,9 +947,9 @@ ssh() { printf '%s\\n' "$@"; }
             text = (REPO_ROOT / f"docs/interfaces/aorta-ros2{suffix}").read_text()
             rows = [line.split("|")[1:-1] for line in text.splitlines()
                     if line.startswith("|") and "| pub/sub — " in line]
-            self.assertEqual(len(rows), 48)
+            self.assertEqual(len(rows), 46)
             topics = {row[1].strip(" `") for row in rows}
-            self.assertEqual(len(topics), 48)
+            self.assertEqual(len(topics), 46)
             for row in rows:
                 self.assertEqual(len(row), 6)
                 topic = row[1].strip(" `")
@@ -945,7 +980,8 @@ ssh() { printf '%s\\n' "$@"; }
         routes = json.loads((REPO_ROOT / "schemas/ros2/routes.json").read_text())["routes"]
         expected = {(route["aorta"]["key"], route["ros"]["name"])
                     for route in routes if route["kind"] == "service"}
-        self.assertEqual(len(expected), 25)
+        self.assertEqual(len(expected), 36)
+        self.assertEqual(len({key for key, _ in expected}), 35)
         for suffix in (".md", ".zh-CN.md"):
             page = (REPO_ROOT / f"docs/interfaces/aorta-ros2{suffix}").read_text()
             rows = [line.split("|")[1:-1] for line in page.splitlines()
@@ -957,21 +993,81 @@ ssh() { printf '%s\\n' "$@"; }
                                ("/rcp/function_input", "rcp"),
                                ("/locomotion/control_enable", "locomotion"),
                                ("/system/power_saving/enable", "system-peripherals"),
+                               ("/light_node/fill_light", "system-peripherals"),
+                               ("/system/power_saving/set_policy", "system-peripherals"),
+                               ("/display_node/add_images", "system-peripherals"),
+                               ("/display_node/get_images_status", "system-peripherals"),
+                               ("/display_node/del_images", "system-peripherals"),
                                ("/function/following", "locomotion")):
                 row = next(row for row in rows if row[0].strip(" `") == key)
                 links = document_links(row[2])
                 self.assertEqual(len(links), 1)
                 self.assertEqual(urlsplit(links[0]).path, f"{guide}{suffix}")
                 self.assertIn(f"`{key}`", (REPO_ROOT / f"docs/interfaces/{guide}{suffix}").read_text())
+            for operation in ("list", "get_metadata", "set_active_map", "remove", "move"):
+                key = "/slam/map_asset/" + operation
+                row = next(row for row in rows if row[0].strip(" `") == key)
+                links = document_links(row[2])
+                self.assertEqual(len(links), 1)
+                self.assertEqual(urlsplit(links[0]).path, f"../guides/mapping-localization{suffix}")
+                guide = REPO_ROOT / f"docs/guides/mapping-localization{suffix}"
+                self.assertIn(f"`{key}`", guide.read_text())
+            self.assertRegex(page, r"35 (Aorta services|个 Aorta service)")
+            self.assertRegex(page, r"36 (ROS 2 service entrances|个 ROS 2 service 入口)")
+            self.assertRegex(page, r"46 (distinct Aorta routes|个不同的 Aorta 路由)")
             rcp = (REPO_ROOT / f"docs/interfaces/rcp{suffix}").read_text()
             for identifier in ("function_msgs/srv/FunctionInput",
                                "aorta.services.rcp.FunctionInputRequest",
                                "aorta.services.rcp.FunctionInputResponse", "accepted=true"):
                 self.assertIn(f"`{identifier}`", rcp)
 
+    def test_extended_schema_contracts_have_family_field_guidance(self):
+        fields = {
+            "sensors": ("alarm_full", "p_positive_voltage_mv", "recharge_thresh_percent",
+                        "record_counts_start", "record_counts_end", "smart_charge_soc_limit",
+                        "smart_charge_enabled", "charge_source", "pd_role"),
+            "locomotion": ("kind", "phase", "progress_seq", "execution_timeout_ms", "owner",
+                           "cmd_smoothing_ratio", "valid_until_ns", "CLEAR_COMMAND_SMOOTHING_OVERRIDE=3"),
+            "system-peripherals": ("custom_images_name", "loop", "brightness", "enable",
+                                   "peripheral_msgs/srv/PlayEmotion", "peripheral_msgs/srv/DisplayImgs"),
+        }
+        for suffix in (".md", ".zh-CN.md"):
+            for family, identifiers in fields.items():
+                page = (REPO_ROOT / f"docs/interfaces/{family}{suffix}").read_text()
+                for identifier in identifiers:
+                    with self.subTest(language=suffix, family=family, field=identifier):
+                        self.assertIn(f"`{identifier}`", page)
+            dag = (REPO_ROOT / f"docs/guides/rcp-dag{suffix}").read_text()
+            row = next(line for line in dag.splitlines() if line.startswith("| `execution_timeout_ms` |"))
+            self.assertRegex(row, r"progress does not extend|进度不能延长")
+
+    def test_display_and_navigation_contracts_follow_current_behavior(self):
+        for suffix in (".md", ".zh-CN.md"):
+            display = (REPO_ROOT / f"docs/interfaces/system-peripherals{suffix}").read_text()
+            for item in ("480×854", "4096", "8 MiB", "32 MiB", "status=SUCCESS", "target_state=0"):
+                self.assertIn(item, display)
+            for service in ("/display_node/add_images", "/display_node/del_images",
+                            "/display_node/get_images_status", "/display_node/play_emotion_native"):
+                self.assertIn(f"`{service}`", display)
+            for path in ("srv/AddImages.srv", "srv/DelImages.srv", "srv/GetImagesStatus.srv",
+                         "srv/PlayEmotion.srv", "msg/ShowImg.msg", "msg/CustomImageSequenceStatus.msg"):
+                self.assertIn("../../schemas/ros2/aorta_msgs/" + path, document_links(display))
+            self.assertNotRegex(display, r"not the sequence-registration|不提供图片序列注册")
+            for field in ("upload_id", "frame_offset", "total_frames", "total_bytes",
+                          "next_frame_offset", "complete=true", "has_aorta_header", "status=0"):
+                self.assertIn(f"`{field}`", display)
+            self.assertIn("rosidl", display)
+            commands = (REPO_ROOT / f"docs/interfaces/rcp-commands{suffix}").read_text()
+            for item in ("`max_xvel`", "`maxXvel`", "`NAV_TO_POINT`"):
+                self.assertIn(item, commands)
+            self.assertNotRegex(commands, r"clamps values below 5000|小于 5000 的值提升")
+            head = commands.split("## HeadCommand\n", 1)[1].split("\n## ", 1)[0]
+            duration = next(line for line in head.splitlines() if line.startswith("| `duration_ms` |"))
+            self.assertRegex(duration, r"positive values are forwarded unchanged|正值原样透传")
+
     def test_every_public_topic_links_to_a_family_usage_guide(self):
         expected = {
-            "sensors": 12, "cameras": 10, "perception": 2, "audio": 6,
+            "sensors": 12, "cameras": 10, "perception": 2, "audio": 4,
             "locomotion": 9, "system-peripherals": 4, "rcp": 1, "mapping-localization": 4,
         }
         for suffix in (".md", ".zh-CN.md"):
@@ -1013,6 +1109,55 @@ ssh() { printf '%s\\n' "$@"; }
                                 "/locomotion/joy", "/locomotion/velocity_command", "/light/ear_modulation",
                             })
 
+    def test_camera_native_codec_guidance_and_permission_checks(self):
+        blocks = []
+        for suffix, language, section in (
+            (".md", "en/", "hardware-decoding-on-s100"),
+            (".zh-CN.md", "", "s100-硬件解码"),
+        ):
+            page = (REPO_ROOT / f"docs/interfaces/cameras{suffix}").read_text()
+            self.assertIn(
+                "https://developer.d-robotics.cc/rdk_s_doc/" + language
+                + "Advanced_development/multimedia_development/S100/codec",
+                document_links(page),
+            )
+            self.assertIn("`hb_mm_mc_*`", page)
+            checks = re.findall(r"```sh\n(.*?)```", page, re.DOTALL)
+            self.assertEqual(len(checks), 1)
+            blocks.append(checks[0])
+            parsed = subprocess.run(["sh", "-n"], input=checks[0], text=True, capture_output=True)
+            self.assertEqual(parsed.returncode, 0, parsed.stderr)
+            self.assertIn("id -nG", checks[0])
+            self.assertIn("[ -c /dev/vpu ] && [ -r /dev/vpu ] && [ -w /dev/vpu ]", checks[0])
+            self.assertNotRegex(checks[0], r"\b(?:sudo|chmod|chown|usermod|dd)\b|>\s*/dev/")
+            recipe = (REPO_ROOT / f"recipes/camera/README{suffix}").read_text()
+            self.assertIn(f"../../docs/interfaces/cameras{suffix}#{section}", document_links(recipe))
+        self.assertEqual(blocks[0], blocks[1])
+
+    def test_s100_camera_build_deployment_examples_match_translations(self):
+        commands = []
+        for suffix, title, ending in (
+            (".md", "## C++: S100 hardware decoding", "## Completion, failures and exit"),
+            (".zh-CN.md", "## C++ S100 硬件解码", "## 完成、失败与退出"),
+        ):
+            page = (REPO_ROOT / f"recipes/camera/README{suffix}").read_text()
+            section = page.split(title, 1)[1].split(ending, 1)[0]
+            blocks = re.findall(r"```bash\n(.*?)```", section, re.DOTALL)
+            self.assertEqual(len(blocks), 3)
+            commands.append(blocks)
+            for block in blocks:
+                parsed = subprocess.run(["bash", "-n"], input=block, text=True, capture_output=True)
+                self.assertEqual(parsed.returncode, 0, parsed.stderr)
+            self.assertIn("bazel build --config=arm64 //recipes/camera:main_cpp_s100_decode", blocks[0])
+            self.assertIn('"$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14"', blocks[1])
+            self.assertIn("sha256sum {} + > SHA256SUMS", blocks[1])
+            self.assertIn("/usr/hobot/lib", blocks[2])
+            self.assertIn("./bin/camera-s100 --camera left --execute --consent --count 5 --timeout 15", blocks[2])
+            self.assertNotIn("bazel run", "\n".join(blocks))
+            self.assertIn("`frame.vir_ptr[0]`", section)
+            self.assertIn("`frame.vir_ptr[1]`", section)
+        self.assertEqual(commands[0], commands[1])
+
     def test_audio_control_contracts_follow_public_schema(self):
         routes = {route["id"]: route for route in json.loads(
             (REPO_ROOT / "schemas/ros2/routes.json").read_text())["routes"]}
@@ -1044,8 +1189,6 @@ ssh() { printf '%s\\n' "$@"; }
                 ("/raw_audio_dump", "foxglove.RawAudio", "foxglove_msgs/msg/RawAudio"),
                 ("/audio/uwb_adpcm_segment", "foxglove.RawAudio", "foxglove_msgs/msg/RawAudio"),
                 ("/uwb/audio_done", "aorta.uwb.AudioDoneEvent", "aorta_msgs/msg/AudioDoneEvent"),
-                ("/speech/asr_result", "aorta.topic.speech.AsrResult", "aorta_msgs/msg/AsrResult"),
-                ("/voice/event", "aorta.voice.VoiceEvent", "aorta_msgs/msg/VoiceEvent"),
             ),
         }
         for name, routes in contracts.items():
@@ -1076,27 +1219,22 @@ ssh() { printf '%s\\n' "$@"; }
                 for topic, _, _ in routes:
                     self.assertIn(f"| `{topic}` | `{topic}` | pub/sub", index)
 
-    def test_audio_sources_and_asr_provider_routing(self):
-        expected = [
-            ("BODY", "1", "`/raw_audio_dump`"),
-            ("TAG", "2", "`/audio/uwb_adpcm_segment`"),
-            ("UNKNOWN", "0", "—"),
-        ]
-        for suffix, sources in (
-            (".md", ("Robot-body microphone", "UWB signalling", "Unspecified source")),
-            (".zh-CN.md", ("本体麦克风", "UWB 信令", "来源未指定")),
-        ):
-            with self.subTest(language=suffix):
-                text = (REPO_ROOT / f"docs/interfaces/audio{suffix}").read_text()
-                rows = re.findall(
-                    r"^\| `(BODY|TAG|UNKNOWN)` \| `(\d+)` \| ([^|]+) \| ([^|]+) \|$",
-                    text, re.MULTILINE,
-                )
-                self.assertEqual([(name, value, topic.strip())
-                                  for name, value, _, topic in rows], expected)
-                for row, source in zip(rows, sources):
-                    self.assertIn(source, row[2])
-                self.assertIn("ros2 interface show aorta_msgs/msg/AsrResult", text)
+    def test_removed_voice_outputs_are_not_advertised(self):
+        paths = [*REPO_ROOT.glob("AGENTS*.md"), *REPO_ROOT.glob("schemas/README*.md")]
+        for directory in ("docs", "recipes", "skills", "catalog"):
+            paths.extend((REPO_ROOT / directory).rglob("*.md"))
+        paths.extend(REPO_ROOT / path for path in ("recipes/audio/main.py", "recipes/audio/main.cc"))
+        for path in paths:
+            text = path.read_text()
+            for retired in ("/speech/asr_result", "/voice/event", "--source asr", "--provider tag"):
+                self.assertNotIn(retired, text, str(path))
+        for suffix, sources in ((".md", ("robot-body microphone", "UWB signalling")),
+                                (".zh-CN.md", ("本体麦克风", "UWB 信令"))):
+            text = (REPO_ROOT / f"docs/interfaces/audio{suffix}").read_text()
+            for source in sources:
+                self.assertIn(source, text)
+            self.assertIn("`/raw_audio_dump`", text)
+            self.assertIn("`/audio/uwb_adpcm_segment`", text)
 
     def test_device_entry_orders_login_before_shell_setup(self):
         for suffix in (".md", ".zh-CN.md"):
@@ -1153,15 +1291,17 @@ ssh() { printf '%s\\n' "$@"; }
     def test_agent_mcp_configuration_routes(self):
         expected = [
             "GET /servers", "POST /servers", "GET /servers/{name}/config",
-            "PUT /servers/{name}/config", "PATCH /servers/{name}", "POST /servers/refresh",
+            "PUT /servers/{name}/config", "PATCH /servers/{name}", "DELETE /servers/{name}",
+            "POST /servers/refresh",
         ]
         for suffix in (".md", ".zh-CN.md"):
             text = (REPO_ROOT / f"docs/interfaces/agent/mcp-config{suffix}").read_text()
-            routes = re.findall(r"^\| `((?:GET|POST|PUT|PATCH) /[^`]+)` \|", text, re.MULTILINE)
+            routes = re.findall(r"^\| `((?:GET|POST|PUT|PATCH|DELETE) /[^`]+)` \|", text, re.MULTILINE)
             self.assertEqual(routes, expected)
             self.assertIn("/api/admin/extensions/vbot-mcp/http", text)
-            self.assertNotIn("DELETE /servers", text)
-            for field in ("canAddServers", "canEdit", "catalogReady", "refreshPending",
+            self.assertNotIn("no server-definition DELETE", text)
+            self.assertNotIn("目前没有删除服务定义", text)
+            for field in ("canAddServers", "canEdit", "canDelete", "catalogReady", "refreshPending",
                           "configError", "diagnostics", "toolCount", "revision", "headerNames",
                           "envHttpHeaders", "hasBearerToken", "storageAvailable", "loadError"):
                 self.assertIn(field, text)
@@ -1173,6 +1313,9 @@ ssh() { printf '%s\\n' "$@"; }
             ("--get", "/servers"), ("--get", "/servers/edu-tools/config"),
             ("-X PUT", "/servers/edu-tools/config?workingDir=$VBOT_WORKING_DIR"),
             ("-X PATCH", "/servers/edu-tools?workingDir=$VBOT_WORKING_DIR"),
+            ("--get", "/servers"),
+            ("-X DELETE", "/servers/edu-tools?workingDir=$VBOT_WORKING_DIR"),
+            ("--get", "/servers"),
         ]
         for suffix in (".md", ".zh-CN.md"):
             text = (REPO_ROOT / f"docs/interfaces/agent/mcp-config{suffix}").read_text()
@@ -1183,15 +1326,37 @@ ssh() { printf '%s\\n' "$@"; }
             self.assertEqual(set(edit), {"revision", "url", "headers", "envHttpHeaders"})
             self.assertEqual(edit["url"], create["url"])
             blocks = re.findall(r"```bash\n(.*?)```", text, re.DOTALL)
-            self.assertEqual(len(blocks), 5)
+            self.assertEqual(len(blocks), 6)
             commands = "\n".join(blocks)
             self.assertEqual(re.findall(
-                r'vbot_mcp_curl (--get|-X POST|-X PUT|-X PATCH) "\$VBOT_MCP_API_URL([^\"]+)"',
+                r'vbot_mcp_curl (--get|-X POST|-X PUT|-X PATCH|-X DELETE) "\$VBOT_MCP_API_URL([^\"]+)"',
                 commands), expected)
             bodies = [json.loads(body) for body in re.findall(r"--data-binary '([^']+)'", commands)]
             self.assertEqual(bodies, [create, {"enabled": False}])
             self.assertIn("--max-time 35", commands)
             self.assertNotIn("--retry", commands)
+            delete = blocks[-1]
+            for guard in ('[[ "${CONFIRM_MCP_DELETE:-}" == edu-tools ]]',
+                          '.source == "global" and .canDelete == true'):
+                self.assertIn(guard, delete)
+                self.assertLess(delete.index(guard), delete.index("-X DELETE"))
+
+    def test_agent_mcp_endpoint_is_explicit_not_a_default_connection(self):
+        for suffix in (".md", ".zh-CN.md"):
+            guide = (REPO_ROOT / f"docs/guides/agent-integration{suffix}").read_text()
+            blocks = re.findall(r"```bash\n(.*?)```", guide, re.DOTALL)
+            self.assertEqual(len(blocks), 1)
+            assignment = next(line for line in blocks[0].splitlines() if line.startswith("MCP_URL="))
+            result = subprocess.run(
+                ["bash", "-c", "unset MCP_URL\n" + assignment],
+                text=True, capture_output=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Set MCP_URL to your registered MCP service URL", result.stderr)
+            for page in ("docs/interfaces/agent/README", "docs/interfaces/agent/http-mcp",
+                         "docs/guides/agent-integration"):
+                content = (REPO_ROOT / f"{page}{suffix}").read_text()
+                self.assertNotRegex(content, r"[Dd]efault S100 endpoint|默认 S100 (?:入口|MCP)")
 
     def test_agent_mcp_configuration_code_is_bilingual_and_parseable(self):
         english = (REPO_ROOT / "docs/interfaces/agent/mcp-config.md").read_text()
@@ -1514,9 +1679,9 @@ ssh() {
             self.assertNotIn('"flatbuffers==25.12.19"', script)
             self.assertIn("flatbuffers-25.12.19-py2.py3-none-any.whl", script)
             self.assertIn("python -m pip check", script)
-            for package in ("aorta_sdk-2026.10.20", "aorta_msgs-2026.10.20",
-                            "vbot_edu_msgs-2026.10.20", "flatbuffers-25.12.19"):
-                self.assertIn(f"artifacts/edu-sdk-2026.10.31/{package}", script)
+            for package in ("aorta_sdk-2026.11.15", "aorta_msgs-2026.11.15",
+                            "vbot_edu_msgs-2026.11.18", "flatbuffers-25.12.19"):
+                self.assertIn(f"artifacts/edu-sdk-2026.11.18/{package}", script)
             self.assertIn("PyPI", setup)
             self.assertIn(f"../../../docs/development/python-deployment{suffix}", document_links(setup))
             for obsolete in ("A release attaches four wheels", "每个 Release 附带四个 wheel"):
@@ -1540,7 +1705,7 @@ ssh() {
                 self.assertIn(required, page)
             self.assertNotIn("pip download", scripts[0])
             self.assertIn("tools/package_python.py --verify", scripts[0])
-            self.assertIn("--assets-dir artifacts/edu-sdk-2026.10.31", scripts[0])
+            self.assertIn("--assets-dir artifacts/edu-sdk-2026.11.18", scripts[0])
             for recipe in (REPO_ROOT / "recipes").glob(f"*/README{suffix}"):
                 body = recipe.read_text()
                 self.assertIn(f"../../docs/development/python-deployment{suffix}", document_links(body))
@@ -1591,7 +1756,7 @@ ssh() {
                 self.assertEqual(result.returncode, 0, result.stderr)
             for required in ("scp -r", "mktemp -d /userdata/vbot/apps/",
                              "sha256sum -c SHA256SUMS", "ldd ./bin/subscribe-state",
-                             "./bin/subscribe-state --execute", "libaorta_core.so.13",
+                             "./bin/subscribe-state --execute", "libaorta_core.so.14",
                              'cp -L "bazel-bin/recipes/$RECIPE/main_cpp"'):
                 self.assertIn(required, page)
             self.assertNotIn("equipped ARM64 device", page)

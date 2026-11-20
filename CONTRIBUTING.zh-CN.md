@@ -20,7 +20,7 @@
 - 每份文档均维护英文和简体中文。默认文件名对应英文，中文使用 `.zh-CN.md` 后缀；在同一项修改中同步更新，并保留语言切换和同语言文档链接。
 - 使用指南应提供完整、正确的功能流程：前置条件、命令、响应、完成条件及恢复方法。测试报告与使用说明分开。
 - 遵循[设备类型文档结构](docs/robots/README.zh-CN.md)：复用通用章节与硬件规格，隔离机型差异，同步发布范围和兼容矩阵，不把尚未发布的类型写成已支持。
-- 保留 `foot_quadruped` 与 `wheel_quadruped` 现有的共用有线连接和传感器规格，不重复维护，也不应用到 `foot_humanoid`。其他类型单独发布并记录之前，当前 EDU 范围仍为 `foot_quadruped`。
+- 保留 `foot_quadruped` 与 `wheel_quadruped` 现有的共用有线连接和传感器规格，不重复维护，也不应用到 `foot_humanoid`。其他类型单独发布并记录之前，当前 EDU／DEV 软件范围仍为 `foot_quadruped`。两个系列共用一份接口参考，保留已发布的包名与配置路径。
 - Schema 修改应包含构建所需依赖，并保持生成的 Python 绑定一致。
 - 提供复现步骤及相关测试结果；分享问题报告时遵循[安全说明](SECURITY.zh-CN.md)。
 - 宿主机或 CI runner 运行 `python3 tools/run_checks.py --scope repository`；开发容器内运行 `python3 tools/run_checks.py --scope recipes` 及相关 Bazel 检查。区分离线测试与实际 harness 会话、设备运行行为。
@@ -29,19 +29,19 @@
 
 ## 维护者与评审
 
-仓库管理员共同组成维护团队，负责问题分流、贡献评审和兼容性变更协调。
-[CODEOWNERS](.github/CODEOWNERS) 列出所有仓库路径的评审负责人；管理员成员变化时同步更新。
+仓库维护者负责问题分流、贡献评审和兼容性变更协调。
+[CODEOWNERS](.github/CODEOWNERS) 列出所有仓库路径的评审负责人；维护者成员变化时同步更新。
 评审分配不会授予仓库权限，也不替代已配置的合并要求。
 
+只有仓库维护者可以向仓库分支提交和推送更新；其他贡献者通过 fork 提交 PR，由仓库维护者评审。
 VBOT Lab 每个版本族使用各自的 `pre_release/V<major>.<minor>.<patch>.X` 分支。
-维护者完成检查后，可以直接向对应迭代分支提交和推送，不要求 PR；
-需要评审时，也可使用以迭代分支为目标的工作分支 PR。
-V1.6.0 应用开发使用 `release/V1.6.0`，`Rel/V1.6.0` 标记正式快照。
+当前 V1.7.0-6 开发使用 `pre_release/V1.7.0.X`。
+先前 V1.6.0 版本保留 `release/V1.6.0` 及正式快照 `Rel/V1.6.0`。
 `main` 保留最新正式版本；只有明确要求正式发布时，才创建正式发布提升 PR，
 日常迭代期间不提前创建。不要直接推送 `main`，也不要暗示支持尚未发布的能力。
 向 `main` 合并 PR 前，需要另一位列出的维护者批准、基于当前目标分支的 `repository-layout` 检查通过，
 并解决评审讨论。推送新的待评审提交后需要重新批准。
-维护者使用 **Squash and merge** 合并；管理员同样遵守保护规则。
+仓库维护者使用 **Squash and merge** 合并，并遵守分支保护规则。
 检查范围与版本 tag 规则见[协作流程](.github/WORKFLOWS.zh-CN.md)。
 
 安全问题请按[安全说明](SECURITY.zh-CN.md)私下反馈，不要使用公开 Issue 或 PR。

@@ -12,7 +12,7 @@
 
 | 能力 | 开发者负责 | Agent 行为 | 详细说明 |
 | --- | --- | --- | --- |
-| HTTP MCP | 运行可信 HTTP MCP 服务，使用额外入口时注册其可达 URL | EDU 运行时作为 MCP 客户端，发现并调用工具 | [工具契约](http-mcp.zh-CN.md)、[连接配置 API](mcp-config.zh-CN.md) |
+| HTTP MCP | 运行可信 HTTP MCP 服务，注册其可达 URL | 设备运行时作为 MCP 客户端，发现并调用工具 | [工具契约](http-mcp.zh-CN.md)、[连接配置 API](mcp-config.zh-CN.md) |
 | 设备端 Skills | 编写 `SKILL.md`，通过 Skills API 上传 | 发现可复用知识／流程，并在匹配的请求中激活 | [编写规范](customization.zh-CN.md)、[内容 API](content-api.zh-CN.md) |
 | 设备端 AGENTS.md | 编写长期偏好，通过 AGENTS.md API 替换用户层内容 | 在后续 Turn 构建提示时合并指令 | [编写规范](customization.zh-CN.md)、[内容 API](content-api.zh-CN.md) |
 
@@ -25,13 +25,13 @@ Skills 与 `AGENTS.md` 提供指令，不授予额外的操作系统权限。
 | 内容 | 使用方 | 位置／交付方式 |
 | --- | --- | --- |
 | Coding Agent Skill | 开发者侧编程 harness，例如 Codex 或 Claude Code | [`skills/`](../../../skills/README.zh-CN.md)；本地环境检查 Skill |
-| 设备端 Skill | EDU `vbot-agent-harness` | 开发者编写 `SKILL.md`，通过 `/api/skills/{name}` 注入 |
-| 设备端 AGENTS.md | EDU `vbot-agent-harness` | 开发者编写指令，通过 `/api/agents-md` 注入 |
+| 设备端 Skill | 设备端 `vbot-agent-harness` | 开发者编写 `SKILL.md`，通过 `/api/skills/{name}` 注入 |
+| 设备端 AGENTS.md | 设备端 `vbot-agent-harness` | 开发者编写指令，通过 `/api/agents-md` 注入 |
 | 仓库 AGENTS.md | 使用或贡献 vbot-lab 的 Coding Agent | [共享任务路由与指令](../../../AGENTS.zh-CN.md)；不是设备定制内容 |
 
 ## 版本兼容性
 
-这些 API 适配 `foot_quadruped` EDU 的机器人应用版本 **V1.6.0-15**、**V1.6.0-17**。
+这些 API 适配 `foot_quadruped` EDU／DEV 的机器人应用版本 **V1.7.0-6**。
 接入前请查看[兼容矩阵](../../compatibility.zh-CN.md)，并确认设备运行时可用。
 通过[接入指南](../../guides/agent-integration.zh-CN.md)检查 API 响应、内容路径及新 Turn 中的行为。
 在自己的工作区保留源内容及备份，升级固件前阅读对应版本说明。
@@ -40,13 +40,14 @@ Skills 与 `AGENTS.md` 提供指令，不授予额外的操作系统权限。
 
 ## 开放边界
 
-- 默认 S100 MCP 入口为 `http://192.168.127.2:18080/mcp`，配置及内容 API 使用
-  `http://192.168.127.10:8787`。两者是机器人内部网络上的不同接口契约。
-  不得将 `18080` 或 `8787` 端口暴露或转发到校园公网、互联网。
+- MCP 服务使用注册的 URL，不要求固定名称或端口。接入前先读取连接列表，
+  不要假定预置服务已经启用。配置及内容 API 使用 `http://192.168.127.10:8787`，
+  与自建 MCP 服务是不同的访问目标。两者均应保留在可信网络内，不暴露至校园公网或互联网。
 - 使用 `vbot` 账户及文档列明的访问方式，操作不得超出账户已分配的权限。
 - MCP 仅承诺已列出的工具子集，不承诺 stdio transport、Resources 或 Prompts。
-- 可通过[连接配置 API](mcp-config.zh-CN.md)新增、编辑、启停及刷新其他 HTTP MCP 服务。
-  地址必须从设备运行时可达，确认发现结果后再开始新的 Turn；不按多租户托管平台使用。
+- 可通过[连接配置 API](mcp-config.zh-CN.md)新增、查询、编辑、启停、删除及刷新 HTTP MCP 服务。
+  地址必须从设备运行时可达，遵循 `canEdit`／`canDelete`，确认发现结果后再开始新的 Turn；
+  不按多租户托管平台使用。
 - MCP 会话请求头只是传输层状态，不是内容 API 的凭证。
 - 用户层 Skills 与 `AGENTS.md` 使用[内容 API](content-api.zh-CN.md)注入。
 - 本章节聚焦 MCP 与用户内容定制，不是完整的应用会话协议，也不包含通用系统服务管理。

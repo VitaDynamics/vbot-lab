@@ -163,7 +163,7 @@ Python 使用 `json.dumps(value)`，其他语言使用对应的 JSON 序列化�
 | `id` | 字符串 | 图内非空且唯一的节点 ID |
 | `dependencies` | 空字符串数组 | 要等待的已有节点 ID；空表示入口节点，文件顺序不决定执行顺序 |
 | `wait_time_ms` | 0／int32 | 依赖就绪后再等待的非负毫秒数，不是绝对时间戳 |
-| `execution_timeout_ms` | 0／int32 | 需要时填正数节点预算；0 不添加正数 DAG 超时，但底层任务／服务仍可能有超时 |
+| `execution_timeout_ms` | 0／int32 | 固定的节点执行截止时间，单位毫秒；进度不能延长它。需要时填正数预算；0 不添加正数 DAG 超时，但底层任务／服务仍可能有超时 |
 | `lifecycle` | UNSPECIFIED／枚举 | 建议显式选 NORMAL、DAEMON、BARRIER；普通节点未指定时为 NORMAL，BarrierCommand 未指定时为 BARRIER |
 | `condition` | 空字符串 | 普通图留空；当前执行器仅特殊处理字面量 false 为跳过，不要填写脚本表达式 |
 | `command_type` | union 类型标记 | [命令参考](../interfaces/rcp-commands.zh-CN.md)中的 13 种类型之一 |

@@ -70,7 +70,7 @@ def blocks(page):
 
 class DeploymentCommandTests(unittest.TestCase):
     def run_block(self, script, *, fail_at=0, remote_directory="/userdata/vbot/apps/mock-ABC123",
-                  package_directory="/tmp/mock-package", ldd_output="libaorta_core.so.13 => ./lib/libaorta_core.so.13",
+                  package_directory="/tmp/mock-package", ldd_output="libaorta_core.so.14 => ./lib/libaorta_core.so.14",
                   activation=True, probe="", account="vbot", architecture="aarch64", python_version="3.10.12"):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -236,7 +236,7 @@ class DeploymentCommandTests(unittest.TestCase):
     def test_missing_libraries_prevent_cpp_program_execution_even_when_ldd_returns_zero(self):
         for suffix in (".md", ".zh-CN.md"):
             script = next(block for block in blocks("packages/aorta/cpp/README" + suffix) if "ldd ./bin/subscribe-state" in block)
-            result, trace = self.run_block(script, ldd_output="libaorta_core.so.13 => not found")
+            result, trace = self.run_block(script, ldd_output="libaorta_core.so.14 => not found")
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(trace[-1].split("\t")[0], "ldd")
             self.assertFalse(any(line.startswith("subscribe-state\t") for line in trace))

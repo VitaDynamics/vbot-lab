@@ -2,13 +2,18 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-[Recipes 索引](../README.zh-CN.md) · [Python](main.py) · [C++](main.cc)
+[Recipes 索引](../README.zh-CN.md) · [Python](main.py) · [C++](main.cc) · [S100 硬件解码](main_s100.cc)
 
 接口: `/image_left_raw/h265`, `/image_right_raw/h265` — pub/sub.
 
 生成类型: `foxglove.CompressedVideo`.
 
 选择单路相机，输出编码、frame ID、采集时间戳和载荷长度。载荷是 H.265 Annex B 视频流，不是 JPEG 或 RGB。默认仅读取元数据；获得许可后，可保存压缩字节到新文件，或用 `--decode` 获取内存中的 RGB 图像。每路相机独立使用解码器；解码依赖关键帧与 VPS/SPS/PPS，中途订阅可能暂时没有可解码图像。
+
+S100 硬件解码优先使用[地瓜原生 SDK](../../docs/interfaces/cameras.zh-CN.md#s100-硬件解码)，
+并按其中说明检查 `vbot` 账户的 `/dev/vpu` 权限。下文独立的
+[S100 C++ 目标](#c-s100-硬件解码)使用该后端；原有 PyAV／FFmpeg 目标保留，
+其 `--decode` 参数不会选择 VPU。
 
 ## Python：构建与离线预览
 
@@ -67,6 +72,102 @@ bazel run //recipes/camera:main_cpp
 [decoder.h](decoder.h) 中的 `rgb` 是连续 RGB24 字节，行跨度为宽度乘 3；
 使用或移交该缓冲区后再离开当前帧作用域。每路相机独立解码，结束时排空延迟帧，
 未解码出图像时报错；本例不保存图片或进行双目同步。
+
+## C++ S100 硬件解码
+
+该目标订阅相同的左／右 H.265 topic，通过 S100 MediaCodec 接口解码，
+不依赖 FFmpeg，也不会回退到软件解码。程序仅输出 NV12 图像尺寸、Y／UV 行跨度、
+时间戳与帧计数，不保存或外传像素。通过 `--camera left` 或 `--camera right`
+选择一路相机，每路独立使用解码器。
+
+### 在开发容器内构建
+
+按 [C++ SDK 指南](../../packages/aorta/cpp/README.zh-CN.md#构建-arm64-程序)
+准备 **ARM64** Aorta SDK 与 EDU Schema。
+另按[地瓜官方 SDK 文档](https://developer.d-robotics.cc/rdk_s_doc/Advanced_development/multimedia_development/S100/codec)
+获取配套 S100 多媒体 SDK，将 `VBOT_S100_MULTIMEDIA_DIR` 设为容器内可见的绝对路径，
+目录结构如下，并保留所有软链接指向的实际文件：
+
+```text
+s100-multimedia-sdk/
+├── include/
+│   ├── hb_media_codec.h
+│   ├── hb_media_basic_types.h
+│   └── hb_media_error.h
+└── lib/
+    ├── libmultimedia.so
+    ├── libhbmem.so.1
+    └── libalog.so.1
+```
+
+使用完整、配套的 SDK 头文件与 ARM64 库。该可选目标只读取本地提供的 SDK，
+Bazel 不会下载它，其他 Recipe 目标无需此依赖。
+设置好 `AORTA_CPP_SDK_DIR` 与 `AORTA_EDU_SCHEMA_DIR` 后执行：
+
+```bash
+export VBOT_S100_MULTIMEDIA_DIR=/absolute/path/to/s100-multimedia-sdk &&
+bazel build --config=arm64 //recipes/camera:main_cpp_s100_decode &&
+file bazel-bin/recipes/camera/main_cpp_s100_decode &&
+aarch64-linux-gnu-readelf -d bazel-bin/recipes/camera/main_cpp_s100_decode
+```
+
+输出必须为 AArch64。在 AMD64 容器中对此仅支持 ARM64 的目标执行构建，
+不要 `bazel run`。将可执行文件、配套 Aorta 运行库与声明文件打包：
+
+```bash
+PACKAGE_DIR=$(mktemp -d /tmp/vbot-camera-s100-XXXXXX) &&
+mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
+cp -L bazel-bin/recipes/camera/main_cpp_s100_decode "$PACKAGE_DIR/bin/camera-s100" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
+cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
+cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
+   "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
+   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
+   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
+(cd "$PACKAGE_DIR" && find bin lib licenses -type f -exec sha256sum {} + > SHA256SUMS)
+```
+
+将此 `PACKAGE_DIR` 用于 [SSH 传输步骤](../../packages/aorta/cpp/README.zh-CN.md#2-通过-ssh-传输)。
+S100 设备在 `/usr/hobot/lib` 提供多媒体运行库，不要用构建机上的副本替换设备系统库。
+若缺少配套运行库，应先解决 SDK 与设备的兼容问题再运行。
+
+### 在设备 vbot shell 中运行
+
+检查 [VPU 权限](../../docs/interfaces/cameras.zh-CN.md#s100-硬件解码)，
+并[配置设备 shell](../../docs/getting-started/device-environment.zh-CN.md)。
+使用传输时输出的实际 `APP_DIR`：
+
+```bash
+APP_DIR=/userdata/vbot/apps/cpp-recipe-XXXXXX &&
+cd "$APP_DIR" &&
+sha256sum -c SHA256SUMS &&
+export ZENOH_SESSION_CONFIG_URI=/opt/vita/aorta/edu/edu_session.json5 &&
+export LD_LIBRARY_PATH="$PWD/lib:/usr/hobot/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" &&
+LDD_OUTPUT=$(ldd ./bin/camera-s100) &&
+printf '%s\n' "$LDD_OUTPUT" &&
+[[ "$LDD_OUTPUT" != *"not found"* ]] &&
+./bin/camera-s100 --camera left --execute --consent --count 5 --timeout 15
+```
+
+`--count` 指**解码输出帧数**，不是收到的数据包数；`--timeout` 限制整个接收／解码循环。
+成功结束时输出 `complete: true`、达到请求数量的 `decoded_frames` 及
+`decoder_released: true`。缺少参数集／关键帧、接收溢出、编解码器失败或超时都会报错，
+不会将空结果视为成功。实时解码必须同时指定 `--execute` 与 `--consent`，
+默认只输出计划。Ctrl-C 会请求清理并退出。
+
+### 在哪里处理图像
+
+源码按以下流程展开：
+
+1. [main_s100.cc](main_s100.cc)校验 Aorta `CompressedVideo` 消息，将 Annex-B 访问单元传给解码器。
+2. [h265_start.h](h265_start.h)等待 VPS／SPS／PPS 与随机访问帧，支持中途加入码流。
+3. [s100_decoder.h](s100_decoder.h)完成 MediaCodec 的初始化、配置、启动，借入输入缓冲区，复制压缩字节并只提交一次。
+4. 确认可用输出后借出 NV12 图像。在 `consume` 回调中通过 `frame.vir_ptr[0]` 处理 Y、`frame.vir_ptr[1]` 处理交错 UV，分别使用 `frame.stride` 与 `frame.vstride`。尺寸以返回值为准，不写死相机尺寸。
+5. 回调结束后通过 `hb_mm_mc_queue_output_buffer` 归还输出，回调抛异常时也会归还；正常退出、超时、异常及已处理的中断均停止并释放解码器。
+
+图像指针是**借用数据**，不属于应用。应同步处理，或在回调返回前复制所需的各行，
+不要将这些指针保留给其他线程。NV12 不是 RGB／BGR，颜色转换需要另行处理。
+该实时流示例在取得指定帧数后停止，不保存视频、不修改相机配置，也不进行双目同步。
 
 ## 完成、失败与退出
 

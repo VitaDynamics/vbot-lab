@@ -13,7 +13,7 @@ only. Do not infer availability on `wheel_quadruped` or `foot_humanoid`.
 
 | Capability | Developer responsibility | Agent behavior | Reference |
 | --- | --- | --- | --- |
-| HTTP MCP | Run a trusted HTTP MCP service and register its reachable URL when using an additional endpoint | The EDU runtime acts as an MCP client, discovers tools, and calls them | [Tool contract](http-mcp.md), [connection API](mcp-config.md) |
+| HTTP MCP | Run a trusted HTTP MCP service and register its reachable URL | The device runtime acts as an MCP client, discovers tools, and calls them | [Tool contract](http-mcp.md), [connection API](mcp-config.md) |
 | Device Skills | Write `SKILL.md` and upload it through the Skills API | Discovers reusable knowledge / procedures and activates them for matching requests | [Authoring](customization.md), [content API](content-api.md) |
 | Device AGENTS.md | Write persistent preferences and replace user-layer content through the AGENTS.md API | Merges instructions during subsequent Turn prompt builds | [Authoring](customization.md), [content API](content-api.md) |
 
@@ -27,13 +27,13 @@ Skills and `AGENTS.md` supply instructions; they do not grant additional OS perm
 | Artifact | Consumer | Location / delivery |
 | --- | --- | --- |
 | Coding Agent Skill | Developer-side coding harness, such as Codex or Claude Code | [`skills/`](../../../skills/README.md); local environment-check Skill |
-| Device Skill | EDU `vbot-agent-harness` | Developer-authored `SKILL.md`, injected through `/api/skills/{name}` |
-| Device AGENTS.md | EDU `vbot-agent-harness` | Developer-authored instructions, injected through `/api/agents-md` |
+| Device Skill | Device `vbot-agent-harness` | Developer-authored `SKILL.md`, injected through `/api/skills/{name}` |
+| Device AGENTS.md | Device `vbot-agent-harness` | Developer-authored instructions, injected through `/api/agents-md` |
 | Repository AGENTS.md | Coding Agents developing with or contributing to vbot-lab | [Shared task routing and instructions](../../../AGENTS.md); not a device customization artifact |
 
 ## Version compatibility
 
-These APIs target robot applications **V1.6.0-15** and **V1.6.0-17** on `foot_quadruped` EDU.
+These APIs target robot application **V1.7.0-6** on `foot_quadruped` EDU / DEV.
 Check the [compatibility matrix](../../compatibility.md) and the installed runtime before integration.
 Use the [integration guide](../../guides/agent-integration.md) to verify API responses,
 content paths, and behavior in a new Turn. Keep your source content and backups in your
@@ -44,15 +44,17 @@ an executable MCP server or installable device Skill packages.
 
 ## Boundaries
 
-- The default S100 MCP endpoint is `http://192.168.127.2:18080/mcp`; the configuration and content APIs use
-  `http://192.168.127.10:8787`. These are separate contracts on the robot's internal network.
-  Do not expose or forward ports `18080` or `8787` to campus public networks or the Internet.
+- MCP services use their registered URLs; there is no requirement to use a fixed name or port.
+  Read the connection list before integration rather than assuming a preconfigured service is enabled.
+  The configuration and content APIs use `http://192.168.127.10:8787` and are separate from
+  your MCP service. Keep both on a trusted network, not campus public networks or the Internet.
 - Use the `vbot` account and the documented access methods; stay within the account's assigned permissions.
 - Only the documented MCP tool subset is promised: no stdio transport, Resources,
   or Prompts.
-- Additional HTTP MCP services can be registered, edited, enabled/disabled and refreshed
+- HTTP MCP services can be registered, queried, edited, enabled/disabled, deleted and refreshed
   through the [connection API](mcp-config.md). Use addresses reachable from the device
-  runtime and check discovery before starting a new Turn. This is not a multi-tenant hosting contract.
+  runtime, respect `canEdit` / `canDelete`, and check discovery before starting a new Turn.
+  This is not a multi-tenant hosting contract.
 - An MCP session header is transport state, not a content API credential.
 - Use the [content API](content-api.md) for user-layer Skills and `AGENTS.md`.
 - This section covers MCP and user-content customization, not the full application

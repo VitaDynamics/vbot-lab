@@ -2,8 +2,9 @@
 
 <p align="center">English | <a href="mcp-config.zh-CN.md">中文</a></p>
 
-Use these HTTP APIs to connect the device Agent to additional **Streamable HTTP MCP**
-services, or edit, enable and disable existing connections without restarting the device.
+Use these HTTP APIs to register **Streamable HTTP MCP** services for the device Agent,
+list and read their configuration, edit connections, enable/disable them, or delete
+developer-owned definitions without restarting the device.
 Scope and application compatibility follow the [Agent overview](README.md).
 These are configuration APIs, not MCP JSON-RPC methods or Aorta routes.
 
@@ -26,6 +27,10 @@ workspaces. `workingDir` selects the same runtime context as the
 Use that same context for writes, refreshes and checks. Do not change preconfigured
 services that you do not own.
 
+Read the server list before integration. Do not assume a preconfigured connection
+exists or is enabled. Start your service, register its actual URL and check discovery;
+choosing a port alone does not configure the Agent.
+
 ## Routes
 
 Paths in this table are relative to `/api/admin/extensions/vbot-mcp/http`.
@@ -38,13 +43,30 @@ Requests and responses use JSON, without a `data` wrapper.
 | `GET /servers/{name}/config` | Query `workingDir` | `200`: editable configuration with saved header values redacted |
 | `PUT /servers/{name}/config` | Query `workingDir`; edit body below | `200`: updated server list; background discovery |
 | `PATCH /servers/{name}` | Query `workingDir`; `{"enabled":true}` or `{"enabled":false}` | `200`: updated server list; background discovery |
+| `DELETE /servers/{name}` | Query `workingDir`; no body; requires `canDelete=true` | `200`: updated server list; background discovery after removing the global definition |
 | `POST /servers/refresh` | Query `workingDir`; no body required | `200`: list after scheduling a connection/catalog refresh |
 
-There is no server-definition DELETE or rename API. Disable your connection with
-PATCH when it is no longer needed; this retains the definition and saved credentials.
-Disabling is not deletion, credential revocation, or cancellation of an already-running
-tool call. These APIs do not add or edit stdio process definitions, install packages,
-or perform an OAuth login.
+PATCH retains the definition and saved credentials; DELETE removes the global
+definition and its saved headers. Neither operation stops the MCP service, cancels an
+already-running tool call or revokes credentials at the service. There is no rename
+API. These APIs do not add or edit stdio process definitions, install packages or
+perform an OAuth login.
+
+### Read the list
+
+| Response field | Meaning |
+| --- | --- |
+| `canAddServers` | Whether a global connection definition can be added |
+| `servers[].name`, `transport`, `target` | Exact connection name, transport and HTTP origin; use GET config for the full URL |
+| `servers[].source` | `global`: developer configuration; `packaged`: packaged definition; `project`: project definition |
+| `servers[].enabled`, `toolCount` | Enabled state and number of currently discovered tools; enabled does not imply connected |
+| `servers[].canEdit`, `canDelete` | Check the flag for the intended operation; editability does not imply deletability |
+| `servers[].configError`, `diagnostics` | Per-connection configuration error and discovery diagnostics |
+| `catalogReady`, `catalogRevision`, `refreshPending` | Whether a catalog is available, its revision and whether a refresh is still pending |
+| `storageAvailable`, `loadError` | Enabled-state storage availability and any state-loading error |
+
+Only global definitions are deletable through this API. Packaged and project
+definitions return `canDelete=false`; do not try to remove them through DELETE.
 
 ### Create fields
 
@@ -144,7 +166,7 @@ vbot_mcp_curl -X POST "$VBOT_MCP_API_URL/servers?workingDir=$VBOT_WORKING_DIR" \
 
 ### Refresh and check discovery
 
-Create, edit and toggle already schedule discovery. Use an explicit refresh after
+Create, edit, toggle and delete already schedule discovery. Use an explicit refresh after
 recovering a service or changing its tool definitions; it can reconnect configured
 services in this context, not just `edu-tools`.
 
@@ -162,7 +184,7 @@ While `refreshPending` is true, wait and read GET again with a bounded deadline;
 do not repeatedly POST refresh. After it clears, require `catalogReady=true`, your
 entry `enabled=true`, no entry `configError` or relevant discovery diagnostic, and the
 expected `toolCount`. `storageAvailable` describes enabled-state storage;
-`canAddServers` and per-entry `canEdit` describe configuration operations. A `loadError`
+`canAddServers` and per-entry `canEdit` / `canDelete` describe configuration operations. A `loadError`
 needs investigation before further writes. GET by itself does not start discovery.
 
 Saving a definition does not prove connectivity or tool execution. After successful
@@ -210,6 +232,42 @@ vbot_mcp_curl -X PATCH "$VBOT_MCP_API_URL/servers/edu-tools?workingDir=$VBOT_WOR
 Use `{"enabled":true}` to re-enable the same connection. Read the list and check the
 settled discovery state afterward. Do not toggle unrelated services.
 
+### Delete your connection
+
+Finish or cancel your application's tool work before deleting its connection.
+Read the list again and confirm the exact name, `source=global` and `canDelete=true`.
+To delete the example connection deliberately, set `CONFIRM_MCP_DELETE=edu-tools`
+in the same shell before running this block; without confirmation it stops before DELETE.
+
+```bash
+vbot_mcp_curl --get "$VBOT_MCP_API_URL/servers" \
+  --data-urlencode "workingDir=$VBOT_WORKING_DIR" \
+  -o "$VBOT_MCP_FILES/servers-before-delete.json"
+jq -e 'any(.servers[]; .name == "edu-tools" and .source == "global" and .canDelete == true)' \
+  "$VBOT_MCP_FILES/servers-before-delete.json"
+[[ "${CONFIRM_MCP_DELETE:-}" == edu-tools ]]
+
+vbot_mcp_curl -X DELETE "$VBOT_MCP_API_URL/servers/edu-tools?workingDir=$VBOT_WORKING_DIR" |
+  jq .
+
+vbot_mcp_curl --get "$VBOT_MCP_API_URL/servers" \
+  --data-urlencode "workingDir=$VBOT_WORKING_DIR" |
+  jq '{catalogReady,refreshPending,diagnostics,
+       servers:[.servers[] | select(.name == "edu-tools")]}'
+```
+
+Wait for `refreshPending=false` with the same bounded GET checks used above. For a
+uniquely named developer connection, require an empty matching `servers` array;
+GET config and another DELETE then return `404 mcp_server_not_found`.
+If you remove a global override of a same-named packaged definition, that definition
+can become visible again: inspect its `source` and enabled state rather than
+repeating DELETE. Deletion has no `revision` precondition; re-read before writing and
+coordinate with anyone else configuring the same connection.
+
+Keep your service source and securely stored original configuration if you may need
+it again; recreation uses POST. Stop a no-longer-needed service separately through
+your own process-management workflow.
+
 ## Errors and recovery
 
 | Result | Handling |
@@ -218,9 +276,9 @@ settled discovery state afterward. Do not toggle unrelated services.
 | `409 mcp_server_already_exists` | Name or normalized tool-prefix collision; inspect the list and choose a distinct name. POST does not replace an existing entry. |
 | `409 mcp_server_config_changed` | Fetch a fresh config/revision, compare changes and rebuild the complete edit. |
 | `404 mcp_server_not_found` | Refresh the list and confirm the exact name/context; do not infer that all APIs are unavailable. |
-| `405 mcp_server_read_only` | Respect the source/transport and `canEdit`; add your own HTTP entry instead of modifying protected definitions. |
+| `405 mcp_server_read_only` | Respect the source/transport and the operation's `canEdit` / `canDelete` flag. Packaged/project entries cannot be deleted; add your own HTTP entry instead of modifying protected definitions. |
 | `500 mcp_config_write_failed` / `mcp_server_state_write_failed`, or `503 mcp_config_unavailable` | Preserve the error and contact support; do not change device permissions or overwrite configuration files to bypass the API. |
-| Non-2xx, timeout or interrupted write | Inspect status/body safely, then GET the list/config before deciding whether to retry: the write may already have persisted. Never blindly repeat POST/PUT. |
+| Non-2xx, timeout or interrupted write | Inspect status/body safely, then GET the list/config before deciding whether to retry: the write may already have persisted. Never blindly repeat POST/PUT/DELETE. |
 | Saved but no tools | Check `enabled`, refresh completion, `configError`, diagnostics, device-to-service networking, authentication, MCP transport and declared tools. A service with no tools cannot satisfy a tool-based request. |
 
 Continue with the [tool contract](http-mcp.md) and

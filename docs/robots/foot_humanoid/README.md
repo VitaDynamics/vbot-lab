@@ -1,10 +1,10 @@
-# Bipedal robot EDU — future release
+# Bipedal robot — future release
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 - Build identifier: `foot_humanoid`.
-- EDU scope: reserved for a future release; outside the current EDU release scope.
-- Guide status: placeholder only. Hardware specifications and the EDU development guide
+- Software scope: reserved for a future release; outside the current EDU / DEV release scope.
+- Guide status: placeholder only. Hardware specifications and the development guide
   have not been provided for this type.
 
 ## Hardware scope

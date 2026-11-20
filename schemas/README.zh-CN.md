@@ -4,19 +4,38 @@
 
 为 [Aorta SDK](../packages/README.zh-CN.md)及设备本地 ROS 2 bridge 提供版本化接口定义。
 
-- `aorta/schemas/` 包含对 EDU 开放的 FlatBuffers 源文件，以及其分发所依据的 `LICENSE` 和
+- `aorta/schemas/` 包含 EDU 与 DEV 共用的开放 FlatBuffers 源文件，以及其分发所依据的 `LICENSE` 和
   `NOTICE`。
 - `ros2/routes.json` 列出机器人公开的 ROS 2 bridge 路由：Aorta key、schema 与类型，
   ROS 2 名称与类型，方向，QoS，服务超时，以及指令限速和可接受的取值范围。
 - `ros2/<package>/` 只包含这些路由使用的 `.msg`、`.srv` 和 `.action` 定义、它们引用的类型，
   以及说明取值的常量定义。`routes.json` 中的 `external_packages` 列出还需要的 ROS 2 标准包。
   `ros2/THIRD_PARTY_NOTICES.txt` 列出第三方包及其许可证。
-- `MANIFEST.json` 记录 schema pack 版本、对应 `edu-sdk-*` release 中的 schema pack 资产及其
-  SHA-256 摘要，以及文件统计。
+- `MANIFEST.json` 通过 `ros2_bridge_version` 记录当前 ROS 2 定义版本，
+  同时记录 schema pack 的归档名／版本／SHA-256 及文件统计。
 
 这些文件随每个版本生成，请勿手工修改。BFBS 文件和生成的 C++ 头文件位于 release 附带的
 schema pack 中。运行时可用性另见[接口参考](../docs/interfaces/README.zh-CN.md)及
 [兼容矩阵](../docs/compatibility.zh-CN.md)。
+
+## 显示接口定义
+
+[显示指南](../docs/interfaces/system-peripherals.zh-CN.md#注册图片序列)说明注册、查询、播放与删除流程。
+仓库提供以下文件：
+
+| 能力 | Aorta Schema | ROS 2 接口源定义 |
+| --- | --- | --- |
+| 注册序列 | [custom_images_ctrl.fbs](aorta/schemas/service/peripheral/custom_images_ctrl.fbs)：`AddImagesRequest`／`AddImagesResponse` | [AddImages.srv](ros2/aorta_msgs/srv/AddImages.srv) |
+| 查询序列 | [custom_images_ctrl.fbs](aorta/schemas/service/peripheral/custom_images_ctrl.fbs)：`GetImagesStatusRequest`／`GetImagesStatusResponse` | [GetImagesStatus.srv](ros2/aorta_msgs/srv/GetImagesStatus.srv) |
+| 删除序列 | [custom_images_ctrl.fbs](aorta/schemas/service/peripheral/custom_images_ctrl.fbs)：`DelImagesRequest`／`DelImagesResponse` | [DelImages.srv](ros2/aorta_msgs/srv/DelImages.srv) |
+| 完整字段序列播放 | [play_emotion.fbs](aorta/schemas/service/peripheral/play_emotion.fbs)：`PlayEmotionRequest`／`PlayEmotionResponse` | [PlayEmotion.srv](ros2/aorta_msgs/srv/PlayEmotion.srv)（ROS 入口为 `/display_node/play_emotion_native`） |
+
+直接依赖包含 [ShowImg.msg](ros2/aorta_msgs/msg/ShowImg.msg)、
+[CustomImageSequenceStatus.msg](ros2/aorta_msgs/msg/CustomImageSequenceStatus.msg)、
+[AortaHeader.msg](ros2/aorta_msgs/msg/AortaHeader.msg) 和
+[ServiceStatus.msg](ros2/aorta_msgs/msg/ServiceStatus.msg)。这些是 ROS 2 `.srv`／`.msg` 源定义，
+不是生成后的 `.idl` 文件；由标准 `rosidl` 工具链生成 IDL 与语言绑定。
+仓库中的定义参考不能代替设备已安装的类型包。
 
 ## Python 绑定与示例索引
 
@@ -26,7 +45,6 @@ schema pack 中。运行时可用性另见[接口参考](../docs/interfaces/READ
 | --- | --- | --- | --- |
 | 相机 | [CompressedVideo.fbs](aorta/schemas/topic/foxglove_schema/CompressedVideo.fbs) | `foxglove.CompressedVideo` | [camera](../recipes/camera/README.zh-CN.md) |
 | 音频帧 | [RawAudio.fbs](aorta/schemas/topic/foxglove_schema/RawAudio.fbs) | `foxglove.RawAudio` | [audio](../recipes/audio/README.zh-CN.md) |
-| ASR | [asr_result.fbs](aorta/schemas/topic/speech/asr_result.fbs) | `aorta.topic.speech.AsrResult` | [audio](../recipes/audio/README.zh-CN.md) |
 | UWB 输入结束 | [audio_done.fbs](aorta/schemas/topic/uwb/audio_done.fbs) | `aorta.uwb.AudioDoneEvent` | [audio](../recipes/audio/README.zh-CN.md) |
 | 状态 | [locomotion_status.fbs](aorta/schemas/topic/locomotion/locomotion_status.fbs) | `locomotion.LocomotionStatus` | [subscribe-state](../recipes/subscribe-state/README.zh-CN.md) |
 | 本体动作 | [lowlevel_action.fbs](aorta/schemas/service/locomotion/lowlevel_action.fbs) | `aorta.services.locomotion.LowlevelActionRequest` | [locomotion](../recipes/locomotion/README.zh-CN.md) |

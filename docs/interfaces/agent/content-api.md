@@ -10,12 +10,13 @@ and [authoring examples](customization.md) first.
 ## Connection and prerequisites
 
 The agreed base URL is `http://192.168.127.10:8787`, reachable from the device's
-development environment using the `vbot` account. The service is supplied with the EDU image;
+development environment using the `vbot` account. The service is supplied with the EDU / DEV image;
 confirm that the delivered version supports these routes before writing content.
 No Harness source build, direct service-file access, or permission change is required.
 
 This is HTTP JSON, not MCP: do not send JSON-RPC envelopes, initialize requests, or
-`Mcp-Session-Id`. The MCP tool server at port `18080` is a different destination.
+`Mcp-Session-Id`. Your registered MCP tool server is a separate destination; see the
+[connection API](mcp-config.md).
 Use the service only on a trusted robot network in the single-trusted-developer scenario.
 Do not expose or forward port `8787` to untrusted networks, campus public networks,
 or the Internet. Instructions are not an OS permission or safety-policy mechanism.
@@ -39,7 +40,7 @@ The interface has no independent `/v1` version; compatibility follows the delive
 
 Skill names use lowercase letters, digits, and hyphens. `content` is the entire
 `SKILL.md`, including YAML frontmatter and a non-empty trigger `description`;
-keep its `name` aligned with the route. EDU writes and deletes use `target=user` only.
+keep its `name` aligned with the route. Writes and deletes use `target=user` only.
 PUT replaces `SKILL.md`, not a directory archive; arbitrary resource uploads are not supported.
 DELETE removes the whole user Skill directory, including auxiliary files, not just `SKILL.md`.
 
@@ -118,7 +119,7 @@ vbot_curl --get "$VBOT_API_URL/api/skills/campus-guide" \
 ```
 
 Expected output: the checked `{path:...}` response and `true` for content equality.
-On an EDU-adapted image, the returned path must be under
+On an EDU / DEV image, the returned path must be under
 `/userdata/.vbot/content/user/skills/`. An unexpected path is a failed adaptation check:
 stop further writes and contact the platform team, without attempting direct filesystem repair.
 The server may already have written content even if the path check fails.

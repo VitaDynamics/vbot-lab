@@ -1,4 +1,4 @@
-// Task Report — generic async terminal-task outcome for Agent-invoked
+// Task Report — generic async task outcome and optional progress for Agent-invoked
 // capabilities (VLN, BaseAction, Locomotion, Speech, Photo, ...).
 //
 // Generalizes the "Service = start ack, Topic = terminal outcome" pattern
@@ -29,9 +29,10 @@ table VlnTaskResult {
   remaining_distance_m: float = null (id: 2);
 }
 
-// Empty result context for base actions; structured detail (e.g. odometry
-// staleness, position-not-initialized) is carried as fields added here.
+// Base-action result context. Extend structured details by appending fields.
 table BaseActionTaskResult {
+  error_code: int;
+  error_detail: string;
 }
 
 // Distinguishes validate-only preparation from the action execution terminal.
@@ -73,13 +74,20 @@ union TaskResultPayload {
   PhotoTaskResult,
 }
 
+enum TaskReportKind: ubyte {
+  TERMINAL = 0,
+  PROGRESS = 1,
+}
+
 table TaskReport {
   aorta_header: aorta.sys.AortaHeader (id: 0);
 
   // Must exactly match the req_id from the originating Service request.
   req_id: string (id: 1);
 
-  // Cross-capability result classification.
+  // Terminal outcome classification. For PROGRESS, producers use SUCCESS
+  // only as a nonterminal activity indicator, never as completion evidence.
+  // Failure/cancellation outcomes must be reported with kind=TERMINAL.
   status: aorta.services.common.ServiceStatus = SUCCESS (id: 2);
 
   // Stable, machine-readable cross-capability root cause, e.g. odom_stale,
@@ -89,12 +97,29 @@ table TaskReport {
 
   // id 4 is auto-assigned by FlatBuffers to the hidden `result_type`
   // discriminator (one less than this field's own explicit id).
-  // NONE when there is no additional structured context.
+  // NONE when there is no additional structured context. PROGRESS may carry
+  // partial stage context (e.g. locomotion stage/action_name), not a final
+  // result or proof of completion. Consumers must inspect kind first.
   result: TaskResultPayload (id: 5);
 
   // Optional concise Agent-facing diagnostic. Consumers MUST NOT branch on
   // this free-form text; use status plus reason instead.
   diagnostic: string (id: 6);
+
+  // Legacy payloads remain terminal. TERMINAL is routed on **/task_report;
+  // PROGRESS is routed exclusively on **/task_progress, never task_report.
+  // Producers report useful progress for correlated operations. Separate
+  // topics keep terminal-only subscribers from receiving progress.
+  // Consumers inspect kind before interpreting status/result.
+  kind: TaskReportKind = TERMINAL (id: 7);
+  // Producer-defined stage; observation alone is not forward progress.
+  phase: string (id: 8);
+  // Strictly increasing only on useful forward progress, scoped to req_id.
+  // Duplicate/older values and heartbeat retransmissions must not renew a
+  // deadline. Action admission-only feedback may use zero; it confirms
+  // admission but never renews a progress deadline. Consumers also enforce
+  // a total-time cap.
+  progress_seq: ulong = 0 (id: 9);
 }
 
 root_type TaskReport;

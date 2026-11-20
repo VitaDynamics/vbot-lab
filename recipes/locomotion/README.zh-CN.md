@@ -37,7 +37,7 @@ python -m recipes.locomotion.main --mode stand --confirm-motion --execute --time
 
 程序在发送请求**前**建立报告订阅，提交前输出唯一 `req_id`。service 响应中的 status/error_code 为零只表示受理。
 
-- `stand`：等待相同请求标识的 `/locomotion/body/task_report`，要求 `LocomotionTaskResult.stage=EXECUTE` 且状态成功。这表示模式已启动，不表示物理站起完成。随后观察连续三个心跳推进的状态样本，要求站立姿态、空闲运动状态且 `current_action=RL_TROT`。状态消息没有请求标识，因此输出明确标注为观察结果，不作为因果关联的完成报告；程序退出后控制器仍持续运行。
+- `stand`：等待相同请求标识的 `/locomotion/body/task_report`，要求 `kind=TERMINAL`、`LocomotionTaskResult.stage=EXECUTE` 且状态成功。这表示模式已启动，不表示物理站起完成。随后观察连续三个心跳推进的状态样本，要求站立姿态、空闲运动状态且 `current_action=RL_TROT`。状态消息没有请求标识，因此输出明确标注为观察结果，不作为因果关联的完成报告；程序退出后控制器仍持续运行。
 - `lie-down` / `safe-stop`：等待相同请求标识且属于 BODY 的 `/locomotion/action_report`，要求 `terminal_status=SUCCESS` 且 `error_code=0`。
 
 实际姿态和稳定性仍需现场确认。超时、中断或响应丢失时，结果可能未知，设备也可能仍在动作。需检查状态并使用既定停止方式；退出程序不会取消运动。示例不盲目重试或下发兜底指令，也不发布速度或摇杆指令。

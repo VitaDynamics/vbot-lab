@@ -7,18 +7,18 @@
 
 Aorta Python SDK 通过 [GitHub Release](https://github.com/VitaDynamics/vbot-lab/releases)
 附件分发。目前 SDK 安装包需要从 GitHub Releases 下载，克隆仓库不会自动安装 SDK。
-下载需要联网；`edu-sdk-2026.10.31` 的四个必需 wheel 可在本地安装，无需访问 PyPI。本页说明如何安装 SDK、让 EDU 客户端连接机器人并
+下载需要联网；`edu-sdk-2026.11.18` 的四个必需 wheel 可在本地安装，无需访问 PyPI。本页说明如何安装 SDK、让客户端连接 EDU／DEV 机器人并
 接收实时状态。支持的机器人镜像见[兼容矩阵](../../../docs/compatibility.zh-CN.md)，
 版本配对见 Release 内的 `EDU_SDK_MANIFEST.json`。
 
-从 [edu-sdk-2026.10.31](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31)
+从 [edu-sdk-2026.11.18](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.11.18)
 安装 Python wheel。版本配套见 [release.json](../../../catalog/release.json)，需安装以下包：
 
 | 发行包 | 版本 | 用途 |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.10.20` | `import aorta`；Python API 与平台相关的原生运行库 |
-| `aorta-msgs` | `2026.10.20` | 基础消息的生成代码与 Schema 元数据 |
-| `vbot-edu-msgs` | `2026.10.20` | EDU 消息的生成代码与 Schema 元数据 |
+| `aorta-sdk` | `2026.11.15` | `import aorta`；Python API 与平台相关的原生运行库 |
+| `aorta-msgs` | `2026.11.15` | 基础消息的生成代码与 Schema 元数据 |
+| `vbot-edu-msgs` | `2026.11.18` | EDU 消息的生成代码与 Schema 元数据 |
 | `flatbuffers` | `25.12.19` | 生成的 FlatBuffers 消息所需运行库 |
 
 Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 `NOTICE`。
@@ -31,7 +31,7 @@ Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 
 
 ## 1. 选择 Release wheel
 
-从 `edu-sdk-2026.10.31` 下载所选平台的以下四个 wheel，
+从 `edu-sdk-2026.11.18` 下载所选平台的以下四个 wheel，
 以及 `SHA256SUMS`、`EDU_SDK_MANIFEST.json` 与 `flatbuffers-25.12.19.LICENSE`：
 
 | Wheel | 用途 |
@@ -52,7 +52,7 @@ Aorta 与 EDU wheel 在 `.dist-info/licenses/` 下附带各自的 `LICENSE` 和 
 ## 2. 安装已下载的 wheel
 
 不要把二进制加入 Git。将四个配套 wheel、`SHA256SUMS` 与 `EDU_SDK_MANIFEST.json`
-放到 `artifacts/edu-sdk-2026.10.31/`。在实际运行 Python 的环境中，确保 Python 3.10+、
+放到 `artifacts/edu-sdk-2026.11.18/`。在实际运行 Python 的环境中，确保 Python 3.10+、
 venv 支持可用。应用开发使用[开发容器](../../../docker/README.zh-CN.md)。
 从 `artifacts/` 的上一级目录运行以下 Linux 命令链。`&&` 会在失败后跳过后续安装步骤，
 不会退出交互式 shell；处理错误后再继续：
@@ -60,7 +60,7 @@ venv 支持可用。应用开发使用[开发容器](../../../docker/README.zh-C
 ```bash
 uname -m &&
 python3 --version &&
-cd artifacts/edu-sdk-2026.10.31 &&
+cd artifacts/edu-sdk-2026.11.18 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 cd ../.. &&
 python3 -m venv .venv &&
@@ -70,10 +70,10 @@ unset AORTA_CORE_FFI_LIB &&
 export PYTHONNOUSERSITE=1 &&
 SDK_PLATFORM=linux_x86_64 &&
 python -m pip install --no-index \
-  "artifacts/edu-sdk-2026.10.31/aorta_sdk-2026.10.20-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.10.31/aorta_msgs-2026.10.20-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.31/vbot_edu_msgs-2026.10.20-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.31/flatbuffers-25.12.19-py2.py3-none-any.whl &&
+  "artifacts/edu-sdk-2026.11.18/aorta_sdk-2026.11.15-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.11.18/aorta_msgs-2026.11.15-py3-none-any.whl \
+  artifacts/edu-sdk-2026.11.18/vbot_edu_msgs-2026.11.18-py3-none-any.whl \
+  artifacts/edu-sdk-2026.11.18/flatbuffers-25.12.19-py2.py3-none-any.whl &&
 python -m pip check &&
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; core = aorta.load_library(); print("SDK imports and native runtime OK; ABI", core.aorta_abi_version())'
 ```
@@ -102,7 +102,7 @@ wheel 已包含生成代码与元数据，无需在本地运行 `flatc`。
 
 ## 3. 连接
 
-EDU 程序使用 `/opt/vita/aorta/edu/` 下发布的会话文件连接机器人的 EDU 路由器：
+EDU、DEV 的用户程序均使用 `/opt/vita/aorta/edu/` 下发布的会话文件连接机器人的 EDU 路由器：
 
 | 文件 | 用途 |
 | --- | --- |
@@ -113,11 +113,11 @@ EDU 程序使用 `/opt/vita/aorta/edu/` 下发布的会话文件连接机器人�
 话题、服务和动作名带前导斜杠（`/imu_raw`、`/my_app/status`），不需要加前缀。机器人
 命名空间由会话配置在链路上附加，不要在 API 调用中添加。属于机器人公开接口的名称按
 [接口参考](../../../docs/interfaces/README.zh-CN.md)到达机器人；其他任意名称只在连接到
-同一台机器人的 EDU 程序之间共享，client 与 peer 模式都适用。EDU 程序处于同一个信任域：
-其他 EDU 程序可以用任意名称发布，包括机器人话题的名称。
+同一台机器人的用户程序之间共享，client 与 peer 模式都适用。用户程序处于同一个信任域：
+其他用户程序可以用任意名称发布，包括机器人话题的名称。
 
 使用机器人接口的程序请以 `edu_sdk` 或 `edu_bridge` 作为节点名：机器人只以这两个名称
-列出 EDU 节点。示例使用 `edu_sdk`。EDU 程序之间可以使用其他节点名。
+列出用户节点。示例使用 `edu_sdk`。用户程序之间可以使用其他节点名。
 
 ### 机上（S100）
 

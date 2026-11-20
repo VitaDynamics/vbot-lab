@@ -6,7 +6,7 @@
 和 SSH 登录步骤，用于完成电脑与设备通信，并使用 `vbot` 账户打开设备终端；
 不涉及安装 SDK、部署应用或启动机器人运动。
 本指南不适用于双足机器人（`foot_humanoid`）。
-当前 EDU 发布范围仍仅为 `foot_quadruped`；连接方式相同不代表 `wheel_quadruped` 的
+当前 EDU／DEV 发布范围仍仅为 `foot_quadruped`；连接方式相同不代表 `wheel_quadruped` 的
 固件、SDK 或 API 已开放。
 
 选择一种连接方式：有线连接完成第 1–2 节，无线连接按下方无线流程操作。
@@ -187,7 +187,7 @@ timeout 10s ssh -i ~/.ssh/id_ed25519 \
 
 ## 下一步
 
-当前 `foot_quadruped` EDU 软件可继续按[设备 shell 配置与检查](../../getting-started/device-environment.zh-CN.md)操作。
+当前 `foot_quadruped` EDU／DEV 软件可继续按[设备 shell 配置与检查](../../getting-started/device-environment.zh-CN.md)操作。
 此软件步骤与共用连接流程分开，不扩展其他类型的软件支持。
 
 继续阅读[开发环境搭建](../../getting-started/README.zh-CN.md)、
@@ -200,5 +200,5 @@ timeout 10s ssh -i ~/.ssh/id_ed25519 \
 通过本地隧道转发 bridge。设备端监听、电脑端转发命令和本地 WebSocket 地址见
 [Foxglove 实时查看](../../guides/foxglove.zh-CN.md)。
 
-返回[四足 EDU 指南](../foot_quadruped/README.zh-CN.md)或
+返回[四足 EDU／DEV 指南](../foot_quadruped/README.zh-CN.md)或
 [四轮机器狗参考](../wheel_quadruped/README.zh-CN.md)。

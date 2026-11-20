@@ -1,4 +1,4 @@
-# EDU development container
+# EDU / DEV development container
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 

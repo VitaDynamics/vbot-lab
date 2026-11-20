@@ -28,7 +28,7 @@ the packaged dependency bundle.
 
 The fetch helper stages the matching Linux aarch64 SDK, aorta-msgs, vbot-edu-msgs and
 FlatBuffers wheels plus release/license metadata from
-[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31).
+[GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.11.18).
 It checks their pinned hashes and reuses already-verified files. For a disconnected container,
 bring those same assets into the asset directory first; skip downloading, not verification.
 Downloading assets requires network access but no PyPI download for this base profile.
@@ -38,12 +38,12 @@ If an asset is missing or invalid, stop; do not download dependencies on the rob
 ```bash
 RECIPE=subscribe-state &&
 PREVIEW_ARGS=() &&
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.11.18 &&
 bazel build "//recipes/$RECIPE:main" &&
 bazel run "//recipes/$RECIPE:main" -- "${PREVIEW_ARGS[@]}" &&
 PACKAGE_DIR="artifacts/python-$RECIPE" &&
 python3 tools/package_python.py --recipe "$RECIPE" \
-  --assets-dir artifacts/edu-sdk-2026.10.31 --output "$PACKAGE_DIR" &&
+  --assets-dir artifacts/edu-sdk-2026.11.18 --output "$PACKAGE_DIR" &&
 python3 tools/package_python.py --verify "$PACKAGE_DIR"
 ```
 
@@ -68,7 +68,7 @@ metadata. Use `fetch_sdk.py --profile all` only when the full SDK asset set is n
 The tar contains the `recipes/` package layout needed by `python -m` and applicable
 LICENSE/NOTICE files. It contains neither a venv nor SDK/native binaries.
 
-The tool's `base` profile covers SDK-only operations such as state, message metadata and ASR.
+The tool's `base` profile covers SDK-only operations such as state, audio-frame metadata and input-end events.
 Audio/video payload saving additionally needs `numpy==2.2.6`; camera decoding also needs
 `av==16.1.0`. These are not included in this package or SDK Release. An application using
 those options needs its own dependency package matched to ARM64 and the device's Python ABI

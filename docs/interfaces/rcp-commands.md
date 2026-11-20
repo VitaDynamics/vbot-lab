@@ -54,7 +54,7 @@ Control head angles or a head trajectory. Resource: HEAD. Choose one input: targ
 | --- | --- | --- | --- |
 | `method` | `HeadMethod` | ANGLE_CONTROL | ANGLE_CONTROL or STREAM; actual current dispatch is selected by the populated angle/path fields. Keep method consistent with that selection. |
 | `pre_check` | `bool` | false | Boolean. With a trajectory, preparation returns the head to neutral; it can move the head. Without a trajectory the precheck returns early. |
-| `duration_ms` | `int` | 0 | Target-angle duration in ms; current RCP implementation clamps values below 5000 to 5000. Not a trajectory playback timeout. |
+| `duration_ms` | `int` | 0 | ANGLE_CONTROL time budget in ms: positive values are forwarded unchanged; omitted/nonpositive values use 5000 ms. Expiry is not proof of reaching the target and does not increase movement speed. Not a trajectory playback timeout. |
 | `loop_enabled` | `bool` | false | Repeat the head trajectory when true; provide explicit cancellation and a finite phase rather than expecting natural completion. |
 | `playback_rate` | `float` | 1.0 | Float in schema; current RCP head task does not consume this field. Keep 1.0; do not rely on it to change speed. |
 | `target_angles` | `[float]` | Absent | Exactly two finite radians [pitch, yaw]. Physical bounds depend on robot configuration; no universal safe range is supplied by this schema. Do not guess limits. |
@@ -118,6 +118,7 @@ Primitive visual-navigation operation. Movement and navigation providers must be
 | `y` | `float` | 0.0 | NAV_TO_POINT finite y coordinate in metres, interpreted in frame. |
 | `frame` | `string` | Absent | NAV_TO_POINT coordinate frame string; omission retains task default local. Use a documented provider frame, not an assumed ROS map/odom alias. |
 | `stop_distance` | `float` | 0.0 | Finite nonnegative arrival tolerance in metres for navigation. 0 is the wire default; do not interpret it as guaranteed zero-error arrival. |
+| `max_xvel` | `float` | 0.0 | NAV_TO_POINT only, m/s. 0 keeps the legacy 0.5 m/s cap; a positive value sets a task-local forward-speed ceiling subject to VLN and locomotion limits; negative or non-finite values are rejected as invalid input. Does not change the persistent follow speed; other methods ignore it. |
 
 method enum: `FOLLOW`, `ROAM`, `NAV_TO_POINT`, `COME_TO_ME`, `WALK`, `STOP`, `WALK_WITH_MPC`.
 
@@ -132,9 +133,26 @@ Owns a visual-navigation session: enter the needed motion mode, run navigation a
 | `y` | `float` | 0.0 | NAV_TO_POINT finite y coordinate in metres, interpreted in frame. |
 | `frame` | `string` | Absent | NAV_TO_POINT coordinate frame string; omission retains task default local. Use a documented provider frame, not an assumed ROS map/odom alias. |
 | `stop_distance` | `float` | 0.0 | Finite nonnegative arrival tolerance in metres for navigation. 0 is the wire default; do not interpret it as guaranteed zero-error arrival. |
+| `max_xvel` | `float` | 0.0 | Same NAV_TO_POINT speed contract as VlnCommand.max_xvel; applies only when method is NAV_TO_POINT and is ignored otherwise. |
 | `prompt` | `string` | Absent | Non-empty string for SYNC_SEMANTIC_NAV / ASYNC_SEMANTIC_NAV. Other methods do not forward it. |
 
 method enum: `FOLLOW`, `ROAM`, `NAV_TO_POINT`, `COME_TO_ME`, `WALK`, `SYNC_SEMANTIC_NAV`, `ASYNC_SEMANTIC_NAV`.
+
+### Navigation speed scope
+
+For both commands, native JSON uses `max_xvel`; Python generated objects use
+`maxXvel`, and C++ message objects use `max_xvel`. This is a per-request forward-speed
+ceiling in m/s for `NAV_TO_POINT`, not a constant-speed command or a persistent FOLLOW
+setting. Omitted/zero values retain the legacy 0.5 m/s cap and its existing interaction
+with the follow-speed setting. Positive ceilings remain bounded by configured navigation
+and locomotion limits; startup, turning, avoidance or arrival can reduce actual speed.
+
+For NAV requests, RCP rejects negative, non-finite or nonnumeric values, including booleans;
+other methods ignore the field. Small positive ceilings are not raised to the startup
+minimum. Zero selects the default; it is **not** a stop operation.
+`VlnSessionCommand` also owns mode entry/restoration; adding a speed ceiling to
+`VlnCommand` does not give it that lifecycle. Keep a finite node timeout and wait for
+the RCP terminal result, not only request admission.
 
 ## LocomotionCommand
 

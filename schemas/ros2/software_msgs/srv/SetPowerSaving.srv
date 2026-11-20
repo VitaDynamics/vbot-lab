@@ -1,0 +1,8 @@
+uint8 TYPE_CHARGING_SLEEP = 1
+uint8 TYPE_POSE_SLEEP = 2
+
+uint8 type
+bool enable
+---
+bool success
+string message

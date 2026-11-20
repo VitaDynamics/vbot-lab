@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="AGENTS.zh-CN.md">中文</a></p>
 
-Help users build applications for VBOT EDU robots. Start with the task and load only its
+Help users build applications for VBOT EDU and DEV robots. Start with the task and load only its
 relevant references; this repository is not a device runtime.
 
 ## Route the task
@@ -15,7 +15,7 @@ relevant references; this repository is not a device runtime.
 | Select application / SDK versions or check compatibility | [Versions and compatibility](docs/compatibility.md), [release configuration](catalog/release.md), then the linked SDK guide |
 | Read hardware telemetry or camera data | [sensors](docs/interfaces/sensors.md) or [cameras](docs/interfaces/cameras.md); select only the required streams |
 | Detect a person, greet on appearance, or use human keypoints | [perception interfaces](docs/interfaces/perception.md); start with built-in detections, not AprilTags or a new video/model pipeline |
-| Receive audio, recognized text, or voice events | [audio](docs/interfaces/audio.md); one family for frames, ASR, voice events, and UWB input completion |
+| Receive robot-body/UWB audio or input-completion events | [audio](docs/interfaces/audio.md); one family for audio frames and UWB input completion |
 | Observe or control motion | [locomotion](docs/interfaces/locomotion.md); distinguish state/report subscriptions from control inputs |
 | Observe system/display state or use ear lights | [system and peripherals](docs/interfaces/system-peripherals.md) |
 | Compose, execute or trace an RCP task | [DAG authoring](docs/guides/rcp-dag.md), [RCP presets](docs/guides/rcp-presets.md), then [RCP](docs/interfaces/rcp.md); distinguish preset goals from nodes and preserve resource/lifecycle constraints |
@@ -37,9 +37,9 @@ Resolve a linked Skill to its physical checkout before using its relative resour
 
 ## Facts and scope
 
-- For V1.6.0 application development, use `release/V1.6.0`, following the [quickstart](docs/getting-started/README.md). Check the current branch before setup; preserve local changes and do not silently replace the selected branch with `main`, an iteration branch or a tag. A user-created application branch may be based on this release branch.
-- The current EDU release target is `foot_quadruped`. Other robot types are planned, even when hardware or connection guides are shared.
-- Supported robot applications are `V1.6.0-15` and `V1.6.0-17`, listed in the robot profile's `supported_application_versions`. `application_version` is the default pairing (`V1.6.0-17`), not the entire compatibility list. Keep application versions separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for unlisted releases or a continuous range.
+- For V1.7.0-6 application development, use `pre_release/V1.7.0.X`, following the [quickstart](docs/getting-started/README.md). Check the current branch before setup; preserve local changes and do not silently replace the selected branch with `main`, an older release branch or a tag. A user-created application branch may be based on this version-family branch.
+- The current release target is `foot_quadruped` in the EDU and DEV series. Both series share the documented software interfaces, Schema, SDK and Recipes; select the same `robot_type` and retain existing `edu` paths and package names. Other robot types are planned, even when hardware or connection guides are shared.
+- The supported robot application is `V1.7.0-6`, listed in the robot profile's `supported_application_versions`. `application_version` is the default pairing (`V1.7.0-6`), not the entire compatibility list. Keep application versions separate from SDK, Schema, system-image and peripheral-firmware versions; do not infer support for unlisted releases or a continuous range.
 - Use the capability catalog as an index, not proof of live availability. Unknown firmware / SDK versions, routes, and ROS2 mappings stay unknown; do not invent them.
 - Use the published wheel pairing in the Python SDK guide and the checked-in public Schema. Preserve Aorta package names and APIs. Recipes have offline previews and explicit device execution; building a target does not verify live compatibility.
 - Device Aorta CLI access is separate from SDK integration. ROS 2 uses a device-local bridge subset; use documented mappings and limitations, not identical-name assumptions.
@@ -68,15 +68,16 @@ on the homepage; do not repeat audience statements in each chapter.
 Prioritize correct, complete usage workflows. Keep device test reports and sampled performance
 or accuracy results out of usage guides.
 Retain interface contracts, operating limits, completion checks, and troubleshooting steps.
-Use `VBOT EDU robots` / `VBOT EDU 机器人` with this capitalization.
+Use `VBOT EDU and DEV robots` / `VBOT EDU／DEV 机器人` for the shared product scope. Keep EDU and DEV uppercase; retain published package, resource and configuration names.
 Read [Contributing](CONTRIBUTING.md) before changing layout or shared robot documentation.
 Prepare VBOT Lab version iterations on the selected `pre_release/V<major>.<minor>.<patch>.X`
 branch for that version family; do not reuse one family branch for all later versions.
-Iteration branches allow direct commits and pushes without a PR, after user confirmation.
-Keep `main` for the latest formal release and `release/V1.6.0` for V1.6.0 development.
-The formal snapshot is `Rel/V1.6.0`; the V1.6.0 iteration is complete.
+Only repository maintainers may commit and push updates to repository branches.
+Other contributors work in forks and submit pull requests for maintainer review.
+Keep `main` for the latest formal release. Current V1.7.0 work uses `pre_release/V1.7.0.X`;
+`release/V1.6.0` and `Rel/V1.6.0` retain the earlier formal version, not the current development entry.
 Do not open a release-promotion PR or publish a
 release unless explicitly requested. See [collaboration](.github/WORKFLOWS.md).
 Validate with `python3 tests/check_repository.py`, `python3 tests/test_agent_workspace.py`,
 and the applicable Bazel targets. Keep changes local and uncommitted for review first;
-commit and push only after the user confirms the changes and requests synchronization.
+commit and push only after a repository maintainer confirms the changes and requests synchronization.

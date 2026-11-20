@@ -1,0 +1,47 @@
+// System Power Saving Set Policy Service
+//
+// Aorta service schema for `/system/power_saving/set_policy`.
+// Mirrors `software_msgs/srv/SetPowerSaving`:
+//   - request `PowerSavingPolicyType type` + `bool enable` -> persist the
+//     auto-trigger policy for one sleep mode; the ROS2 server (SSM
+//     power_saving_manager) routes TYPE_CHARGING_SLEEP to SetChargingEnable
+//     and TYPE_POSE_SLEEP to SetPoseEnable
+//   - response carries Aorta's standard ServiceStatus (SUCCESS == 0) with an
+//     optional message; ServiceStatus is the single authoritative result
+//
+// The enum values mirror the .srv constants verbatim
+// (TYPE_CHARGING_SLEEP=1, TYPE_POSE_SLEEP=2) with a leading UNKNOWN=0, per
+// the repository schema guide (MODE_* -> enum mapping); new modes can be
+// appended without breaking the wire format.
+//
+// Kept in a standalone file (separate BFBS / schema hash) from the
+// wire-frozen, already-deployed `power_saving_enable.fbs`: adding tables to
+// that file would change its BFBS and therefore the deployed
+// PowerSavingEnable service hash, breaking rolling deployments (same reason
+// calib_param_upload_service.fbs is standalone).
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.system;
+
+/// Mirrors SetPowerSaving.srv TYPE_* constants (1=CHARGING_SLEEP, 2=POSE_SLEEP).
+enum PowerSavingPolicyType: ubyte {
+  UNKNOWN = 0,
+  CHARGING_SLEEP = 1,
+  POSE_SLEEP = 2,
+}
+
+table PowerSavingSetPolicyRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  type: PowerSavingPolicyType = UNKNOWN (id: 1);
+  enable: bool = false (id: 2);
+}
+
+table PowerSavingSetPolicyResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+}
+
+root_type PowerSavingSetPolicyRequest;

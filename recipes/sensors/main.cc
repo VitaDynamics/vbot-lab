@@ -14,13 +14,29 @@ int main(int argc, char **argv) {
       "battery", [](const std::string &stream, const auto &bytes) {
         if (stream == "battery") {
           const auto *m = Decode<bms::BmsState>(bytes);
+          const auto number = [](auto value) {
+            return value ? N(*value) : "null";
+          };
+          const auto smart_enabled = m->smart_charge_enabled();
+          const auto alarm_full = m->alarm_full();
           return Object(
               {{"timestamp_ns", std::to_string(m->sensor_timestamp_ns())},
                {"voltage_v", N(m->voltage_mv() / 1000.0)},
                {"current_a", N(m->current_ma() / 1000.0)},
                {"soc_percent", N(m->soc_percent())},
                {"alarm", N(m->alarm())},
-               {"charger_connected", B(m->is_charger_connected())}});
+               {"alarm_full", number(alarm_full)},
+               {"effective_alarm", N(alarm_full ? *alarm_full : m->alarm())},
+               {"charger_connected", B(m->is_charger_connected())},
+               {"charge_state", N(int(m->charge_state()))},
+               {"charge_source", N(int(m->charge_source()))},
+               {"pd_role", N(int(m->pd_role()))},
+               {"p_positive_voltage_mv", number(m->p_positive_voltage_mv())},
+               {"recharge_thresh_percent", number(m->recharge_thresh_percent())},
+               {"record_counts_start", number(m->record_counts_start())},
+               {"record_counts_end", number(m->record_counts_end())},
+               {"smart_charge_soc_limit", number(m->smart_charge_soc_limit())},
+               {"smart_charge_enabled", smart_enabled ? B(*smart_enabled) : "null"}});
         }
         if (stream == "imu" || stream == "lidar-imu") {
           const auto *m = Decode<aorta::topic::sensor::Imu>(bytes);

@@ -2,7 +2,7 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-为 VBOT EDU 机器人应用提供软件开发库。
+为 VBOT EDU／DEV 机器人应用提供软件开发库。
 
 可选择 [Aorta Python SDK](aorta/python/README.zh-CN.md) 或 [Aorta C++ SDK](aorta/cpp/README.zh-CN.md)。
 软件包、原生运行库与可安装制品通过 SDK Release 附件分发（`edu-sdk-*`）。

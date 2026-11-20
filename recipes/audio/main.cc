@@ -1,5 +1,4 @@
 #include "RawAudio_generated.h"
-#include "asr_result_generated.h"
 #include "audio_done_generated.h"
 #include "recipes/cpp_common.h"
 #include <tuple>
@@ -10,11 +9,9 @@ int main(int argc, char **argv) {
     const std::map<std::string, std::string> routes = {
         {"body", "/raw_audio_dump"},
         {"uwb", "/audio/uwb_adpcm_segment"},
-        {"asr", "/speech/asr_result"},
         {"uwb-end", "/uwb/audio_done"}};
     const auto &route = routes.at(args.source);
-    if (recipe::Preview(args, route,
-                        ",\"provider\":" + recipe::Json(args.provider)))
+    if (recipe::Preview(args, route))
       return 0;
     auto node = recipe::OpenNode("vbot_lab_cpp_audio");
     recipe::Output output(args.output);
@@ -24,21 +21,7 @@ int main(int argc, char **argv) {
     int count = 0;
     while (count < args.count) {
       auto bytes = inbox.Next(end);
-      if (args.source == "asr") {
-        const auto *message =
-            recipe::Decode<aorta::topic::speech::AsrResult>(bytes);
-        int provider = static_cast<int>(message->provider());
-        if (args.provider != "all" &&
-            provider != (args.provider == "body" ? 1 : 2))
-          continue;
-        const char *source = provider == 1   ? "BODY"
-                             : provider == 2 ? "TAG"
-                                             : "UNKNOWN";
-        recipe::Emit(
-            "\"provider\":" + recipe::Json(source) +
-            ",\"provider_value\":" + std::to_string(provider) +
-            ",\"text\":" + recipe::Json(recipe::Text(message->text())));
-      } else if (args.source == "uwb-end") {
+      if (args.source == "uwb-end") {
         const auto *message = recipe::Decode<aorta::uwb::AudioDoneEvent>(bytes);
         const auto *context = message->user_interaction_context();
         recipe::Emit(

@@ -3,7 +3,7 @@
 #
 # fbs type:  aorta.services.rcp.VlnSessionCommand [table]
 # fbs path:  schemas/service/rcp/function_input.fbs
-# sha256:    98a537a9c943483df02dd5dc10a14468d9bb2e7ae7a55d33fbc76cecac8f1d0d
+# sha256:    2fb74890e17fb290de73201875411ffee46468301f3f8111992c229c0d6f425d
 # root type: no
 #
 # enum aorta.services.rcp.VlnSessionMethod; constants in aorta_msgs/msg/VlnSessionMethod
@@ -13,3 +13,6 @@ float32 y
 string frame
 float32 stop_distance
 string prompt
+# Same NAV_TO_POINT speed contract as VlnCommand.max_xvel.
+# Applies only when method == NAV_TO_POINT; ignored for all other methods.
+float32 max_xvel

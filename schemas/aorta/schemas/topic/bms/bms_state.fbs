@@ -48,6 +48,23 @@ enum ChargeState : ubyte {
   FULL = 3,
 }
 
+// Physical input source, independent of charge progress. PD takes priority
+// when both inputs are present. UNKNOWN never grants a docking motion exception.
+enum ChargeSource : ubyte {
+  NONE = 0,
+  PD = 1,
+  DOCK = 2,
+  UNKNOWN = 255,
+}
+
+// Role of an attached PD port, sampled in the same cycle as charge_source.
+// Detached ports and failed queries publish UNKNOWN, never a default SINK.
+enum PdRole : ubyte {
+  UNKNOWN = 0,
+  SINK = 1,
+  SOURCE = 2,
+}
+
 table BmsState {
   aorta_header: aorta.sys.AortaHeader (id: 0);
   sensor_timestamp_ns: ulong          (id: 1);
@@ -84,6 +101,7 @@ table BmsState {
   mos_pre_discharge_is_open: ubyte = 0 (id: 24);
 
   // Alarm information
+  // Legacy low 16 bits. New readers prefer alarm_full when present.
   alarm: ushort = 0                  (id: 25);
   vendor_alarm: uint = 0             (id: 26);
 
@@ -111,6 +129,32 @@ table BmsState {
   // obtained from a valid query in this publication cycle.
   button_press_count: ushort = 0 (id: 36);
   button_press_count_valid: bool = false (id: 37);
+
+  // Current-cycle result; missing/failed observations must publish UNKNOWN.
+  // DOCK requires confirmation that no PD sink is attached.
+  charge_source: ChargeSource = UNKNOWN (id: 38);
+
+  // PD input is confirmed only by charge_source=PD AND pd_role=SINK.
+  // SOURCE includes powering an external accessory. Missing field is UNKNOWN.
+  pd_role: PdRole = UNKNOWN (id: 39);
+
+  // Complete alarm bitmask. Absence means a legacy publisher or no valid
+  // current-cycle BMS sample; zero is a valid sample with no active alarms.
+  alarm_full: uint = null (id: 40);
+
+  // Extended battery status. Omitted when the server sends the legacy
+  // shorter status packet, the query fails, or this product lacks the data.
+  p_positive_voltage_mv: uint = null (id: 41);
+  recharge_thresh_percent: float = null (id: 42);
+  record_counts_start: uint = null (id: 43);
+  record_counts_end: uint = null (id: 44);
+
+  // Battery-reported smart-charge settings, sampled in this collection cycle.
+  // Both are omitted on unsupported firmware, invalid reply or query failure.
+  // soc_limit is 80..100 percent; enabled=false is a valid disabled setting.
+  // A successful set request alone must never populate these fields.
+  smart_charge_soc_limit: ubyte = null (id: 45);
+  smart_charge_enabled: bool = null (id: 46);
 }
 
 root_type BmsState;

@@ -8,6 +8,10 @@ SDK requirement, Recipe, and verification boundary without reading every documen
 For source, application, SDK, Schema and image pairing, see the
 [release configuration](release.md) and [release.json](release.json).
 
+EDU and DEV share this catalog and its software interfaces. Select `robot_type` by robot
+shape: both four-legged series use `--robot-type foot_quadruped`.
+See [compatibility](../docs/compatibility.md) for the supported application version and product scope.
+
 ## Query the catalog
 
 From the checkout root, using Python 3.10+:
@@ -68,8 +72,8 @@ device's interface availability and operating prerequisites before following the
 SDK metadata records integration and version separately. Robot profiles distinguish the current
 release target from planned releases; empty `models` means exact models are not recorded.
 The robot profile's `supported_application_versions` explicitly lists `V1.6.0-15` and
-`V1.6.0-17` for `foot_quadruped`. `application_version` remains the default pairing
-(`V1.6.0-17`), including package metadata; it is `null` for unreleased types.
+`V1.7.0-6` for `foot_quadruped`. `application_version` remains the default pairing
+(`V1.7.0-6`), including package metadata; it is `null` for unreleased types.
 Queries return these fields under `robot`. A profile without a support list declares
 only its non-null default version. These are application versions, not SDK or system-image
 versions, a continuous range or "this version or newer" compatibility.
@@ -103,7 +107,7 @@ Its implementations fields provide both source files and their exact Bazel targe
 
 Do not copy topic names, fields, units, or HTTP route lists into this index by hand.
 They remain in the referenced Schema/contract sources; generate structural indexes from those
-sources when integrated. The supported applications are `V1.6.0-15` and `V1.6.0-17`; check the installed application
+sources when integrated. The supported application is `V1.7.0-6`; check the installed application
 and runtime availability on the selected device.
 
 Cameras, audio, locomotion and RCP remain grouped by interface family; the `recipe` field links to the

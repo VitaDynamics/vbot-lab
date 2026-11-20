@@ -10,19 +10,20 @@ include "schemas/shared/service_common/status.fbs";
 
 namespace aorta.services.locomotion;
 
-// Append-only. Runtime-control command vocabulary; currently only
-// TRY_RESUME_PILOT is defined.
+// Append-only runtime-control command vocabulary.
 enum RuntimeControlCommand : ubyte {
   UNKNOWN = 0,
   TRY_RESUME_PILOT = 1,
+  SET_COMMAND_SMOOTHING_OVERRIDE = 2,
+  CLEAR_COMMAND_SMOOTHING_OVERRIDE = 3,
 }
 
 // Outcome vocabulary shared by all runtime-control commands. Semantic
 // contract: APPLIED == the runtime event was dispatched; NOT_APPLICABLE ==
 // the current action/state cannot honor the command (e.g. the pilot is not
 // the active action or is not in a resumable state); FAILED == the request
-// reached the service but could not be executed. ALREADY_APPLIED and
-// CONFLICT are reserved vocabulary.
+// reached the service but could not be executed. CONFLICT means a different
+// owner holds the override. ALREADY_APPLIED is reserved vocabulary.
 enum RuntimeControlOutcome : ubyte {
   UNSPECIFIED = 0,
   APPLIED = 1,
@@ -35,6 +36,20 @@ enum RuntimeControlOutcome : ubyte {
 table RuntimeControlRequest {
   aorta_header: aorta.sys.AortaHeader (id: 0);
   command: RuntimeControlCommand = UNKNOWN (id: 1);
+  // Smoothing commands only: unique caller session, nonempty, at most 128 bytes.
+  // SET applies to the active NORMAL policy without changing its configured
+  // default or resetting filtering/model history. Another active owner conflicts.
+  // CLEAR releases only this owner; action deactivation also releases it.
+  // An expired or released lease must not be renewed under the same owner.
+  owner: string (id: 2);
+  cmd_smoothing_ratio: double = 0 (id: 3); // SET: finite, 0 <= ratio < 1.
+  // SET: CLOCK_REALTIME Unix nanoseconds (C++ system_clock), never PHC time.
+  // Caller and server must share this clock domain. At validation, remaining
+  // time must be > 0 and <= 3 seconds; otherwise INVALID_REQUEST, no clamping.
+  // Request 2.5 seconds and renew before expiry, leaving 0.5 seconds below the
+  // upper bound. The server converts only the remaining time to a monotonic
+  // lease; queueing cannot extend it and stale requests cannot revive it.
+  valid_until_ns: ulong = 0 (id: 4);
 }
 
 table RuntimeControlResponse {

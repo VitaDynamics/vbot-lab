@@ -2,9 +2,9 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-The default path is **Python + foot_quadruped EDU + a read-only state subscription**.
-It targets robot applications `V1.6.0-15` and `V1.6.0-17`, development branch `release/V1.6.0` and SDK Release
-`edu-sdk-2026.10.31`.
+The default path is **Python + foot_quadruped EDU / DEV + a read-only state subscription**.
+It targets robot application `V1.7.0-6`, development branch `pre_release/V1.7.0.X` and SDK Release
+`edu-sdk-2026.11.18`.
 The goal is three decoded `/locomotion/status` samples followed by
 normal program exit. No motion, audio/video capture or autostart is involved.
 
@@ -18,22 +18,22 @@ normal program exit. No motion, audio/video capture or autostart is involved.
 ## 1. Select the matching source — host
 
 Check the [robot-type guide](../robots/README.md) and [compatibility matrix](../compatibility.md).
-Four-wheeled and bipedal EDU software are not part of this release. Clone normally, then
-select the release branch for the V1.6.0 family:
+Four-wheeled and bipedal software are not part of this release. Clone normally, then
+select the development branch for the V1.7.0 family:
 
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout release/V1.6.0
+git checkout pre_release/V1.7.0.X
 ```
 
 For an existing checkout, preserve local changes, run `git fetch origin`, then
-`git checkout release/V1.6.0`. Check that `git branch --show-current` prints
-`release/V1.6.0` before continuing. If the remote does not provide the branch, stop;
-do not substitute `main`, an iteration branch or a tag. Confirm that the matching
+`git checkout pre_release/V1.7.0.X`. Check that `git branch --show-current` prints
+`pre_release/V1.7.0.X` before continuing. If the remote does not provide the branch, stop;
+do not substitute `main`, an older release branch or a tag. Confirm that the matching
 SDK Release is available before downloading its assets. See the
 [release configuration](../../catalog/release.md) for the source and component pairing.
-If you want to edit this checkout, create a working branch from the release branch first:
+If you want to edit this checkout, create a working branch from this version-family branch first:
 
 ```bash
 git switch -c my-edu-app
@@ -79,11 +79,11 @@ the [SDK guide](../../packages/aorta/python/README.md) into the same mounted dir
 The helper validates and reuses those files without downloading them again.
 
 ```bash
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.11.18 &&
 python3 tools/in_container.py -- bazel build //recipes/subscribe-state:main &&
 python3 tools/in_container.py -- bazel run //recipes/subscribe-state:main &&
 python3 tools/package_python.py --recipe subscribe-state \
-  --assets-dir artifacts/edu-sdk-2026.10.31 --output artifacts/first-state &&
+  --assets-dir artifacts/edu-sdk-2026.11.18 --output artifacts/first-state &&
 python3 tools/package_python.py --verify artifacts/first-state
 ```
 

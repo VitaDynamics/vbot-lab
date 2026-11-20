@@ -4,8 +4,8 @@
 
 Use this family for image capture/decoding, calibrated image processing, and tag-based interaction.
 
-For a Python SDK implementation, see the [camera Recipe](../../recipes/camera/README.md): source, Bazel target, offline preview and explicit device execution. The interface semantics below remain authoritative.
-The topic table below lists read-only pub/sub outputs for `foot_quadruped` EDU.
+For Python/C++ implementations, see the [camera Recipe](../../recipes/camera/README.md): source, Bazel targets, deployment and explicit device execution. The interface semantics below remain authoritative.
+The topic table below lists read-only pub/sub outputs for `foot_quadruped` EDU / DEV.
 Log in, complete [device shell setup](../getting-started/device-environment.md), and use
 the [interface table](aorta-ros2.md) for exact Aorta/ROS message types and mappings.
 
@@ -33,6 +33,43 @@ the [interface table](aorta-ros2.md) for exact Aorta/ROS message types and mappi
   only when that side is valid. Decision margin is not a person-detection confidence.
   A tag message does not by itself supply a metric robot pose; pose estimation additionally
   requires the tag's physical size and matching calibration/coordinate transforms.
+
+## Hardware decoding on S100
+
+For H.265 hardware decoding on the robot, use the **D-Robotics S100 native multimedia
+SDK**, specifically its MediaCodec APIs (`hb_mm_mc_*`). Follow the official
+[S100 codec guide](https://developer.d-robotics.cc/rdk_s_doc/en/Advanced_development/multimedia_development/S100/codec)
+for decoder configuration, input/output buffers and resource release.
+The Aorta SDK receives compressed video; decoding is a separate application step.
+
+The device image grants the `vbot` account read/write access to `/dev/vpu` through
+the `vpu` group. After SSH login, check the actual session without accessing the
+codec or changing permissions:
+
+```sh
+id -nG
+stat -c 'device=%n mode=%a group=%G' /dev/vpu
+if [ -c /dev/vpu ] && [ -r /dev/vpu ] && [ -w /dev/vpu ]; then
+  printf '%s\n' '/dev/vpu is readable and writable'
+else
+  printf '%s\n' '/dev/vpu is missing or not readable/writable' >&2
+  exit 1
+fi
+```
+
+Expect `vpu` in the session's groups, that group on the device node, and a successful
+permission check. This checks access only; decoder initialization, buffer allocation
+and frame output must still succeed in your application. If access fails, retain the
+output and contact support rather than changing device permissions.
+
+Use native SDK headers and libraries matching the delivered device software. Build
+ARM64 applications in the development container and deploy the executable and its
+required libraries through the [C++ deployment flow](../../packages/aorta/cpp/README.md#run-on-the-robot).
+Feed one subscribed H.265 stream to each decoder and respect the SDK's buffer ownership,
+output format and stride. Stop and release your own decoder on exit without interrupting
+the robot's camera services. The [S100 C++ hardware-decoding example](../../recipes/camera/README.md#c-s100-hardware-decoding)
+shows the complete build/deployment flow and borrowed NV12 buffer handling.
+The separate PyAV/FFmpeg paths do not select this native backend.
 
 ## JPEG snapshot dimensions
 

@@ -23,7 +23,7 @@ Python 3.10 or newer is required. Download the `aorta_sdk` wheel for the machine
 `linux_aarch64`, `linux_x86_64`, or `macosx_11_0_arm64` — plus `aorta_msgs` and
 `vbot_edu_msgs` from GitHub Releases. SDK downloads require network access.
 
-`vbot_edu_msgs` also requires `flatbuffers`; the `edu-sdk-2026.10.31` release attaches the
+`vbot_edu_msgs` also requires `flatbuffers`; the `edu-sdk-2026.11.18` release attaches the
 `flatbuffers` 25.12.19 wheel. Follow the [Aorta Python SDK guide](python/README.md) to
 install all four wheels from that release in a dedicated venv without package-index access.
 That guide also covers preparing dependencies for a robot without Internet access,
@@ -34,12 +34,12 @@ connection modes, and a runnable example.
 For Bazel examples, pinned versions, runtime deployment and optional camera decoding,
 follow the [C++ guide](cpp/README.md). The commands below describe the archive layout.
 
-Extract `aorta-cpp-sdk-<ver>-abi13-ubuntu22.04-<arch>.tar.zst` and
+Extract `aorta-cpp-sdk-<ver>-abi14-ubuntu22.04-<arch>.tar.zst` and
 `aorta-edu-schema-pack-<ver>-v4.tar.zst` into separate directories:
 
 ```bash
 mkdir -p sdk pack
-tar --zstd -xf aorta-cpp-sdk-<ver>-abi13-ubuntu22.04-<arch>.tar.zst -C sdk
+tar --zstd -xf aorta-cpp-sdk-<ver>-abi14-ubuntu22.04-<arch>.tar.zst -C sdk
 tar --zstd -xf aorta-edu-schema-pack-<ver>-v4.tar.zst -C pack
 ```
 
@@ -153,7 +153,7 @@ cmake --build build -j2
 LD_LIBRARY_PATH="$PWD/sdk/lib" ldd build/edu_bms_subscriber
 ```
 
-`ldd` must resolve `libaorta_core.so.13` and `libaorta_cpp.so` from the extracted
+`ldd` must resolve `libaorta_core.so.14` and `libaorta_cpp.so` from the extracted
 `sdk/lib` directory. Run every binary with `LD_LIBRARY_PATH="<sdk>/lib"` so the loader
 finds both libraries.
 
@@ -175,7 +175,7 @@ RECEIVED sensor_timestamp_ns=987654321 voltage_mv=49500
 
 On the robot, use the delivered session configuration. The S100 image ships GCC 11.4 but no
 CMake, so build aarch64 binaries on a workstation and copy the executable together with
-`libaorta_core.so.13` and `libaorta_cpp.so` to a user directory on the robot:
+`libaorta_core.so.14` and `libaorta_cpp.so` to a user directory on the robot:
 
 ```bash
 export ZENOH_SESSION_CONFIG_URI=/opt/vita/aorta/edu/edu_session.json5

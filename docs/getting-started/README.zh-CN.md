@@ -2,8 +2,8 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-默认主路径是 **Python＋四足 EDU＋只读状态订阅**。
-适配机器人应用 `V1.6.0-15`、`V1.6.0-17`、开发分支 `release/V1.6.0` 和 SDK Release `edu-sdk-2026.10.31`。
+默认主路径是 **Python＋四足 EDU／DEV＋只读状态订阅**。
+适配机器人应用 `V1.7.0-6`、开发分支 `pre_release/V1.7.0.X` 和 SDK Release `edu-sdk-2026.11.18`。
 目标是收到三条解码后的 `/locomotion/status` 状态并正常退出，不涉及运动、音视频采集或自启动。
 
 | 步骤 | 执行位置 | 成功结果 | 失败后查看 |
@@ -16,20 +16,20 @@
 ## 1. 选择配套源码——宿主机
 
 先核对[设备类型指南](../robots/README.zh-CN.md)和[兼容矩阵](../compatibility.zh-CN.md)。
-当前软件不包含四轮或双足 EDU 发布。正常克隆，再切换到 V1.6.0 版本族的正式分支：
+当前软件不包含四轮或双足发布。正常克隆，再切换到 V1.7.0 版本族的开发分支：
 
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout release/V1.6.0
+git checkout pre_release/V1.7.0.X
 ```
 
-已有仓库先保留本地修改，执行 `git fetch origin`，再执行 `git checkout release/V1.6.0`。
-继续前确认 `git branch --show-current` 输出 `release/V1.6.0`。
-如果远程没有该分支，先停止，不改用 `main`、迭代分支或 tag。
+已有仓库先保留本地修改，执行 `git fetch origin`，再执行 `git checkout pre_release/V1.7.0.X`。
+继续前确认 `git branch --show-current` 输出 `pre_release/V1.7.0.X`。
+如果远程没有该分支，先停止，不改用 `main`、旧版本正式分支或 tag。
 下载 SDK 制品前也要确认配套 Release 已提供。
 源码与组件配套见[发布配置](../../catalog/release.zh-CN.md)。
-如需修改该仓库，从正式分支创建工作分支：
+如需修改该仓库，从该版本族分支创建工作分支：
 
 ```bash
 git switch -c my-edu-app
@@ -69,11 +69,11 @@ C++ Recipe 构建范围见 [C++ SDK 指南](../../packages/aorta/cpp/README.zh-C
 清单、校验文件和许可证下载到同一挂载目录；工具会校验并复用已有文件，不重复下载。
 
 ```bash
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.11.18 &&
 python3 tools/in_container.py -- bazel build //recipes/subscribe-state:main &&
 python3 tools/in_container.py -- bazel run //recipes/subscribe-state:main &&
 python3 tools/package_python.py --recipe subscribe-state \
-  --assets-dir artifacts/edu-sdk-2026.10.31 --output artifacts/first-state &&
+  --assets-dir artifacts/edu-sdk-2026.11.18 --output artifacts/first-state &&
 python3 tools/package_python.py --verify artifacts/first-state
 ```
 

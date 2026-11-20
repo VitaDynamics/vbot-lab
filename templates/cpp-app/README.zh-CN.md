@@ -5,8 +5,8 @@
 这是以只读健康监测为起点的独立 C++17／Bazel 工作区。
 只订阅 /locomotion/status、/bms_state 与 /system/sm_status，
 不发布控制指令、不调用 service／action，也不采集音视频。
-配套 foot_quadruped 应用 V1.6.0-15、V1.6.0-17、C++ SDK 2026.10.20／ABI 13，
-以及 SDK Release edu-sdk-2026.10.31 中的 Schema pack 2026.10.20-v4。
+配套 foot_quadruped 应用 V1.7.0-6、C++ SDK 2026.11.15／ABI 14，
+以及 SDK Release edu-sdk-2026.11.18 中的 Schema pack 2026.11.18-v4。
 
 ## 项目内容
 
@@ -29,13 +29,13 @@ APP.json 记录语言、SDK 配套、构建目标和运行配置清单，是项�
 bazel test //:model_test
 ```
 
-按 [C++ SDK 指南](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/packages/aorta/cpp/README.zh-CN.md)
+按 [C++ SDK 指南](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/packages/aorta/cpp/README.zh-CN.md)
 准备已校验的原生与 ARM64 SDK 制品及共用 Schema。
 将 SDK_ARTIFACTS 替换为它们的实际父目录，不必放在参考仓库中。
 首次 Bazel 构建可能需要联网获取公共构建规则；应用的接入规则不下载 SDK 或编译器。
 
 ```bash
-SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.10.31 &&
+SDK_ARTIFACTS=/workspace/sdk/edu-sdk-2026.11.18 &&
 export AORTA_CPP_SDK_DIR="$SDK_ARTIFACTS/cpp-sdk-x86_64" &&
 export AORTA_EDU_SCHEMA_DIR="$SDK_ARTIFACTS/edu-schema" &&
 bazel build //:main &&
@@ -76,14 +76,14 @@ PACKAGE_DIR=$(mktemp -d /tmp/vbot-cpp-app-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
 cp -L bazel-bin/main "$PACKAGE_DIR/bin/health-monitor" &&
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
 cp config.json APP.json "$PACKAGE_DIR/" &&
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
   "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
-file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/bin/health-monitor" &&
 (cd "$PACKAGE_DIR" && find bin lib licenses config.json APP.json -type f -exec sha256sum {} + > SHA256SUMS) &&
 printf 'Package directory: %s\n' "$PACKAGE_DIR"
@@ -138,7 +138,7 @@ printf '%s\n' "$LDD_OUTPUT" &&
 重新登录后，进入同一目录并再次设置三个运行变量即可，无需重新安装。
 Ctrl+C 或时长到期即可停止，不修改服务、自启动、ACL 或资源配置。
 
-连接、环境及接口说明见 [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0)。
-排障使用 [C++ 路径](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.zh-CN.md#cpp)，不需要安装 Python wheel。
+连接、环境及接口说明见 [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/pre_release/V1.7.0.X)。
+排障使用 [C++ 路径](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/docs/development/diagnostics.zh-CN.md#cpp)，不需要安装 Python wheel。
 请在审阅报告后到 [Vbot 超能社区](https://forum.vbot.cn/)反馈可复现问题，
 不分享凭据或会话配置。

@@ -6,7 +6,7 @@ Python/C++ 只读示例见 [sensors Recipe](../../recipes/sensors/README.zh-CN.m
 
 这些输出用于传感器接入、设备看板和硬件故障提示，均为 pub/sub 订阅，
 不是传感器配置或执行器指令。先完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)。
-范围为 `foot_quadruped` EDU；准确的 Aorta／ROS 类型及映射见[接口表](aorta-ros2.zh-CN.md)，
+范围为 `foot_quadruped` EDU／DEV；准确的 Aorta／ROS 类型及映射见[接口表](aorta-ros2.zh-CN.md)，
 字段以已安装固件交付的 Schema 为准。
 
 ## 路由与数据含义
@@ -25,6 +25,26 @@ Python/C++ 只读示例见 [sensors Recipe](../../recipes/sensors/README.zh-CN.m
 | `/lowlevel/servo_status` | 按 ID／名称识别的逐舵机 `statuses`，含有效位、角度、温度和电气数据 | 关节看板；角度为度，角速度为度/秒，先检查每组有效位再读取字段 |
 | `/gnss/fix` | 原始定位状态、经纬度（度）、高度（米）、协方差、采集时间及有效位 | 地理位置；无定位或未知协方差不能当作有效的零位置 |
 | `/gnss/fusion` | 融合地理位置，含 `valid`、`source`、采集时间和位置 | 粗粒度全局定位；检查来源与新鲜度，不假定一定是新的卫星定位 |
+
+## 电池字段与缺失值
+
+原生 Aorta 电池数据以 [BmsState Schema](../../schemas/aorta/schemas/topic/bms/bms_state.fbs) 为准。
+充电器连接、输入来源与充电进度需要分开判断：
+
+| 字段 | 含义 |
+| --- | --- |
+| `charge_state` | UNKNOWN=0、IDLE=1、CHARGING=2、FULL=3；表示充电进度，不表示输入来源 |
+| `charge_source` | NONE=0、PD=1、DOCK=2、UNKNOWN=255；UNKNOWN 不能当作未接充电器 |
+| `pd_role` | UNKNOWN=0、SINK=1、SOURCE=2；只有同一条消息中 `charge_source=PD` 且 `pd_role=SINK` 才确认 PD 受电 |
+| `alarm`、`alarm_full` | `alarm` 是兼容旧接口的低 16 位。优先使用可选的 32 位 `alarm_full`，包括有效的零；缺失时才回退到旧值 |
+| `p_positive_voltage_mv`、`recharge_thresh_percent` | 电池回报的可选扩展电压（mV）与回充阈值（百分比） |
+| `record_counts_start`、`record_counts_end` | 电池回报的可选记录计数；存在时保留零值 |
+| `smart_charge_soc_limit`、`smart_charge_enabled` | 电池回报的可选智能充电 SOC 上限（80–100%）与开关；`false` 是有效的关闭状态 |
+
+旧发布端、不支持的电池固件或查询失败可能不提供可选字段。Python 返回 `None`，C++ 返回可选值；
+输出 JSON 时保留为 `null`，不能替换成 `0` 或 `false`。配置请求成功不等于电池已读回该设置。
+当前 ROS `lowlevel_msg/msg/BmsState` 不包含这些原生扩展字段，不要根据充电连接标志推算。
+[电池 Recipe](../../recipes/sensors/README.zh-CN.md) 的两种语言实现均保留上述区别。
 
 ## 读取与使用
 

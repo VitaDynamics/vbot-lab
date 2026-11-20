@@ -102,7 +102,7 @@ test -r "$AORTA_CPP_SDK_DIR/lib/libaorta_cpp.a" &&
 test -r "$AORTA_EDU_SCHEMA_DIR/include/locomotion_status_generated.h" &&
 g++ -dumpmachine &&
 aarch64-linux-gnu-g++ -dumpmachine &&
-file "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13"
+file "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14"
 ```
 
 Default g++ targets the container; aarch64-linux-gnu-g++ must report aarch64-linux-gnu.
@@ -130,7 +130,7 @@ printf '%s\n' "$LDD_OUTPUT" &&
 ```
 
 Expected: successful checksums, aarch64, and no unresolved dependencies. Resolve the packaged
-Aorta runtime from the application's lib directory. A missing libaorta_core.so.13 means check
+Aorta runtime from the application's lib directory. A missing libaorta_core.so.14 means check
 the complete package and LD_LIBRARY_PATH. Exec format error, GLIBC_* or GLIBCXX_* requires
 matching the compiler/SDK/system runtime; repackage rather than replacing device system libraries.
 For another C++ application, use its documented executable path and complete package inventory.

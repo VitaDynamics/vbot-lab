@@ -90,11 +90,11 @@ are needed for this workflow.
 
 ### Wired: with the published configuration
 
-This configuration and the full topic list below include audio, ASR, and camera streams.
+This configuration and the full topic list below include audio and camera streams.
 Obtain permission from people whose audio/video will be accessed before starting either.
 
 Robot software with the EDU router publishes `/opt/vita/aorta/edu/foxglove_bridge.yaml`.
-It selects every robot topic EDU programs can read, plus every topic your own EDU programs
+It selects every robot topic EDU / DEV user programs can read, plus every topic your own programs
 publish:
 
 ```bash
@@ -111,7 +111,7 @@ software has no EDU router; use the topic list below.
 ### Wired: with a topic list
 
 Name only the topics you need to reduce device and network load, especially for video
-variants and LiDAR. Remove the audio, ASR, and camera entries when they are not needed.
+variants and LiDAR. Remove the audio and camera entries when they are not needed.
 
 ```bash
 aorta-foxglove-bridge \
@@ -156,7 +156,6 @@ aorta-foxglove-bridge \
   --include slam/grid_map/compressed \
   --include slam/static_transforms \
   --include slam/status \
-  --include speech/asr_result \
   --include stereo_apriltag/detection \
   --include stereo_left/camera_info \
   --include stereo_right/camera_info \
@@ -164,8 +163,7 @@ aorta-foxglove-bridge \
   --include uwb/audio_done \
   --include uwb/head_touch \
   --include uwb/ranging \
-  --include uwb/state \
-  --include voice/event
+  --include uwb/state
 ```
 
 - `--group default` selects the Aorta group.

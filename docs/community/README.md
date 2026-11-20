@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-Building with VBOT EDU robots, stuck on a problem, or exploring a new idea?
+Building with VBOT EDU and DEV robots, stuck on a problem, or exploring a new idea?
 Search the forum first at [Vbot 超能社区](https://forum.vbot.cn/) for the feature name
 or error. Add useful details to a relevant existing topic, or open one focused question
 if you do not find an answer. You can also share applications and suggest improvements.

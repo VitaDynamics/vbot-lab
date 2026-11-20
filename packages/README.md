@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-Software libraries for applications built on VBOT EDU robots.
+Software libraries for applications built on VBOT EDU and DEV robots.
 
 Use the [Aorta Python SDK](aorta/python/README.md) or [Aorta C++ SDK](aorta/cpp/README.md).
 Its package, native runtime, and installable artifacts are distributed as

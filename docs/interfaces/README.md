@@ -5,14 +5,15 @@
 Use the [capability catalog](../../catalog/README.md) to select the relevant interface and check
 release scope. The catalog indexes these contracts; it does not establish live device availability.
 
-The interface reference targets robot applications **V1.6.0-15** and **V1.6.0-17** on `foot_quadruped` EDU;
+The interface reference targets robot application **V1.7.0-6** on `foot_quadruped` EDU / DEV;
 see [compatibility](../compatibility.md) for component pairing and configuration limits.
+EDU and DEV share the interfaces, Schema and usage described in these chapters.
 
 ## Agent extension interfaces
 
 The [Agent capability reference](agent/README.md) documents HTTP MCP, device Skills, and runtime AGENTS.md,
 including the [MCP connection configuration API](agent/mcp-config.md) and [content injection API](agent/content-api.md),
-for the current four-legged EDU scope. See the [integration guide](../guides/agent-integration.md)
+for the current four-legged EDU / DEV scope. See the [integration guide](../guides/agent-integration.md)
 for connection steps, protocol checks, and troubleshooting.
 Confirm interface availability against your device's firmware and runtime version.
 
@@ -30,7 +31,7 @@ retain their distinct types and operating conditions. Inspect only what the task
 | Sensors | [Hardware telemetry](sensors.md): battery, IMU, LiDAR, UWB, GNSS, and servo feedback |
 | Cameras | [Cameras and AprilTags](cameras.md): calibration, video decoding, and tag results |
 | Perception | [Object detection and human keypoints](perception.md): presence and gesture inputs |
-| Audio | [Audio and speech input](audio.md): audio frames, ASR text, voice events, and input completion |
+| Audio | [Audio and speech input](audio.md): audio frames, input completion, PCM playback and speech policy |
 | Locomotion | [State, reports, and control](locomotion.md): correlate requests, distinguish outputs from commands |
 | System and peripherals | [System, display, and lights](system-peripherals.md): state interpretation and brightness control |
 | RCP | [Tasks and tracing](rcp.md): action lifecycle, cancellation, and correlated events |

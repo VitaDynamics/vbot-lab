@@ -3,7 +3,7 @@
 <p align="center"><a href="device-environment.md">English</a> | 中文</p>
 
 在机器人上使用 Aorta 或 ROS 2 工具前，先配置 `vbot` 账户的 Bash 环境。
-本指南适用于提供 `/opt/vita` 公开工具路径的当前 `foot_quadruped` EDU 软件。
+本指南适用于提供 `/opt/vita` 公开工具路径的当前 `foot_quadruped` EDU／DEV 软件。
 请先核对[版本范围](../compatibility.zh-CN.md)；机器狗共用连接说明不代表软件支持相同。
 
 Aorta 是原生通信层。系统启动 `aorta_ros2_bridge`，兼容部分此前已公开的 ROS 2 接口。

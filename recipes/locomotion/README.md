@@ -37,7 +37,7 @@ python -m recipes.locomotion.main --mode stand --confirm-motion --execute --time
 
 The report subscriber is opened **before** sending the request. A unique `req_id` is logged before submission. Status/error_code zero in the service response only means admission.
 
-- `stand`: wait for the matching `/locomotion/body/task_report` with `LocomotionTaskResult.stage=EXECUTE` and successful status. This reports mode activation, not physical standing completion. Then observe three advancing status samples with standing posture, idle motion, and `current_action=RL_TROT`. Status has no request ID: the output explicitly labels this as observation, not causal completion. The controller continues running after the program exits.
+- `stand`: wait for the matching `/locomotion/body/task_report` with `kind=TERMINAL`, `LocomotionTaskResult.stage=EXECUTE` and successful status. This reports mode activation, not physical standing completion. Then observe three advancing status samples with standing posture, idle motion, and `current_action=RL_TROT`. Status has no request ID: the output explicitly labels this as observation, not causal completion. The controller continues running after the program exits.
 - `lie-down` / `safe-stop`: wait for a BODY `/locomotion/action_report` with the same request ID, `terminal_status=SUCCESS` and `error_code=0`.
 
 Confirm the actual posture and stability on site. On timeout, interruption, or lost response, the outcome may be unknown and the device may still be acting. Inspect state and use the established stopping procedure; exiting the program does not cancel motion. No blind retries or fallback commands are sent. The example does not publish velocity or joystick commands.

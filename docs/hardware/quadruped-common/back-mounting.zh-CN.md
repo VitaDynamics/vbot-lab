@@ -7,7 +7,7 @@
 与轮式四足机器狗（`wheel_quadruped`）共用，不适用于双足机器人（`foot_humanoid`）。
 
 两类机器狗引用同一份资料，不重复维护。共用机械结构不改变
-[EDU 软件发布范围](../../robots/README.zh-CN.md)。
+[EDU／DEV 软件发布范围](../../robots/README.zh-CN.md)。
 
 这些资料是机械图纸与零件 CAD 模型，不是机器人 URDF、机械臂控制接口，
 也不代表已明确支持的负载能力。

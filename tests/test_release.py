@@ -45,16 +45,36 @@ class ReleaseTests(unittest.TestCase):
 
     def test_checkout_pairing(self):
         expected = []
-        if self.baseline["workspace"]["tag"] is None:
+        if self.baseline["workspace"].get("tag") is None and (
+                "tag" in self.baseline["workspace"] or
+                not self.baseline["workspace"]["branch"].startswith("pre_release/")):
             expected.append("workspace.tag")
         if self.baseline["development"]["image"]["digest"] is None:
             expected.append("development.image.digest")
         self.assertEqual(release.validate(self.baseline, ROOT), expected)
 
-    def test_current_source_snapshot_is_recorded(self):
+    def test_current_iteration_uses_the_development_branch(self):
         self.assertEqual(self.baseline["workspace"],
-                         {"branch": "release/V1.6.0", "tag": "Rel/V1.6.0"})
+                         {"branch": "pre_release/V1.7.0.X"})
         self.assertEqual(release.validate(self.baseline, ROOT), [])
+
+    def test_iteration_branch_is_complete_without_a_snapshot_tag(self):
+        self.config = copy.deepcopy(self.baseline)
+        code, output, errors = self.invoke("--require-complete")
+        self.assertEqual(code, 0)
+        self.assertFalse(errors)
+        self.assertEqual(json.loads(output)["pending"], [])
+        self.assertTrue(json.loads(output)["configuration_complete"])
+
+    def test_formal_source_selection_still_requires_a_snapshot_tag(self):
+        for branch in ("main", "release/V1.7.0"):
+            with self.subTest(branch=branch):
+                self.config = copy.deepcopy(self.baseline)
+                self.config["workspace"]["branch"] = branch
+                code, output, errors = self.invoke("--require-complete")
+                self.assertEqual(code, 1)
+                self.assertFalse(errors)
+                self.assertEqual(json.loads(output)["pending"], ["workspace.tag"])
 
     def test_consistent_draft_reports_pending(self):
         code, output, errors = self.invoke()
@@ -80,6 +100,8 @@ class ReleaseTests(unittest.TestCase):
 
     def test_unknown_and_missing_fields(self):
         for change in (lambda config: config.update({"unexpected": True}),
+                       lambda config: config["workspace"].update({"unexpected": True}),
+                       lambda config: config["workspace"].pop("branch"),
                        lambda config: config["sdk"].pop("assets")):
             config = copy.deepcopy(self.config)
             change(config)
@@ -104,7 +126,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_supported_applications_match_profile_without_implying_a_range(self):
         robot = self.config["robots"]["foot_quadruped"]
-        self.assertEqual(robot["supported_application_versions"], ["V1.6.0-15", "V1.6.0-17"])
+        self.assertEqual(robot["supported_application_versions"], ["V1.7.0-6"])
         self.assertNotIn("V1.6.0-16", robot["supported_application_versions"])
         for value in (None, "V1.6.0-15/V1.6.0-17", [], [None], [True], [{}],
                       ["V1.6.0-15", "V1.6.0-15", "V1.6.0-17"], ["V1.6.0-15"],
@@ -116,6 +138,10 @@ class ReleaseTests(unittest.TestCase):
                 self.rejects(config, "application")
         config = copy.deepcopy(self.config)
         del config["robots"]["foot_quadruped"]["supported_application_versions"]
+        # Omitting a one-version list still means exactly the default, not a range.
+        self.assertEqual(release.validate(config, ROOT), ["workspace.tag", "development.image.digest"])
+        config = copy.deepcopy(self.config)
+        config["robots"]["foot_quadruped"]["supported_application_versions"] = ["V1.7.0-6", "V1.7.0-5"]
         self.rejects(config, "robot profile")
 
         original_read = release.read_json
@@ -128,6 +154,9 @@ class ReleaseTests(unittest.TestCase):
                 return data
             with patch.object(release, "read_json", side_effect=changed_profile):
                 self.rejects(self.config, "robot profile")
+
+        config = copy.deepcopy(self.config)
+        del config["robots"]["foot_quadruped"]["supported_application_versions"]
 
         def legacy_profile(path):
             data = original_read(path)
@@ -192,8 +221,41 @@ class ReleaseTests(unittest.TestCase):
         config = copy.deepcopy(self.config)
         config["schema"]["pack_version"] = "2099.1.1-v4"
         self.rejects(config, "pack revision")
-        self.config["schema"]["ros2_bridge_version"] = "2099.1.1"
-        self.rejects(self.config, "MANIFEST mismatch")
+        original_read = release.read_json
+
+        def changed_manifest(path):
+            data = original_read(path)
+            if path == ROOT / "schemas/MANIFEST.json":
+                data["schema_pack"]["sha256"] = "b" * 64
+            return data
+
+        with patch.object(release, "read_json", side_effect=changed_manifest):
+            self.rejects(self.config, "MANIFEST mismatch")
+
+    def test_ros_definition_version_is_independent_of_sdk_pack_pairing(self):
+        original_read = release.read_json
+
+        def changed_manifest(path):
+            data = original_read(path)
+            if path == ROOT / "schemas/MANIFEST.json":
+                data["ros2_bridge_version"] = "2099.1.1"
+            return data
+
+        with patch.object(release, "read_json", side_effect=changed_manifest):
+            self.assertEqual(release.validate(self.baseline, ROOT), [])
+
+    def test_ros_definition_version_still_requires_a_valid_version(self):
+        original_read = release.read_json
+        for invalid in (None, True, "invalid", "2026.11"):
+            with self.subTest(version=invalid):
+                def changed_manifest(path):
+                    data = original_read(path)
+                    if path == ROOT / "schemas/MANIFEST.json":
+                        data["ros2_bridge_version"] = invalid
+                    return data
+
+                with patch.object(release, "read_json", side_effect=changed_manifest):
+                    self.rejects(self.config, "schema.MANIFEST.ros2_bridge_version")
 
     def test_image_and_bazel_mismatch(self):
         self.config["development"]["image"]["reference"] = "example.com/edu:other"
@@ -263,6 +325,13 @@ class ReleaseTests(unittest.TestCase):
             path = Path(directory) / "manifest.json"
             path.write_text(json.dumps(manifest))
             release.check_sdk_manifest(self.config, path)
+            # A newer checked-in ROS snapshot cannot rewrite the SDK asset pairing.
+            bridge = manifest["pairing"]["ros2_bridge"]
+            manifest["pairing"]["ros2_bridge"] = "2099.1.1"
+            path.write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(release.ReleaseError, "component pairing mismatch"):
+                release.check_sdk_manifest(self.config, path)
+            manifest["pairing"]["ros2_bridge"] = bridge
             manifest["assets"][0]["sha256"] = "b" * 64
             path.write_text(json.dumps(manifest))
             with self.assertRaisesRegex(release.ReleaseError, "checksum mismatch"):

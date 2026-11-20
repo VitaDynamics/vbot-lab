@@ -9,7 +9,7 @@ or integrate a deliberate control input.
 
 For Python and C++ SDK implementations, see the [locomotion Recipe](../../recipes/locomotion/README.md): source, Bazel targets, offline previews and explicit device execution. The interface semantics below remain authoritative.
 Complete [device shell setup](../getting-started/device-environment.md)
-on the selected `foot_quadruped` EDU device. Exact types and ROS mappings are in the
+on the selected `foot_quadruped` EDU / DEV device. Exact types and ROS mappings are in the
 [interface table](aorta-ros2.md); output topics and command inputs must not be confused.
 
 ## Routes and data meaning
@@ -44,12 +44,32 @@ timeout 15s aorta topic echo /locomotion/status --count 1
 3. Treat the service's start reply as admission, not completion. Match terminal reports to
    that exact request, then inspect success/failure/cancellation and structured result data.
    A transition to idle alone is not proof that the requested action succeeded.
-4. In a task report, inspect `result_type` before reading `result`. If a locomotion result
+4. First require `kind=TERMINAL` (0; also the default for older messages).
+   `PROGRESS` (1) with `status=SUCCESS` is activity, not completion.
+   Then inspect `result_type` before reading `result`. If a locomotion result
    contains `stage`, distinguish preparation from execution. Use stable status/reason fields
    for decisions; `diagnostic` is descriptive text, not a machine-readable error code.
 5. Action reports with an empty request ID cannot safely complete a specific pending request.
    Keep a timeout for each request and report an unknown outcome when no matching terminal
    report arrives; do not blindly resubmit an operation that might still be running.
+
+### TaskReport fields
+
+The [TaskReport Schema](../../schemas/aorta/schemas/topic/task/task_report.fbs) adds
+the following native fields without changing existing field IDs:
+
+| Field | Meaning |
+| --- | --- |
+| `kind` | `TERMINAL=0` or `PROGRESS=1`; check this before interpreting `status` or the result union |
+| `phase` | Producer-defined stage label; not a completion flag or a stable error code |
+| `progress_seq` | Useful-progress sequence scoped to `req_id`; zero, duplicates and older values must not extend a progress deadline |
+
+The public body/head task-report routes above carry terminal reports, not progress
+streams. Their current ROS `aorta_msgs/msg/TaskReport` representation does not carry
+these three fields. Native `BaseActionTaskResult` also has `error_code` and
+`error_detail`; the current ROS result arm does not expose them.
+For RCP graphs, `execution_timeout_ms` remains a fixed node deadline: progress does
+not extend it. Keep a total timeout even when a capability reports activity.
 
 ## Control input behavior
 
@@ -143,6 +163,31 @@ Inspect the type without submitting a command:
 ```bash
 timeout 15s ros2 interface show function_msgs/srv/ControlFollowing
 ```
+
+## Runtime-control service
+
+`/locomotion/runtime_control` uses
+[RuntimeControlRequest / RuntimeControlResponse](../../schemas/aorta/schemas/service/locomotion/runtime_control.fbs).
+`TRY_RESUME_PILOT=1` requests resumption only when the current pilot state permits it;
+it is not a general stand or emergency-stop command. Inspect both response `status`
+and `outcome`; `APPLIED` reports dispatch, not a physical-motion result.
+
+The native contract also defines `SET_COMMAND_SMOOTHING_OVERRIDE=2` and
+`CLEAR_COMMAND_SMOOTHING_OVERRIDE=3` for a temporary override on the active NORMAL policy:
+
+| Request field | Contract |
+| --- | --- |
+| `owner` | Unique nonempty caller-session token, at most 128 bytes; another active owner produces `CONFLICT` |
+| `cmd_smoothing_ratio` | SET only: finite double, `0 <= ratio < 1`; does not rewrite the configured default or reset controller history |
+| `valid_until_ns` | SET only: absolute Unix nanoseconds from CLOCK_REALTIME, not a sensor/PHC timestamp; remaining time on receipt must be positive and at most 3 seconds |
+
+Request a 2.5-second lease and renew before expiry, allowing transmission margin. A released
+or expired owner cannot revive that lease: create a new session token.
+CLEAR releases only its owner; action deactivation also releases the override. Invalid
+deadlines are rejected, not clamped. Do not rely on process exit as immediate release.
+The current ROS `aorta_msgs/srv/RuntimeControl` request has only `command` and cannot
+express these lease fields; use the matching native SDK for them. These commands change
+live control behavior and require supervised-motion precautions.
 
 ## Interpretation and recovery
 

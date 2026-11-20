@@ -2,7 +2,7 @@
 
 <p align="center"><a href="AGENTS.md">English</a> | 中文</p>
 
-帮助用户开发 VBOT EDU 机器人应用。根据任务按需读取相关资料；本仓库不是设备运行时。
+帮助用户开发 VBOT EDU／DEV 机器人应用。根据任务按需读取相关资料；本仓库不是设备运行时。
 
 ## 任务路由
 
@@ -14,7 +14,7 @@
 | 选择应用／SDK 版本或核对兼容性 | [版本与兼容性](docs/compatibility.zh-CN.md)、[发布配置](catalog/release.zh-CN.md)，再查阅所链接的 SDK 指南 |
 | 读取硬件遥测或相机数据 | [传感器](docs/interfaces/sensors.zh-CN.md)或[相机](docs/interfaces/cameras.zh-CN.md)，只选择所需数据流 |
 | 检测人体、见人问候或使用人体关键点 | [感知接口](docs/interfaces/perception.zh-CN.md)|
-| 接收音频、识别文本或语音事件 | [audio](docs/interfaces/audio.zh-CN.md)，统一音频帧、ASR、语音事件与 UWB 输入结束 |
+| 接收本体／UWB 音频或输入结束事件 | [audio](docs/interfaces/audio.zh-CN.md)，统一音频帧与 UWB 输入结束 |
 | 观察或控制运动 | [运动](docs/interfaces/locomotion.zh-CN.md)，区分状态／报告订阅与控制输入 |
 | 观察系统／显示状态或使用耳灯 | [系统与外设](docs/interfaces/system-peripherals.zh-CN.md) |
 | 编排、执行或追踪 RCP 任务 | [DAG 编写](docs/guides/rcp-dag.zh-CN.md)、[RCP 预设目录](docs/guides/rcp-presets.zh-CN.md)，再看 [RCP](docs/interfaces/rcp.zh-CN.md)；区分预设 Goal 与节点，保留资源和生命周期约束 |
@@ -36,9 +36,9 @@
 
 ## 事实与范围
 
-- V1.6.0 应用开发使用 `release/V1.6.0`，按[快速开始](docs/getting-started/README.zh-CN.md)操作。搭建前确认当前分支，保留本地修改，不擅自替换为 `main`、迭代分支或 tag；用户自行创建的应用分支可基于该正式分支。
-- 当前 EDU 发布对象为 `foot_quadruped`。其他设备类型处于规划阶段，共用硬件或连接指南不改变这一范围。
-- 当前适配的机器人应用版本为 `V1.6.0-15`、`V1.6.0-17`，由设备配置的 `supported_application_versions` 明确列出；`application_version` 记录默认配套版本 `V1.6.0-17`，不代表完整兼容清单。应用版本与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断未列出版本或连续范围兼容。
+- V1.7.0-6 应用开发使用 `pre_release/V1.7.0.X`，按[快速开始](docs/getting-started/README.zh-CN.md)操作。搭建前确认当前分支，保留本地修改，不擅自替换为 `main`、旧版本正式分支或 tag；用户自行创建的应用分支可基于该版本族分支。
+- 当前发布对象为 EDU、DEV 系列的 `foot_quadruped`。两个系列共用文档中的软件接口、Schema、SDK 与 Recipes，选择相同的 `robot_type`，保留现有 `edu` 路径与包名。其他设备类型处于规划阶段，共用硬件或连接指南不改变这一范围。
+- 当前适配的机器人应用版本为 `V1.7.0-6`，由设备配置的 `supported_application_versions` 明确列出；`application_version` 记录默认配套版本 `V1.7.0-6`，不代表完整兼容清单。应用版本与 SDK、Schema、系统镜像及外设固件版本分别管理，不推断未列出版本或连续范围兼容。
 - 能力目录是索引，不是在线可用性证明。未知固件／SDK 版本、路由与 ROS2 映射应保持未知，不得猜测。
 - 使用 Python SDK 指南指定的发布版 wheel 配套与已入库的开放 Schema，保留 Aorta 包名与 API。Recipes 提供离线预览及显式设备执行，构建成功不代表在线兼容。
 - 设备 Aorta CLI 访问与 SDK 接入独立。ROS 2 使用设备本机 bridge 子集，遵循已整理的映射与限制，不凭同名推测。
@@ -65,14 +65,15 @@
 章节直接说明任务、前置条件、操作步骤与预期结果。项目定位保留在首页，不在各章重复受众描述。
 优先保证功能使用流程正确、完整。使用指南不放设备测试报告、性能或精度实测；
 保留接口契约、使用限制、完成条件与排障步骤。
-主体统一使用 `VBOT EDU robots`／`VBOT EDU 机器人`，保持大小写。
+描述共用产品范围时使用 `VBOT EDU and DEV robots`／`VBOT EDU／DEV 机器人`。EDU、DEV 保持大写，已发布的包、资源与配置名称保持原样。
 调整结构或共用设备文档前，阅读[贡献说明](CONTRIBUTING.zh-CN.md)。
 VBOT Lab 版本迭代在选定的 `pre_release/V<major>.<minor>.<patch>.X` 分支准备，
 每个分支只对应一个版本族，不作为所有后续版本的共用分支。
-迭代分支允许在用户确认后直接提交和推送，不要求 PR。
-`main` 保存最新正式版本，`release/V1.6.0` 用于 V1.6.0 开发，正式快照为 `Rel/V1.6.0`；
-V1.6.0 的迭代阶段已结束。未明确要求时，不创建正式发布提升 PR，也不发布版本。
+只有仓库维护者可以向仓库分支提交和推送更新；其他贡献者通过 fork 提交 PR，由仓库维护者评审。
+`main` 保存最新正式版本。当前 V1.7.0 开发使用 `pre_release/V1.7.0.X`；
+`release/V1.6.0` 与 `Rel/V1.6.0` 保留先前正式版本，不是当前开发入口。
+未明确要求时，不创建正式发布提升 PR，也不发布版本。
 参阅[协作流程](.github/WORKFLOWS.zh-CN.md)。
 运行 `python3 tests/check_repository.py`、`python3 tests/test_agent_workspace.py`
 及适用的 Bazel 目标进行验证。先保留本地未提交修改供审阅，
-仅在用户确认修改并要求同步后，再提交和推送。
+仅在仓库维护者确认修改并要求同步后，再提交和推送。

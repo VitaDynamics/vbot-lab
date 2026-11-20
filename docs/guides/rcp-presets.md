@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="rcp-presets.zh-CN.md">中文</a></p>
 
-Use this foot-quadruped EDU reference with the [DAG authoring guide](rcp-dag.md).
+Use this foot-quadruped EDU / DEV reference with the [DAG authoring guide](rcp-dag.md).
 The device service loads presets; users need no access to their installation directory.
 Pass exact relative names through `DagPresetRef.relative_path`.
 Resource presence does not make a behavior suitable for every posture; admission depends

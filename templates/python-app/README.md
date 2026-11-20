@@ -4,8 +4,8 @@
 
 A standalone Bazel workspace based on the read-only health monitor. Keep application changes
 here rather than editing your VBOT Lab reference checkout. Requires Python 3.10+, Bazel 7.6.1
-and the VBOT development container. The supported robot applications are V1.6.0-15 and V1.6.0-17 (foot_quadruped);
-SDK Release edu-sdk-2026.10.31 supplies the pinned requirements.
+and the VBOT development container. The supported robot application is V1.7.0-6 (foot_quadruped);
+SDK Release edu-sdk-2026.11.18 supplies the pinned requirements.
 
 ## Build and test — development container
 
@@ -35,7 +35,7 @@ without raw exceptions or configuration contents. config_not_found and invalid_c
 to stage=config and stop before SDK/device access; sdk_not_installed, sdk_version_mismatch
 and sdk_load_failed belong to stage=sdk. Environment and subscription failures have their own
 stages; unexpected failures use runtime/unexpected_error. Follow the supplied next_step and
-the [error guide](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/troubleshooting/README.md#application-errors).
+the [error guide](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/docs/troubleshooting/README.md#application-errors).
 
 ## Package — development container
 
@@ -44,7 +44,7 @@ The example assumes /workspace/vbot-lab and an application under /workspace/my-a
 
 ```bash
 python3 /workspace/vbot-lab/tools/package_app.py --project /workspace/my-app \
-  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.10.31 \
+  --assets-dir /workspace/vbot-lab/artifacts/edu-sdk-2026.11.18 \
   --output /workspace/my-app-package &&
 python3 /workspace/vbot-lab/tools/package_app.py --verify /workspace/my-app-package
 ```
@@ -95,7 +95,7 @@ does not establish that an interface is unsupported. Nothing starts automaticall
 For a new login, re-enter APP_DIR, clear the two Python overrides, set the same environment,
 and rerun the last command without reinstalling. Subscribers and the Node close on exit.
 
-Start from [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/release/V1.6.0) for connection, environment
-and interface guides. Use the [Python diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/release/V1.6.0/docs/development/diagnostics.md)
+Start from [VBOT Lab](https://github.com/VitaDynamics/vbot-lab/tree/pre_release/V1.7.0.X) for connection, environment
+and interface guides. Use the [Python diagnostic path](https://github.com/VitaDynamics/vbot-lab/blob/pre_release/V1.7.0.X/docs/development/diagnostics.md)
 for environment or missing-data issues. Share reproducible issues in [Vbot 超能社区](https://forum.vbot.cn/),
 after reviewing diagnostic summaries; do not share credentials or session configuration.

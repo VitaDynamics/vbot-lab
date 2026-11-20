@@ -2,9 +2,9 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-VBOT Lab 汇集 VBOT EDU 机器人的开发工具与接口参考。
+VBOT Lab 汇集 VBOT EDU／DEV 机器人的开发工具与接口参考。
 设备指南按四足机器狗、四轮机器狗与双足机器人组织。
-当前 EDU 发布范围仅为四足机器狗（`foot_quadruped`），已有 Aorta Python SDK 发布版 wheel、开放 Schema 源码与可执行 Recipes。
+当前 EDU／DEV 发布范围仅为四足机器狗（`foot_quadruped`），已有 Aorta Python SDK 发布版 wheel、开放 Schema 源码与可执行 Recipes。
 当前提供本地环境检查 Skill 与可查询的能力索引。
 其他设备类型在[设备类型指南索引](../robots/README.zh-CN.md)中保留后续版本入口。
 目录入口存在不代表所有设备型号均已获得支持。
@@ -27,7 +27,7 @@ Aorta 保持原有包名与 API；Recipes 与 Blueprints 共用 Python 优先、
 
 传感器参数与安装位置请在[传感器规格索引](../hardware/sensors.zh-CN.md)中按类型选择。
 现有参数由 `foot_quadruped` 与 `wheel_quadruped` 共用，不适用于 `foot_humanoid`；
-这一硬件范围不扩大 EDU 软件支持范围。
+这一硬件范围不扩大 EDU／DEV 软件支持范围。
 
 - Schema 描述通信契约；SDK 提供调用能力；Recipes 实现单项任务；Blueprints 将接口组合成应用。
 - 开发主线采用 Aorta；只记录确实存在并经过验证的 ROS2 映射。

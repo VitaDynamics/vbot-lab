@@ -5,7 +5,7 @@
 For Python/C++ read-only examples, see the [slam Recipe](../../recipes/slam/README.md), including Bazel builds, offline previews, and explicit device reads.
 
 Use the device's Aorta CLI to check odometry, build and save an indoor map, then localize
-in it. This guide covers the current `foot_quadruped` EDU interface set. Confirm the installed
+in it. This guide covers the current `foot_quadruped` EDU / DEV interface set. Confirm the installed
 [software scope](../compatibility.md) and live interfaces before proceeding.
 This CLI workflow does not require Python SDK installation.
 
@@ -26,7 +26,7 @@ This CLI workflow does not require Python SDK installation.
 
 ## 2. Check the required interfaces
 
-The following native interfaces are included in the EDU interface set. Discovery alone
+The following native interfaces are included in the EDU / DEV interface set. Discovery alone
 does not prove that a producer is running or that the data is usable.
 
 | Data / operation | Aorta CLI route | Primitive and message type | Use |
@@ -196,7 +196,50 @@ navigation merely because the mode-switch request was accepted.
   displaying it. A thumbnail is not proof that saving or localization has completed.
 - Maintain map display names, rooms, areas, and named destinations in the application as
   needed. Store a map name as an identifier, not a device filesystem path. This workflow
-  selects known maps; it does not introduce a map-list or map-upload API.
+  selects known maps; use the map-asset services below to discover saved maps.
+
+## 9. Manage saved map assets
+
+These **services** manage saved assets, not the live mapping/localization mode. They
+use the same names in Aorta and ROS 2. Native requests include the SDK `aorta_header`;
+the table lists business fields, not a serialized envelope.
+
+| Service | Request fields | Response / use |
+| --- | --- | --- |
+| `/slam/map_asset/list` | `scope=LOCAL` (1), `include_artifacts` (default true) | `ListMapsResponse`: `status`, `maps`, `message`; discover names before selecting one |
+| `/slam/map_asset/get_metadata` | `map_name`, optional `version_id`, `scope=LOCAL` | `GetMapMetadataResponse`: `status`, `metadata`, `message`; inspect one returned name/version |
+| `/slam/map_asset/set_active_map` | `map_name`, optional `version_id` | `SetActiveMapResponse`: `status`, `message`, selected `map_name` / `version_id`, `map_id`, `frame_id`, `revision` |
+| `/slam/map_asset/remove` | `map_name`, optional `version_id`, `scope=LOCAL`, `remove_artifacts` (default true) | `RemoveMapResponse`: `status`, `message`; destructive removal of stored data |
+| `/slam/map_asset/move` | `from_map_name`, `to_map_name`, `scope=LOCAL`, `overwrite_policy=REJECT` (1) | `MoveMapResponse`: `status`, `metadata`, `message`; rename/move a stored map |
+
+Read and select definitions are in
+[map_asset_service.fbs](../../schemas/aorta/schemas/service/slam/map_asset_service.fbs);
+remove/move definitions are in
+[map_asset_admin_service.fbs](../../schemas/aorta/schemas/service/slam/map_asset_admin_service.fbs).
+ROS uses `aorta_msgs/srv/ListMaps`, `GetMapMetadata`, `SetActiveMap`, `RemoveMap` and
+`MoveMap`, respectively. Both native and ROS replies use `status`
+(`ServiceStatus.SUCCESS=0`), not a ROS boolean `success` field.
+
+`MapAssetMetadata` describes `map_name`, `version_id`, `has_global_map`, `size_bytes`,
+`checksum`, creation/update/upload times in Unix milliseconds and `tags`.
+`local_map_dir` and `artifact_paths` are descriptive server-side locations, not permission
+to read arbitrary files or names to submit in place of `map_name`.
+Use LOCAL for device assets; the presence of REMOTE/BOTH enum values alone does not
+establish cloud storage availability. For a first read, list without expanding artifacts:
+
+```bash
+timeout 15s aorta service call /slam/map_asset/list '{"scope":"LOCAL","include_artifacts":false}' --timeout 5
+```
+
+Use an actual returned name for a metadata query. Check `status` before using `maps`
+or `metadata`; empty results and failed queries are different outcomes.
+`set_active_map` changes the active/default selection; it is not proof of localization
+or permission to move. Recheck SLAM status and use the mode flow above when appropriate.
+Before remove/move, back up the map, confirm no task uses it and confirm the exact name.
+Keep `overwrite_policy=REJECT`; REPLACE=2 can destroy existing target data and
+KEEP_EXISTING=3 must not be interpreted as successful replacement. Do not use mutations
+as discovery probes or automatically retry an unknown outcome.
+These services do not constitute a map-upload/download workflow.
 
 ## Stop and recover
 

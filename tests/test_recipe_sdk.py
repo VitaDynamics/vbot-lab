@@ -190,6 +190,10 @@ class ReleaseSDKTests(unittest.TestCase):
             ("aorta.services.system.PowerSavingEnableRequest", {"data": True}, "Data", True),
             ("aorta.services.vln.ControlFollowingRequest", {"targetState": 0, "mode": 3}, "Mode", 3),
             ("aorta.services.speech.SpeechControlRequest", {"requestType": 1}, "RequestType", 1),
+            ("aorta.services.speech.SpeechControlRequest", {"requestType": 18, "closeMicOutput": True}, "CloseMicOutput", True),
+            ("aorta.services.speech.SpeechControlRequest", {"requestType": 19, "val": 1}, "Val", 1),
+            ("aorta.services.speech.SpeechControlRequest", {"requestType": 19, "val": 3600}, "Val", 3600),
+            ("aorta.services.peripheral.DisplayImgsRequest", {"loop": True}, "Loop", True),
         )
         for name, fields, accessor, expected in cases:
             with self.subTest(binding=name):
@@ -199,6 +203,38 @@ class ReleaseSDKTests(unittest.TestCase):
                 payload = self.sdk.FlatbuffersActionCodec.serialize(value)
                 decoded = getattr(module, root).GetRootAs(payload, 0)
                 self.assertEqual(getattr(decoded, accessor)(), expected)
+
+    def test_battery_extensions_preserve_absent_zero_and_false(self):
+        from bms.BmsState import BmsState, BmsStateT
+        summarize = recipe("sensors").summarize
+        pack = self.sdk.FlatbuffersActionCodec.serialize
+        def read(**fields):
+            return summarize("battery", BmsState.GetRootAs(pack(BmsStateT(**fields)), 0))
+        missing = read(alarm=17)
+        self.assertIsNone(missing["alarm_full"])
+        self.assertEqual(missing["effective_alarm"], 17)
+        self.assertEqual(missing["charge_source"], 255)
+        self.assertEqual(missing["pd_role"], 0)
+        for field in ("p_positive_voltage_mv", "recharge_thresh_percent", "record_counts_start",
+                      "record_counts_end", "smart_charge_soc_limit", "smart_charge_enabled"):
+            self.assertIsNone(missing[field])
+        present = read(alarm=17, alarmFull=0, chargeSource=1, pdRole=1,
+                       pPositiveVoltageMv=0, rechargeThreshPercent=95,
+                       recordCountsStart=0, recordCountsEnd=2,
+                       smartChargeSocLimit=80, smartChargeEnabled=False)
+        self.assertEqual(present["effective_alarm"], 0)
+        self.assertEqual(present["p_positive_voltage_mv"], 0)
+        self.assertEqual(present["record_counts_start"], 0)
+        self.assertIs(present["smart_charge_enabled"], False)
+        self.assertEqual(read(alarmFull=0x80000000)["effective_alarm"], 0x80000000)
+
+    def test_vln_navigation_speed_round_trip_uses_published_field(self):
+        for root in ("VlnCommand", "VlnSessionCommand"):
+            module = importlib.import_module("aorta.services.rcp." + root)
+            value = getattr(module, root + "T")(method=2, x=1, y=0,
+                                                frame="local", maxXvel=0.3)
+            decoded = getattr(module, root).GetRootAs(self.sdk.FlatbuffersActionCodec.serialize(value), 0)
+            self.assertAlmostEqual(decoded.MaxXvel(), 0.3, places=6)
 
     @classmethod
     def tearDownClass(cls):
@@ -297,6 +333,7 @@ class ReleaseSDKTests(unittest.TestCase):
     def test_stand_waits_for_activation_then_observes_posture(self):
         from locomotion.LocomotionStatus import LocomotionStatusT
         from aorta.topic.task.TaskReport import TaskReportT
+        from aorta.topic.task.TaskReportKind import TaskReportKind
         from aorta.topic.task.TaskResultPayload import TaskResultPayload
         from aorta.topic.task.LocomotionTaskResult import LocomotionTaskResultT
         from aorta.services.locomotion.SetRunModeResponse import SetRunModeResponseT, SetRunModeResponse
@@ -309,6 +346,9 @@ class ReleaseSDKTests(unittest.TestCase):
                     posture=2 if scenario == "wrong-posture" else 1,
                     currentAction="RL_TROT")) for i in (3, 4, 5)]
                 reports = [pack(TaskReportT(reqId="unrelated")),
+                           pack(TaskReportT(reqId="vbot-lab-test-id", kind=TaskReportKind.PROGRESS,
+                                progressSeq=1, resultType=TaskResultPayload.LocomotionTaskResult,
+                                result=LocomotionTaskResultT(stage=2))),
                            pack(TaskReportT(reqId="vbot-lab-test-id",
                                 resultType=TaskResultPayload.LocomotionTaskResult,
                                 result=LocomotionTaskResultT(stage=1)))]
@@ -455,28 +495,28 @@ class ReleaseSDKTests(unittest.TestCase):
                     self.assertIn("close-feedback", events)
                 self.assertNotIn("goal_secret", output.getvalue())
 
-    def test_audio_asr_and_uwb_frame_decoding(self):
-        from aorta.topic.speech.AsrResult import AsrResultT
+    def test_audio_frames_and_uwb_input_end_decoding(self):
+        from aorta.uwb.AudioDoneEvent import AudioDoneEventT
         from foxglove.RawAudio import RawAudioT
         from foxglove.Time import TimeT
         module = recipe("audio")
         pack = self.sdk.FlatbuffersActionCodec.serialize
-        for source, messages, expected in (
-                ("asr", [AsrResultT(provider=0, text="unknown"), AsrResultT(provider=2, text="hello")], "TAG"),
+        for source, messages, field, expected in (
+                ("body", [RawAudioT(format="pcm", sampleRate=16000, numberOfChannels=1,
+                                   data=[1, 2], timestamp=TimeT(sec=1, nsec=2))], "format", "pcm"),
                 ("uwb", [RawAudioT(format="adpcm", sampleRate=8000, numberOfChannels=1,
-                                  data=[1, 2, 3], timestamp=TimeT(sec=1, nsec=2))], "adpcm")):
+                                  data=[1, 2, 3], timestamp=TimeT(sec=1, nsec=2))], "format", "adpcm"),
+                ("uwb-end", [AudioDoneEventT(timestampNs=123)], "timestamp_ns", 123)):
             samples = iter(pack(message) for message in messages)
             @contextmanager
             def inbox(*_args):
                 yield lambda _deadline: next(samples)
             args = ["--source", source, "--execute", "--consent"]
-            if source == "asr":
-                args += ["--provider", "tag"]
             with patch.object(module, "device_node", side_effect=lambda _: self.fake_device()), \
                  patch.object(module, "inbox", side_effect=inbox), redirect_stdout(io.StringIO()) as output:
                 self.assertEqual(module.main(args), 0)
             data = json.loads(output.getvalue())
-            self.assertEqual(data["provider" if source == "asr" else "format"], expected)
+            self.assertEqual(data[field], expected)
 
     def test_camera_metadata_decode_uses_generated_binding(self):
         from foxglove.CompressedVideo import CompressedVideoT
@@ -510,7 +550,6 @@ class ReleaseSDKTests(unittest.TestCase):
         classes = {
             "foxglove.CompressedVideo": ("Format", "FrameId", "Timestamp", "DataLength", "Data"),
             "foxglove.RawAudio": ("Format", "SampleRate", "NumberOfChannels", "UserInteractionContext", "Timestamp", "Data"),
-            "aorta.topic.speech.AsrResult": ("Text", "Provider"),
             "aorta.uwb.AudioDoneEvent": ("TimestampNs", "UserInteractionContext"),
             "locomotion.LocomotionStatus": ("HeartbeatSeq", "Posture", "Motion", "StampNs", "CurrentAction"),
             "locomotion.ActionReport": ("ReqId", "ActionFamily", "TerminalStatus", "ErrorCode", "Reason"),

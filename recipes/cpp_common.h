@@ -69,7 +69,7 @@ struct Args {
   bool decode = false;
   int count = 1, duration_ms = 500;
   double timeout = 10, cancel_after = 0;
-  std::string camera = "left", source = "asr", provider = "all",
+  std::string camera = "left", source = "body",
               device = "motor", mode, output, stream;
 };
 inline double Number(const std::string &text, double low, double high) {
@@ -93,16 +93,19 @@ inline void Choice(const std::string &value,
 inline Args Parse(int argc, char **argv, const std::string &task) {
   Args a;
   std::set<std::string> allowed = {"--execute", "--timeout", "--help"};
-  if (task == "camera" || task == "audio" || task == "subscribe-state")
+  if (task == "camera" || task == "camera-s100" || task == "audio" ||
+      task == "subscribe-state")
     allowed.insert("--count");
   if (task == "camera")
     allowed.insert({"--camera", "--output", "--consent"});
+  if (task == "camera-s100")
+    allowed.insert({"--camera", "--consent"});
 #ifdef VBOT_CAMERA_DECODE
   if (task == "camera")
     allowed.insert("--decode");
 #endif
   if (task == "audio")
-    allowed.insert({"--source", "--provider", "--output", "--consent"});
+    allowed.insert({"--source", "--output", "--consent"});
   if (task == "device-info")
     allowed.insert("--device");
   if (task == "locomotion")
@@ -142,8 +145,6 @@ inline Args Parse(int argc, char **argv, const std::string &task) {
         a.camera = v;
       else if (key == "--source")
         a.source = v;
-      else if (key == "--provider")
-        a.provider = v;
       else if (key == "--device")
         a.device = v;
       else if (key == "--mode")
@@ -167,8 +168,7 @@ inline Args Parse(int argc, char **argv, const std::string &task) {
   }
   Choice(a.camera, {"left", "right"});
   Choice(a.device, {"motor", "servo", "lidar", "uwb"});
-  Choice(a.source, {"body", "uwb", "asr", "uwb-end"});
-  Choice(a.provider, {"all", "body", "tag"});
+  Choice(a.source, {"body", "uwb", "uwb-end"});
   if (task == "locomotion") {
     Choice(a.mode, {"stand", "lie-down", "safe-stop"});
     if (a.execute && !a.confirm_motion)
@@ -177,13 +177,13 @@ inline Args Parse(int argc, char **argv, const std::string &task) {
   if (task == "audio") {
     if (a.execute && !a.consent)
       throw std::invalid_argument("live voice access requires --consent");
-    if (a.provider != "all" && a.source != "asr")
-      throw std::invalid_argument("--provider requires ASR");
     if (!a.output.empty() && a.source != "body" && a.source != "uwb")
       throw std::invalid_argument("--output requires body or uwb");
   }
   if (task == "camera" && (!a.output.empty() || a.decode) && !a.consent)
     throw std::invalid_argument("capture/decode requires --consent");
+  if (task == "camera-s100" && a.execute && !a.consent)
+    throw std::invalid_argument("hardware decode requires --consent");
   if (a.cancel_after >= a.timeout)
     throw std::invalid_argument("--cancel-after must be less than --timeout");
   return a;

@@ -5,7 +5,7 @@
 Python/C++ 只读示例见 [slam Recipe](../../recipes/slam/README.zh-CN.md)，包含 Bazel 构建、离线预览及显式设备读取。
 
 使用设备上的 Aorta CLI 检查里程计、建立并保存室内地图，再在地图中定位。
-本指南适用于当前 `foot_quadruped` EDU 接口集。
+本指南适用于当前 `foot_quadruped` EDU／DEV 接口集。
 操作前确认设备的[软件范围](../compatibility.zh-CN.md)
 和在线接口。本 CLI 流程不依赖Aorta Python SDK 安装。
 
@@ -24,7 +24,7 @@ Python/C++ 只读示例见 [slam Recipe](../../recipes/slam/README.zh-CN.md)，�
 
 ## 2. 检查所需接口
 
-以下原生接口已包含在 EDU 接口集中。发现路由不代表发布进程正在运行，也不代表数据可用。
+以下原生接口已包含在 EDU／DEV 接口集中。发现路由不代表发布进程正在运行，也不代表数据可用。
 
 | 数据／操作 | Aorta CLI 路由 | 类型与消息类型 | 用途 |
 | --- | --- | --- | --- |
@@ -175,7 +175,42 @@ timeout 15s aorta service call /slam/set_slam_mode '{"mode":3,"request_reloc":tr
   `png;resolution=...;x_min=...;y_min=...`；显示时保留分辨率与原点元数据。
   收到缩略图不能证明地图保存或定位完成。
 - 应用按需维护地图显示名、房间、区域和目标点。地图名作为标识保存，不作为设备文件路径。
-  本流程选择已知地图，不引入地图列表或上传 API。
+  本流程选择已知地图；可通过下方地图资产服务发现已存地图。
+
+## 9. 管理已保存的地图资产
+
+以下均为 **service**，管理已存资产，不是实时建图／定位模式切换。Aorta 与 ROS 2 使用相同服务名。
+原生请求遵循 SDK 的 `aorta_header` 约定；下表只列业务字段，不是序列化后的封装。
+
+| 服务 | 请求字段 | 响应／用途 |
+| --- | --- | --- |
+| `/slam/map_asset/list` | `scope=LOCAL`（1）、`include_artifacts`（默认 true） | `ListMapsResponse`：`status`、`maps`、`message`；先发现名字再选择 |
+| `/slam/map_asset/get_metadata` | `map_name`、可选 `version_id`、`scope=LOCAL` | `GetMapMetadataResponse`：`status`、`metadata`、`message`；查询返回的某个名字／版本 |
+| `/slam/map_asset/set_active_map` | `map_name`、可选 `version_id` | `SetActiveMapResponse`：`status`、`message`、所选 `map_name`／`version_id`、`map_id`、`frame_id`、`revision` |
+| `/slam/map_asset/remove` | `map_name`、可选 `version_id`、`scope=LOCAL`、`remove_artifacts`（默认 true） | `RemoveMapResponse`：`status`、`message`；破坏性删除已存数据 |
+| `/slam/map_asset/move` | `from_map_name`、`to_map_name`、`scope=LOCAL`、`overwrite_policy=REJECT`（1） | `MoveMapResponse`：`status`、`metadata`、`message`；移动／重命名地图 |
+
+读取和选择定义见
+[map_asset_service.fbs](../../schemas/aorta/schemas/service/slam/map_asset_service.fbs)，
+删除／移动定义见
+[map_asset_admin_service.fbs](../../schemas/aorta/schemas/service/slam/map_asset_admin_service.fbs)。
+ROS 分别使用 `aorta_msgs/srv/ListMaps`、`GetMapMetadata`、`SetActiveMap`、`RemoveMap`、`MoveMap`，
+原生与 ROS 响应均使用 `status`（`ServiceStatus.SUCCESS=0`），不是 ROS 的布尔 `success` 字段。
+
+`MapAssetMetadata` 包含 `map_name`、`version_id`、`has_global_map`、`size_bytes`、`checksum`、
+Unix 毫秒表示的创建／更新／上传时间及 `tags`。`local_map_dir`、`artifact_paths` 只是服务端位置说明，
+不代表有权读取任意文件，也不能替代请求中的 `map_name`。
+设备资产使用 LOCAL；REMOTE／BOTH 枚举存在不等于云端存储已可用。首次查询可不展开附件：
+
+```bash
+timeout 15s aorta service call /slam/map_asset/list '{"scope":"LOCAL","include_artifacts":false}' --timeout 5
+```
+
+使用实际返回的名字查询元数据；先检查 `status`，再读取 `maps`／`metadata`，区分空结果和查询失败。
+`set_active_map` 改变当前／默认选择，不证明定位完成，也不授予运动权限；按需要重新检查 SLAM 状态并使用上文模式流程。
+删除／移动前备份地图、确认没有任务占用并核对准确名字。保持 `overwrite_policy=REJECT`；
+REPLACE=2 可能销毁目标数据，KEEP_EXISTING=3 也不能理解成已替换成功。
+不能把修改操作用作接口探测，结果未知时不自动重试。这些服务不构成地图上传／下载流程。
 
 ## 停止与恢复
 

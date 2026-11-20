@@ -2,8 +2,8 @@
 
 <p align="center"><a href="mcp-config.md">English</a> | 中文</p>
 
-通过这些 HTTP API，可以为设备 Agent 新增 **Streamable HTTP MCP** 服务连接，
-或编辑、启用和停用已有连接，无需重启设备。
+通过这些 HTTP API，可以为设备 Agent 注册 **Streamable HTTP MCP** 服务连接，
+查询列表及配置、编辑、启停或删除开发者自己的连接定义，无需重启设备。
 适用范围及应用兼容性见 [Agent 概览](README.zh-CN.md)。
 这些是配置 API，不是 MCP JSON-RPC 方法，也不是 Aorta 路由。
 
@@ -25,6 +25,9 @@ MCP `url` 是**设备运行时需要连接的目标**，不是上面的 API 基�
 不代表允许访问该目录。写入、刷新和检查均使用同一上下文。
 不要修改不属于自己的预置服务。
 
+接入前先读取服务列表，不要假定某个预置连接存在或已经启用。
+启动自己的服务后，注册真实 URL 并检查发现结果；只选定端口不会自动配置 Agent。
+
 ## 路由
 
 下表路径均相对于 `/api/admin/extensions/vbot-mcp/http`。
@@ -37,11 +40,27 @@ MCP `url` 是**设备运行时需要连接的目标**，不是上面的 API 基�
 | `GET /servers/{name}/config` | 查询参数 `workingDir` | `200`：可编辑配置，不返回已保存的请求头值 |
 | `PUT /servers/{name}/config` | 查询参数 `workingDir`；下文编辑请求体 | `200`：更新后的列表，并在后台发现 |
 | `PATCH /servers/{name}` | 查询参数 `workingDir`；`{"enabled":true}` 或 `{"enabled":false}` | `200`：更新后的列表，并在后台发现 |
+| `DELETE /servers/{name}` | 查询参数 `workingDir`；无需请求体；要求 `canDelete=true` | `200`：移除全局定义后的列表，并在后台发现 |
 | `POST /servers/refresh` | 查询参数 `workingDir`；无需请求体 | `200`：调度连接／目录刷新后的列表 |
 
-目前没有删除服务定义或重命名 API。不再需要自己的连接时，通过 PATCH 停用；
-定义及已保存的凭据仍保留。停用不等于删除、撤销凭据，也不等于取消正在执行的工具调用。
-这些 API 不新增或编辑 stdio 进程定义，不安装软件包，也不执行 OAuth 登录。
+PATCH 保留定义及已保存的凭据；DELETE 移除全局定义及其中保存的请求头。
+这两种操作均不会停止 MCP 服务、取消正在执行的工具调用，也不会在服务端撤销凭据。
+没有重命名 API。这些 API 不新增或编辑 stdio 进程定义，不安装软件包，也不执行 OAuth 登录。
+
+### 读取列表
+
+| 响应字段 | 含义 |
+| --- | --- |
+| `canAddServers` | 是否允许新增全局连接定义 |
+| `servers[].name`、`transport`、`target` | 准确的连接名称、传输类型及 HTTP origin；完整 URL 通过 GET config 获取 |
+| `servers[].source` | `global`：开发者全局配置；`packaged`：安装包定义；`project`：项目定义 |
+| `servers[].enabled`、`toolCount` | 启停状态及当前发现的工具数量；已启用不代表已连接 |
+| `servers[].canEdit`、`canDelete` | 按操作检查对应标记；可编辑不代表可删除 |
+| `servers[].configError`、`diagnostics` | 单个连接的配置错误及发现诊断 |
+| `catalogReady`、`catalogRevision`、`refreshPending` | 是否已有目录、目录修订及刷新是否仍在进行 |
+| `storageAvailable`、`loadError` | 启停状态存储是否可用及状态加载错误 |
+
+此 API 仅允许删除全局定义。安装包与项目定义返回 `canDelete=false`，不要通过 DELETE 移除。
 
 ### 新增字段
 
@@ -137,7 +156,7 @@ vbot_mcp_curl -X POST "$VBOT_MCP_API_URL/servers?workingDir=$VBOT_WORKING_DIR" \
 
 ### 刷新与检查发现结果
 
-新增、编辑及启停已会调度发现。服务恢复或工具定义改变后，可显式刷新；
+新增、编辑、启停及删除已会调度发现。服务恢复或工具定义改变后，可显式刷新；
 它可能重新连接此上下文中的配置服务，不只影响 `edu-tools`。
 
 ```bash
@@ -153,7 +172,7 @@ vbot_mcp_curl --get "$VBOT_MCP_API_URL/servers" \
 `refreshPending=true` 时，等待后再次 GET，并设置等待总时限，不要反复 POST 刷新。
 刷新结束后，应确认 `catalogReady=true`、自己的条目 `enabled=true`，
 没有条目 `configError` 或相关发现诊断，且 `toolCount` 符合服务实际工具数量。
-`storageAvailable` 表示启停状态存储情况；`canAddServers` 及条目 `canEdit`
+`storageAvailable` 表示启停状态存储情况；`canAddServers` 及条目 `canEdit`／`canDelete`
 表示配置操作能力。存在 `loadError` 时，先排查再继续写入。单独 GET 不会开始发现。
 
 配置保存不代表连接成功，也不代表工具已执行。发现成功后，在新的 Agent Turn 中请求
@@ -198,6 +217,40 @@ vbot_mcp_curl -X PATCH "$VBOT_MCP_API_URL/servers/edu-tools?workingDir=$VBOT_WOR
 将请求体改为 `{"enabled":true}` 可重新启用同一连接。
 操作后读取列表，确认刷新结束后的状态。不要启停无关服务。
 
+### 删除自己的连接
+
+先完成或取消应用正在执行的工具任务，再删除连接。
+重新读取列表，核对准确名称、`source=global` 和 `canDelete=true`。
+确定删除示例连接时，在同一终端预先设置 `CONFIRM_MCP_DELETE=edu-tools`；
+未确认时，下面的代码会在 DELETE 之前停止。
+
+```bash
+vbot_mcp_curl --get "$VBOT_MCP_API_URL/servers" \
+  --data-urlencode "workingDir=$VBOT_WORKING_DIR" \
+  -o "$VBOT_MCP_FILES/servers-before-delete.json"
+jq -e 'any(.servers[]; .name == "edu-tools" and .source == "global" and .canDelete == true)' \
+  "$VBOT_MCP_FILES/servers-before-delete.json"
+[[ "${CONFIRM_MCP_DELETE:-}" == edu-tools ]]
+
+vbot_mcp_curl -X DELETE "$VBOT_MCP_API_URL/servers/edu-tools?workingDir=$VBOT_WORKING_DIR" |
+  jq .
+
+vbot_mcp_curl --get "$VBOT_MCP_API_URL/servers" \
+  --data-urlencode "workingDir=$VBOT_WORKING_DIR" |
+  jq '{catalogReady,refreshPending,diagnostics,
+       servers:[.servers[] | select(.name == "edu-tools")]}'
+```
+
+按上文相同的有界 GET 检查，等待 `refreshPending=false`。
+对于名称唯一的开发者连接，应确认匹配的 `servers` 数组为空；
+此后 GET config 和再次 DELETE 均返回 `404 mcp_server_not_found`。
+删除的是同名安装包定义的全局覆盖时，原安装包定义可能重新出现；
+此时检查 `source` 和启停状态，不要重复 DELETE。
+删除请求没有 `revision` 前置校验；操作前重新读取，并与同时配置该连接的人员协调。
+
+若以后需要恢复，请保留服务源码及安全保存的原始配置，通过 POST 重新注册。
+不再需要运行的服务，应通过自己的进程管理流程单独停止。
+
 ## 错误与恢复
 
 | 结果 | 处理方式 |
@@ -206,9 +259,9 @@ vbot_mcp_curl -X PATCH "$VBOT_MCP_API_URL/servers/edu-tools?workingDir=$VBOT_WOR
 | `409 mcp_server_already_exists` | 名称或规范化工具前缀冲突，先读列表，再选择不同名称；POST 不覆盖已有条目。 |
 | `409 mcp_server_config_changed` | 重新读取配置／revision，对比修改后重建完整编辑请求。 |
 | `404 mcp_server_not_found` | 刷新列表并确认准确名称及上下文，不要据此判断整组 API 不可用。 |
-| `405 mcp_server_read_only` | 遵循来源／传输类型与 `canEdit`，新增自己的 HTTP 条目，不要修改受保护定义。 |
+| `405 mcp_server_read_only` | 遵循来源／传输类型及对应操作的 `canEdit`／`canDelete`；安装包／项目条目不可删除。新增自己的 HTTP 条目，不要修改受保护定义。 |
 | `500 mcp_config_write_failed`／`mcp_server_state_write_failed`，或 `503 mcp_config_unavailable` | 保留错误并联系支持，不要通过修改设备权限或覆盖配置文件绕过 API。 |
-| 非 2xx、超时或写入中断 | 安全检查状态码／正文，先 GET 列表及配置，再决定是否重试；写入可能已落盘，不要盲目重复 POST／PUT。 |
+| 非 2xx、超时或写入中断 | 安全检查状态码／正文，先 GET 列表及配置，再决定是否重试；写入可能已落盘，不要盲目重复 POST／PUT／DELETE。 |
 | 保存后没有工具 | 检查 `enabled`、刷新是否结束、`configError`、诊断、设备到服务的网络、认证、MCP 传输及工具声明；没有工具的服务不能满足工具调用需求。 |
 
 继续阅读[工具契约](http-mcp.zh-CN.md)及[接入指南](../../guides/agent-integration.zh-CN.md)。

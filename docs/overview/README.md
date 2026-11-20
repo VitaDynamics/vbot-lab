@@ -2,9 +2,9 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-VBOT Lab organizes development tools and interface references for VBOT EDU robots.
+VBOT Lab organizes development tools and interface references for VBOT EDU and DEV robots.
 Robot guides are grouped into four-legged robot dogs, four-wheeled robot dogs, and bipedal robots.
-The current EDU release scope is the four-legged robot dog (`foot_quadruped`) only,
+The current EDU / DEV release scope is the four-legged robot dog (`foot_quadruped`) only,
 with public Schema sources, released Python SDK wheels and executable Recipes.
 A local environment-check Skill and a queryable capability catalog are available.
 The other robot types have future-release placeholders in the [robot-type guide index](../robots/README.md).
@@ -31,7 +31,7 @@ the Python-first, Bazel-based development path.
 For sensor parameters and mounting locations, select a type in the
 [sensor specification index](../hardware/sensors.md).
 The documented sensors are shared by `foot_quadruped` and `wheel_quadruped`,
-not by `foot_humanoid`; this hardware scope does not extend EDU software support.
+not by `foot_humanoid`; this hardware scope does not extend EDU / DEV software support.
 
 - Schema defines communication contracts; the SDK provides calls; Recipes implement individual tasks; Blueprints combine them into applications.
 - Aorta is the primary development path; document only ROS2 mappings that exist and have been verified.

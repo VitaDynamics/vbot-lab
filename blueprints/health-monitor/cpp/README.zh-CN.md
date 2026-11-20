@@ -4,8 +4,8 @@
 
 这是[健康监测 Blueprint](../README.zh-CN.md)的 C++17／Aorta C++ SDK 实现，
 组合 `/locomotion/status`、`/bms_state` 与 `/system/sm_status`，不发布控制消息、
-不调用 service／action，也不采集音视频。配套 foot_quadruped 应用 V1.6.0-15、V1.6.0-17，
-以及 Release edu-sdk-2026.10.31 中的 SDK 2026.10.20／ABI 13、Schema pack 2026.10.20-v4。
+不调用 service／action，也不采集音视频。配套 foot_quadruped 应用 V1.7.0-6，
+以及 Release edu-sdk-2026.11.18 中的 SDK 2026.11.15／ABI 14、Schema pack 2026.11.18-v4。
 机器人无需 Python 运行时或 wheel。
 
 ## 构建与预览——开发容器
@@ -57,21 +57,21 @@ RAII 保证先释放订阅再释放 Node，包括部分订阅失败与 Ctrl+C。
 AMD64 容器进行交叉编译，不在其中执行 ARM64 程序或测试。
 
 ```bash
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.11.18/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.11.18/edu-schema" &&
 bazel build --config=arm64 //blueprints/health-monitor:main_cpp &&
 PACKAGE_DIR=$(mktemp -d /tmp/vbot-health-cpp-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
 cp -L bazel-bin/blueprints/health-monitor/main_cpp "$PACKAGE_DIR/bin/health-monitor" &&
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
 cp blueprints/health-monitor/config.json "$PACKAGE_DIR/config.json" &&
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
   "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
-file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/bin/health-monitor" &&
 (cd "$PACKAGE_DIR" && find bin lib licenses config.json -type f -exec sha256sum {} + > SHA256SUMS)
 ```

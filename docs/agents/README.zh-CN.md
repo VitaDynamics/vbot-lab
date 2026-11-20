@@ -7,7 +7,7 @@
 
 ## 在 VBOT Lab 内工作
 
-V1.6.0 开发先按[快速开始](../getting-started/README.zh-CN.md)切换到 `release/V1.6.0`，
+V1.7.0-6 开发先按[快速开始](../getting-started/README.zh-CN.md)切换到 `pre_release/V1.7.0.X`，
 再启动 Agent。已有仓库应先确认分支，并在切换前保留本地修改。
 
 使用保留软链接的 Git 工作副本。开发容器及 Linux／WSL 工作区适合这一文件系统要求；

@@ -3,7 +3,7 @@
 <p align="center"><a href="customization.md">English</a> | 中文</p>
 
 适用范围及状态见 [Agent 能力总览](README.zh-CN.md)。
-这些文档由 EDU 设备上的 `vbot-agent-harness` 进程使用。
+这些文档由 EDU／DEV 设备上的 `vbot-agent-harness` 进程使用。
 请在自己的开发工作区编写并审阅，再通过 [Skills／AGENTS.md 内容 API](content-api.zh-CN.md)
 将文本注入服务。它们不能赋予文档所述开发者接口之外的能力。
 
@@ -65,7 +65,7 @@ frontmatter 名称应与 API 路径中的名称一致。API 接收完整 `SKILL.
 
 [内容 API 参考](content-api.zh-CN.md)提供请求、响应、上传／读回命令、返回路径检查及删除／恢复边界。
 内容由设备服务管理，示例不直接写入其文件系统。
-适配机器人应用版本为 **V1.6.0-15**、**V1.6.0-17**，配套要求见[兼容矩阵](../../compatibility.zh-CN.md)。
+适配机器人应用版本为 **V1.7.0-6**，配套要求见[兼容矩阵](../../compatibility.zh-CN.md)。
 
 上传后检查读回，并按[接入指南](../../guides/agent-integration.zh-CN.md)在新 Turn 发起匹配请求。
 在自己的工作区保留源内容及备份，便于恢复。提示规则不是强制安全策略。

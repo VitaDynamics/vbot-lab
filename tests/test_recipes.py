@@ -35,7 +35,7 @@ class RecipeTests(unittest.TestCase):
     def test_invalid_or_missing_safety_flags_fail_before_connection(self):
         cases = (("locomotion", ["--mode", "stand", "--execute"]),
                  ("audio", ["--execute"]), ("audio", ["--source", "body", "--provider", "tag"]),
-                 ("audio", ["--output", "transcript.bin"]), ("camera", ["--decode"]),
+                 ("audio", ["--source", "uwb-end", "--output", "event.bin"]), ("camera", ["--decode"]),
                  ("camera", ["--output", "private.h265"]), ("rcp-task", ["--duration-ms", "0"]),
                  ("rcp-task", ["--cancel-after", "10", "--timeout", "10"]),
                  ("subscribe-state", ["--count", "0"]), ("subscribe-state", ["--timeout", "nan"]))
@@ -123,13 +123,22 @@ class RecipeTests(unittest.TestCase):
                 common.exclusive_output(path)
             self.assertEqual(path.read_bytes(), b"original")
 
-    def test_asr_filter_does_not_guess_unknown_provider(self):
-        matches = recipe("audio").provider_matches
-        self.assertTrue(matches(0, "all"))
-        self.assertFalse(matches(0, "body"))
-        self.assertFalse(matches(0, "tag"))
-        self.assertTrue(matches(1, "body"))
-        self.assertTrue(matches(2, "tag"))
+    def test_audio_previews_only_offer_supported_sources(self):
+        module = recipe("audio")
+        self.assertEqual(module.TOPICS, {"body": "/raw_audio_dump",
+                                      "uwb": "/audio/uwb_adpcm_segment",
+                                      "uwb-end": "/uwb/audio_done"})
+        for source, topic in module.TOPICS.items():
+            with patch.object(module, "device_node", side_effect=AssertionError("device access")), \
+                 redirect_stdout(io.StringIO()) as output:
+                self.assertEqual(module.main(["--source", source]), 0)
+                self.assertEqual(json.loads(output.getvalue())["topic"], topic)
+        with redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(module.main([]), 0)
+            self.assertEqual(json.loads(output.getvalue())["topic"], "/raw_audio_dump")
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+            module.main(["--source", "asr"])
+        self.assertEqual(error.exception.code, 2)
 
     def test_motion_report_requires_identifier_and_body_family(self):
         match = recipe("locomotion").matches_report

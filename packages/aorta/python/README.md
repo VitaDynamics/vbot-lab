@@ -9,20 +9,20 @@ The separately marked robot deployment/runtime steps remain in the device's vbot
 The Aorta Python SDK is distributed as [GitHub Release](https://github.com/VitaDynamics/vbot-lab/releases)
 assets. SDK packages must currently be downloaded from GitHub Releases; cloning this
 repository does not install them. Downloading requires network access; the four required
-wheels in `edu-sdk-2026.10.31` install locally without contacting PyPI. This page installs
-the SDK, connects an EDU client to the robot, and receives live robot state. Check the
+wheels in `edu-sdk-2026.11.18` install locally without contacting PyPI. This page installs
+the SDK, connects a client to an EDU / DEV robot, and receives live robot state. Check the
 [compatibility matrix](../../../docs/compatibility.md) for the supported robot software
 image, and the release's `EDU_SDK_MANIFEST.json` for the version pairing.
 
-Install the Python wheels from [edu-sdk-2026.10.31](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31).
+Install the Python wheels from [edu-sdk-2026.11.18](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.11.18).
 Version pairing is recorded in [release.json](../../../catalog/release.json).
 The following packages are required:
 
 | Distribution | Version | Purpose |
 | --- | --- | --- |
-| `aorta-sdk` | `2026.10.20` | `import aorta`; Python API and platform-specific native runtime |
-| `aorta-msgs` | `2026.10.20` | Base generated messages and schema metadata |
-| `vbot-edu-msgs` | `2026.10.20` | EDU generated messages and schema metadata |
+| `aorta-sdk` | `2026.11.15` | `import aorta`; Python API and platform-specific native runtime |
+| `aorta-msgs` | `2026.11.15` | Base generated messages and schema metadata |
+| `vbot-edu-msgs` | `2026.11.18` | EDU generated messages and schema metadata |
 | `flatbuffers` | `25.12.19` | Runtime for generated FlatBuffers messages |
 
 The Aorta and EDU wheels carry their `LICENSE` and `NOTICE` under `.dist-info/licenses/`.
@@ -36,7 +36,7 @@ See [compatibility](../../../docs/compatibility.md).
 
 ## 1. Choose the release wheels
 
-From `edu-sdk-2026.10.31`, download these four wheels for the selected platform,
+From `edu-sdk-2026.11.18`, download these four wheels for the selected platform,
 plus `SHA256SUMS`, `EDU_SDK_MANIFEST.json` and `flatbuffers-25.12.19.LICENSE`:
 
 | Wheel | Role |
@@ -58,7 +58,7 @@ version under `pairing.wheels`.
 ## 2. Install the downloaded wheels
 
 Keep binaries out of Git. Put the four matching wheels, `SHA256SUMS`, and
-`EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.10.31/`. In the environment that
+`EDU_SDK_MANIFEST.json` in `artifacts/edu-sdk-2026.11.18/`. In the environment that
 will run Python, ensure Python 3.10+ and venv support are available.
 For application development use the [development container](../../../docker/README.md).
 From the parent of `artifacts/`, run the following Linux command chain. `&&` skips
@@ -68,7 +68,7 @@ fix the error before continuing:
 ```bash
 uname -m &&
 python3 --version &&
-cd artifacts/edu-sdk-2026.10.31 &&
+cd artifacts/edu-sdk-2026.11.18 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 cd ../.. &&
 python3 -m venv .venv &&
@@ -78,10 +78,10 @@ unset AORTA_CORE_FFI_LIB &&
 export PYTHONNOUSERSITE=1 &&
 SDK_PLATFORM=linux_x86_64 &&
 python -m pip install --no-index \
-  "artifacts/edu-sdk-2026.10.31/aorta_sdk-2026.10.20-py3-none-${SDK_PLATFORM}.whl" \
-  artifacts/edu-sdk-2026.10.31/aorta_msgs-2026.10.20-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.31/vbot_edu_msgs-2026.10.20-py3-none-any.whl \
-  artifacts/edu-sdk-2026.10.31/flatbuffers-25.12.19-py2.py3-none-any.whl &&
+  "artifacts/edu-sdk-2026.11.18/aorta_sdk-2026.11.15-py3-none-${SDK_PLATFORM}.whl" \
+  artifacts/edu-sdk-2026.11.18/aorta_msgs-2026.11.15-py3-none-any.whl \
+  artifacts/edu-sdk-2026.11.18/vbot_edu_msgs-2026.11.18-py3-none-any.whl \
+  artifacts/edu-sdk-2026.11.18/flatbuffers-25.12.19-py2.py3-none-any.whl &&
 python -m pip check &&
 python -c 'import aorta; from foxglove.CompressedVideo import CompressedVideo; from aorta.action.rcp.ExecuteTaskGoal import ExecuteTaskGoalT; core = aorta.load_library(); print("SDK imports and native runtime OK; ABI", core.aorta_abi_version())'
 ```
@@ -114,7 +114,7 @@ Wheels include generated bindings and metadata; no local `flatc` generation is n
 
 ## 3. Connect
 
-EDU programs connect to the robot's EDU router with the session files published in
+User programs on EDU and DEV connect to the robot's EDU router with the session files published in
 `/opt/vita/aorta/edu/`:
 
 | File | Use |
@@ -127,13 +127,13 @@ Topic, service and action names are spelled with a leading slash (`/imu_raw`,
 `/my_app/status`) and need no prefix. The session configuration adds the robot namespace on
 the wire, so do not add it in the API call. Names in the robot's public interfaces reach the
 robot as described in the [interface reference](../../../docs/interfaces/README.md); any
-other name is shared only among EDU programs connected to the same robot, in client or peer
-mode. EDU programs share one trust domain: another EDU program can publish under any name,
+other name is shared only among user programs connected to the same robot, in client or peer
+mode. User programs share one trust domain: another user program can publish under any name,
 including a robot topic's name.
 
 Use the node name `edu_sdk` or `edu_bridge` for programs that use robot interfaces: the
-robot lists EDU nodes only under these names. The examples use `edu_sdk`. Other node names
-work between EDU programs.
+robot lists user nodes only under these names. The examples use `edu_sdk`. Other node names
+work between user programs.
 
 ### On the robot (S100)
 

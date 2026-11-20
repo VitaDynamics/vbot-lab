@@ -64,10 +64,11 @@ pairing and test mismatch handling. They do not download attachments or publish 
 ## Iteration updates
 
 Use the `pre_release/V<major>.<minor>.<patch>.X` branch for the selected version family.
-Maintainers may commit and push directly after running the applicable checks;
-iteration updates do not require a PR. Topic PRs are optional when review is wanted.
-Retain protection against force pushes and deletion. CI runs on iteration-branch pushes,
-but does not require opening a PR or obtaining a pre-push CI result for each new commit.
+Only repository maintainers may commit and push updates to repository branches.
+Other contributors work in forks and submit pull requests for maintainer review.
+Run the applicable checks before submitting updates. Retain protection against force
+pushes and deletion. CI runs on iteration-branch pushes; a passing check does not grant
+repository write permission.
 
 ## Formal release review and merge
 
@@ -89,18 +90,19 @@ but does not require opening a PR or obtaining a pre-push CI result for each new
 | Reference | Role |
 | --- | --- |
 | `main` | Latest formal release; do not merge work-in-progress version updates |
+| `pre_release/V1.7.0.X` | V1.7.0 version-family development branch, supporting robot application `V1.7.0-6`; updates are managed by repository maintainers |
 | `release/V1.6.0` | Development entry for the final `V1.6.0` family release, targeting robot applications `V1.6.0-15` and `V1.6.0-17` |
 | `Rel/V1.6.0` | Immutable formal source snapshot; not the default development checkout |
 | `pre_release/V1.6.0.X` | Completed iteration history for the `V1.6.0` family, not its development entry; the final `X` stays literal |
 | `V1.6.0.15` | Preserved iteration snapshot for robot application `V1.6.0-15` |
-| `edu-sdk-*` | SDK attachment Release tags; independent of source tags and robot application versions |
+| `edu-sdk-*` | SDK attachment Release tags; independent of source tags and robot application versions. This checkout pairs `edu-sdk-2026.11.18` with robot application `V1.7.0-6` |
 
 The `V1.6.0` branch is not shared by all future versions. A new family such as
 `V1.6.1` uses its own `pre_release/V1.6.1.X` branch.
 
 1. Create a new family branch from a known baseline; keep existing iteration content
-   when adopting this workflow. Subsequent changes may be committed directly to that
-   family branch, without a required PR.
+   when adopting this workflow. Repository maintainers manage updates to that
+   version-family branch after the applicable checks and confirmation.
 2. Update [release configuration](../catalog/release.md), component pairing and both
    languages. Run the offline checks and applicable SDK/build/device checks before
    recording the checked iteration commit under a new source tag.

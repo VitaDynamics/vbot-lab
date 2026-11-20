@@ -9,11 +9,11 @@
 ## 连接与前提
 
 约定服务基址为 `http://192.168.127.10:8787`，在设备开发环境中使用 `vbot` 账户访问。
-服务随 EDU 镜像交付，写入前须确认交付版本支持这些路由。
+服务随 EDU／DEV 镜像交付，写入前须确认交付版本支持这些路由。
 不需要编译 Harness 源码、直接访问服务文件或修改权限。
 
 这是 HTTP JSON，不是 MCP：不发送 JSON-RPC 包装、initialize 请求或 `Mcp-Session-Id`。
-`18080` 端口的 MCP 工具服务是另一个访问目标。
+自己注册的 MCP 工具服务是另一个访问目标，见[连接配置 API](mcp-config.zh-CN.md)。
 仅在可信机器人网络中的单可信开发者场景使用服务。
 不得将 `8787` 暴露或转发到不可信网络、校园公网或互联网。
 指令不是操作系统权限或安全策略机制。
@@ -37,7 +37,7 @@
 
 Skill 名称只使用小写字母、数字与连字符。`content` 是完整的 `SKILL.md`，
 包含 YAML frontmatter 和非空触发说明 `description`；其中 `name` 与路由名称保持一致。
-EDU 写入、删除只使用 `target=user`。PUT 替换 `SKILL.md`，不接收目录压缩包，
+写入、删除只使用 `target=user`。PUT 替换 `SKILL.md`，不接收目录压缩包，
 也不支持任意资源上传。DELETE 删除整个用户 Skill 目录及其辅助文件，不只是 `SKILL.md`。
 
 列表项中的 `name`、`description`、`source`、`path` 为字符串，`shadowedByProject` 为布尔值。
@@ -110,7 +110,7 @@ vbot_curl --get "$VBOT_API_URL/api/skills/campus-guide" \
 ```
 
 预期输出通过路径检查的 `{path:...}` 响应，以及内容一致性检查的 `true`。
-EDU 适配镜像的返回路径必须位于 `/userdata/.vbot/content/user/skills/` 下。
+EDU／DEV 镜像的返回路径必须位于 `/userdata/.vbot/content/user/skills/` 下。
 路径不符表示适配检查失败，应停止后续写入并联系平台方，不尝试直接修复文件系统。
 即使路径检查失败，服务也可能已经完成写入。
 

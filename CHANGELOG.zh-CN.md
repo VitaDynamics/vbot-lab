@@ -2,6 +2,31 @@
 
 <p align="center"><a href="CHANGELOG.md">English</a> | 中文</p>
 
+## 机器人应用 V1.7.0-6 — 2026-11-20
+
+仅支持 `foot_quadruped` EDU／DEV 机器人应用 **V1.7.0-6**，默认配套版本也为该版本，
+SDK 配套见 [release.json](catalog/release.json)。开发使用 `pre_release/V1.7.0.X`；
+下方历史记录分别描述其所属版本。
+
+- 沿用现有接口分类提供 `/light_node/fill_light`、`/system/power_saving/set_policy` 和
+  `/slam/map_asset/{list,get_metadata,set_active_map,remove,move}` 服务说明，包括请求字段、响应和使用限制。
+- 说明 `VlnCommand.max_xvel`／`VlnSessionCommand.max_xvel` 的单次 `NAV_TO_POINT` 速度上限、
+  默认行为、单位及导航会话生命周期，以及头部动作时长预算和原生指令平滑租约。
+- 说明原生语音控制字段，包括请求类型 19 以整数秒设置的静音超时，区分原生字段与已支持的 ROS 映射。
+- 说明内置表情与内联 JPEG 显示的图片尺寸、请求限额、循环、显式停止和首帧响应语义。
+- 提供自定义图片序列注册、状态查询与删除服务，以及完整字段 ROS 播放入口，关联 Aorta Schema 与生成的 ROS 定义。
+- 提供 HTTP MCP 连接注册、列表与配置查询、编辑、启停、删除及发现刷新，明确服务 URL 与逐条管理标记。
+- Python／C++ 示例支持扩展电池与智能充电字段，保留缺失值、零与 false 的区别；
+  站起示例先区分任务进度和终态，再检查实际姿态。
+- 提供 C++ 相机 Recipe 的 S100 原生 H.265 硬件解码与 NV12 输出，
+  说明 VPU 权限检查、ARM64 构建部署及借用缓冲区的使用方式。
+- 从支持接口、指南、Foxglove 话题选择及 Python／C++ 音频示例中移除
+  `/speech/asr_result` 和 `/voice/event`，保留本体麦克风音频、UWB 音频及 UWB 输入结束事件。
+- SDK 与 V1.7.0 机器人上的 Aorta 运行时配套。C++ SDK ABI 由 13 变为 14：请重新构建 C++
+  应用并随应用部署 `libaorta_core.so.14`；公共 C++ 头文件只新增声明。Python 应用重新安装
+  release.json 中列出的 Aorta wheel。EDU 接口定义、Schema hash 与支持的路由不变。
+- 保持 SDK／Schema 定义、双语接口指南与回归测试一致；使用前检查选定设备的路由与类型。
+
 ## Rel/V1.6.0 — 2026-11-02
 
 V1.6.0 最终正式版汇总 VBOT Lab 自建仓以来提供的能力。

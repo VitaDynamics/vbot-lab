@@ -10,13 +10,13 @@ This is a hardware reference, not a runtime configuration or calibration file.
 | Robot type | Build identifier | Applicability |
 | --- | --- | --- |
 | Four-legged robot dog | `foot_quadruped` | Applies to the documented hardware configuration |
-| Four-wheeled robot dog | `wheel_quadruped` | Shares this sensor specification; its EDU guide is not released |
+| Four-wheeled robot dog | `wheel_quadruped` | Shares this sensor specification; its development guide is not released |
 | Bipedal robot | `foot_humanoid` | Not applicable; separate specifications are pending |
 
 This page is the single shared specification for the two robot-dog types, not a
-specification for all EDU robots. Exact product models and hardware revisions still
+specification for all robot configurations. Exact product models and hardware revisions still
 need to be identified before treating other configurations as equivalent.
-Hardware applicability does not extend the current EDU release beyond `foot_quadruped`.
+Hardware applicability does not extend the current EDU / DEV software release beyond `foot_quadruped`.
 See the [robot-type guide index](../../robots/README.md) for release scope and guide status.
 
 ## Stereo camera module

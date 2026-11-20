@@ -20,6 +20,150 @@
   ],
   "routes": [
     {
+      "id": "display.add_images",
+      "row": 63,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/add_images",
+        "schema": "aorta/schemas/service/peripheral/custom_images_ctrl.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.AddImagesRequest",
+          "response": "aorta.services.peripheral.AddImagesResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/add_images",
+        "type": "aorta_msgs/srv/AddImages"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 10000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5,
+        "burst": 10,
+        "max_request_bytes": 4456448
+      }
+    },
+    {
+      "id": "display.del_images",
+      "row": 64,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/del_images",
+        "schema": "aorta/schemas/service/peripheral/custom_images_ctrl.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.DelImagesRequest",
+          "response": "aorta.services.peripheral.DelImagesResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/del_images",
+        "type": "aorta_msgs/srv/DelImages"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5,
+        "burst": 10,
+        "max_request_bytes": 4096
+      }
+    },
+    {
+      "id": "display.get_images_status",
+      "row": 65,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/get_images_status",
+        "schema": "aorta/schemas/service/peripheral/custom_images_ctrl.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.GetImagesStatusRequest",
+          "response": "aorta.services.peripheral.GetImagesStatusResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/get_images_status",
+        "type": "aorta_msgs/srv/GetImagesStatus"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5,
+        "burst": 10,
+        "max_request_bytes": 4096
+      }
+    },
+    {
+      "id": "display.play_emotion_native",
+      "row": 40,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/display_node/play_emotion",
+        "schema": "aorta/schemas/service/peripheral/play_emotion.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.PlayEmotionRequest",
+          "response": "aorta.services.peripheral.PlayEmotionResponse"
+        }
+      },
+      "ros": {
+        "name": "/display_node/play_emotion_native",
+        "type": "aorta_msgs/srv/PlayEmotion"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5,
+        "burst": 10,
+        "max_request_bytes": 4096
+      }
+    },
+    {
       "id": "audio.play_pcm",
       "row": 57,
       "kind": "topic",
@@ -302,6 +446,50 @@
         ],
         "finite_fields": [
           "value"
+        ]
+      }
+    },
+    {
+      "id": "ear_light.fill_light",
+      "row": 66,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/light_node/fill_light",
+        "schema": "aorta/schemas/service/peripheral/fill_light.fbs",
+        "types": {
+          "request": "aorta.services.peripheral.FillLightRequest",
+          "response": "aorta.services.peripheral.FillLightResponse"
+        }
+      },
+      "ros": {
+        "name": "/light_node/fill_light",
+        "type": "peripheral_msgs/srv/FillLight"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096,
+        "bounds": [
+          {
+            "field": "brightness",
+            "minimum": 0,
+            "maximum": 100,
+            "unit": "percent"
+          }
         ]
       }
     },
@@ -869,26 +1057,6 @@
         "rate_per_second": 50.0,
         "burst": 5,
         "max_request_bytes": 4096,
-        "bounds": [
-          {
-            "field": "linear.x",
-            "minimum": -0.5,
-            "maximum": 0.5,
-            "unit": "m/s"
-          },
-          {
-            "field": "linear.y",
-            "minimum": -0.5,
-            "maximum": 0.5,
-            "unit": "m/s"
-          },
-          {
-            "field": "angular.z",
-            "minimum": -1.0,
-            "maximum": 1.0,
-            "unit": "rad/s"
-          }
-        ],
         "finite_fields": [
           "linear.x",
           "linear.y",
@@ -1421,6 +1589,239 @@
         "durability": "volatile",
         "history": "keep_last",
         "depth": 1
+      }
+    },
+    {
+      "id": "slam.map_asset.get_metadata",
+      "row": 69,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/map_asset/get_metadata",
+        "schema": "aorta/schemas/service/slam/map_asset_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.GetMapMetadataRequest",
+          "response": "aorta.services.slam.GetMapMetadataResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/map_asset/get_metadata",
+        "type": "aorta_msgs/srv/GetMapMetadata"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096,
+        "enum_domains": [
+          {
+            "field": "scope",
+            "allowed": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "slam.map_asset.list",
+      "row": 68,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/map_asset/list",
+        "schema": "aorta/schemas/service/slam/map_asset_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.ListMapsRequest",
+          "response": "aorta.services.slam.ListMapsResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/map_asset/list",
+        "type": "aorta_msgs/srv/ListMaps"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096,
+        "enum_domains": [
+          {
+            "field": "scope",
+            "allowed": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "slam.map_asset.move",
+      "row": 72,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/map_asset/move",
+        "schema": "aorta/schemas/service/slam/map_asset_admin_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.MoveMapRequest",
+          "response": "aorta.services.slam.MoveMapResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/map_asset/move",
+        "type": "aorta_msgs/srv/MoveMap"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096,
+        "enum_domains": [
+          {
+            "field": "scope",
+            "allowed": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "field": "overwrite_policy",
+            "allowed": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "slam.map_asset.remove",
+      "row": 71,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/map_asset/remove",
+        "schema": "aorta/schemas/service/slam/map_asset_admin_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.RemoveMapRequest",
+          "response": "aorta.services.slam.RemoveMapResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/map_asset/remove",
+        "type": "aorta_msgs/srv/RemoveMap"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096,
+        "enum_domains": [
+          {
+            "field": "scope",
+            "allowed": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "slam.map_asset.set_active_map",
+      "row": 70,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/slam/map_asset/set_active_map",
+        "schema": "aorta/schemas/service/slam/map_asset_service.fbs",
+        "types": {
+          "request": "aorta.services.slam.SetActiveMapRequest",
+          "response": "aorta.services.slam.SetActiveMapResponse"
+        }
+      },
+      "ros": {
+        "name": "/slam/map_asset/set_active_map",
+        "type": "aorta_msgs/srv/SetActiveMap"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096
       }
     },
     {
@@ -2240,6 +2641,51 @@
         "rate_per_second": 5.0,
         "burst": 10,
         "max_request_bytes": 4096
+      }
+    },
+    {
+      "id": "system.power_saving_set_policy",
+      "row": 67,
+      "kind": "service",
+      "direction": "ros_to_aorta",
+      "aorta": {
+        "key": "/system/power_saving/set_policy",
+        "schema": "aorta/schemas/service/system/power_saving_set_policy.fbs",
+        "types": {
+          "request": "aorta.services.system.PowerSavingSetPolicyRequest",
+          "response": "aorta.services.system.PowerSavingSetPolicyResponse"
+        }
+      },
+      "ros": {
+        "name": "/system/power_saving/set_policy",
+        "type": "software_msgs/srv/SetPowerSaving"
+      },
+      "qos": {
+        "reliability": "reliable",
+        "durability": "volatile",
+        "history": "keep_last",
+        "depth": 4
+      },
+      "service": {
+        "timeout_ms": 5000,
+        "max_in_flight": 1
+      },
+      "command": {
+        "single_writer": true,
+        "deadman_ms": null,
+        "zero_on_deadman": false,
+        "rate_per_second": 5.0,
+        "burst": 10,
+        "max_request_bytes": 4096,
+        "enum_domains": [
+          {
+            "field": "type",
+            "allowed": [
+              1,
+              2
+            ]
+          }
+        ]
       }
     },
     {

@@ -2,6 +2,41 @@
 
 <p align="center">English | <a href="CHANGELOG.zh-CN.md">中文</a></p>
 
+## Robot application V1.7.0-6 — 2026-11-20
+
+Supports only `foot_quadruped` EDU / DEV application **V1.7.0-6**, also the default pairing,
+with the SDK combination in [release.json](catalog/release.json).
+Development uses `pre_release/V1.7.0.X`; earlier changelog sections describe their own versions.
+
+- Provide `/light_node/fill_light`, `/system/power_saving/set_policy` and
+  `/slam/map_asset/{list,get_metadata,set_active_map,remove,move}` service references in
+  their existing interface families, with request fields, responses and operating limits.
+- Explain `VlnCommand.max_xvel` / `VlnSessionCommand.max_xvel` task-local `NAV_TO_POINT`
+  speed ceilings, default behavior, units and navigation-session lifecycle, plus head-action
+  duration budgets and native command-smoothing leases.
+- Cover native speech-control fields, including the request-type-19 silence timeout in
+  whole seconds, and distinguish native fields from the supported ROS mappings.
+- Describe built-in expressions and inline JPEG display, including image dimensions,
+  request limits, looping, explicit stopping and first-frame acknowledgement semantics.
+- Provide custom image-sequence registration, status and deletion services, plus the
+  full-field ROS playback entrance, with Aorta Schema and generated ROS definitions.
+- Provide HTTP MCP connection registration, list/config queries, editing, enable/disable,
+  deletion and discovery refresh, with explicit service URLs and per-entry management flags.
+- Support extended battery and smart-charge fields in the Python/C++ examples while
+  preserving absent, zero and false values. Stand examples distinguish task progress from
+  terminal reports before checking the observed posture.
+- Provide S100 native H.265 hardware decoding to NV12 in the C++ camera Recipe,
+  with VPU access checks, ARM64 build/deployment and borrowed-buffer handling.
+- Remove `/speech/asr_result` and `/voice/event` from the supported interfaces,
+  guides, Foxglove topic selection and Python/C++ audio examples. Retain body-microphone
+  audio, UWB audio and UWB input-completion events.
+- Pair the SDK with the Aorta runtime on V1.7.0 robots. The C++ SDK ABI moves from 13 to 14:
+  rebuild C++ applications and deploy `libaorta_core.so.14` with them; public C++ headers only
+  add declarations. Python applications reinstall the Aorta wheels named in release.json.
+  EDU interface definitions, schema hashes and supported routes are unchanged.
+- Keep SDK/Schema definitions, bilingual interface guides and regression tests aligned;
+  inspect the selected device's routes and types before use.
+
 ## Rel/V1.6.0 — 2026-11-02
 
 The final V1.6.0 release brings together the capabilities added since VBOT Lab was created.

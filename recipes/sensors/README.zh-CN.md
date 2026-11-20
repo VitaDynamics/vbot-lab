@@ -10,6 +10,13 @@
 
 电池输出将 mV/mA 转为 V/A，保留电流符号、SOC、告警及充电连接状态。IMU 保留采集时间、坐标系、四元数与协方差；角速度与加速度按原始值输出，不推测单位或自动换算；数值积分前须确认所选固件和数据流的单位。orientation_unit_length 仅检查四元数范数有限且与 1 的差不超过 0.01，不代表姿态有效。不要使用无效姿态或静默归一化。协方差 -1 表示相应估计不可用，零协方差不表示完全确定。点云输出字节数、步长和字段布局，不假设固定 XYZ 结构，也不复制或保存原始点数据。
 
+电池 JSON 还包含 `charge_state`、`charge_source`、`pd_role`、`alarm_full`、`effective_alarm`、
+`p_positive_voltage_mv`、`recharge_thresh_percent`、`record_counts_start`、`record_counts_end`、
+`smart_charge_soc_limit` 和 `smart_charge_enabled`。
+`effective_alarm` 在 `alarm_full` 存在时使用它，否则回退到 `alarm`；零值不会触发回退。
+包括旧消息在内，缺失的可选值均保留为 `null`，而存在的零计数、关闭状态 `false` 均保留为有效值。
+字段解释见[电池字段与缺失值](../../docs/interfaces/sensors.zh-CN.md#电池字段与缺失值)。
+
 ## 构建与离线预览
 
 Python 与 C++ 使用相同参数，默认仅输出计划，不创建 Node。C++ 需要配套 SDK/Schema 才能构建和运行预览。

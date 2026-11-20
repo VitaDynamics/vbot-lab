@@ -1,0 +1,28 @@
+// Fill Light Service
+//
+// Aorta service schema for `/light_node/fill_light`.
+// Mirrors `peripheral_msgs/srv/FillLight` semantics:
+//   - request `enable` selects the light state; `brightness` is a percentage
+//     in 0-100. Adapters must reject values above 100 rather than wrap or
+//     silently clamp them; the wire field remains an unsigned byte.
+//   - response carries Aorta's standard ServiceStatus (SUCCESS == 0) with an
+//     optional message.
+
+include "schemas/system/aorta_base.fbs";
+include "schemas/shared/service_common/status.fbs";
+
+namespace aorta.services.peripheral;
+
+table FillLightRequest {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  enable: bool (id: 1);
+  brightness: ubyte (id: 2);
+}
+
+table FillLightResponse {
+  aorta_header: aorta.sys.AortaHeader (id: 0);
+  status: aorta.services.common.ServiceStatus (id: 1);
+  message: string (id: 2);
+}
+
+root_type FillLightRequest;

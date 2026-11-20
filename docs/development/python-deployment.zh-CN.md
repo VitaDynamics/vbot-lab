@@ -20,7 +20,7 @@ ARM64 wheel，最后在设备上创建 venv。此 Python 部署流程不要求�
 打包内容仅包含所选 main.py 与公共 Python 模块，不包含全部示例或
 完整仓库。使用配套依赖包时，按[离线 Bazel 指南](offline-build.zh-CN.md)替换构建入口。
 
-下载工具从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31)
+下载工具从 [GitHub Releases](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.11.18)
 暂存配套的 Linux aarch64 SDK、aorta-msgs、vbot-edu-msgs、FlatBuffers wheel 及发布／许可证元数据，
 核对固定哈希，并复用已校验文件。容器不联网时，先将这些相同制品带入制品目录；
 可跳过下载，不跳过校验。下载附件需要网络，基础配套无需从 PyPI 下载。
@@ -30,12 +30,12 @@ ARM64 wheel，最后在设备上创建 venv。此 Python 部署流程不要求�
 ```bash
 RECIPE=subscribe-state &&
 PREVIEW_ARGS=() &&
-python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.10.31 &&
+python3 tools/fetch_sdk.py --output artifacts/edu-sdk-2026.11.18 &&
 bazel build "//recipes/$RECIPE:main" &&
 bazel run "//recipes/$RECIPE:main" -- "${PREVIEW_ARGS[@]}" &&
 PACKAGE_DIR="artifacts/python-$RECIPE" &&
 python3 tools/package_python.py --recipe "$RECIPE" \
-  --assets-dir artifacts/edu-sdk-2026.10.31 --output "$PACKAGE_DIR" &&
+  --assets-dir artifacts/edu-sdk-2026.11.18 --output "$PACKAGE_DIR" &&
 python3 tools/package_python.py --verify "$PACKAGE_DIR"
 ```
 
@@ -56,7 +56,7 @@ PREVIEW_ARGS 中不要加入 `--execute`：此阶段只预览和打包，不连�
 压缩包保留 `python -m` 所需的 `recipes/` 包结构，以及适用的 LICENSE/NOTICE；
 不包含 venv 或 SDK／原生二进制。
 
-工具的 `base` 配套覆盖状态、消息元数据、ASR 等仅依赖 SDK 的操作。
+工具的 `base` 配套覆盖状态、音频帧元数据、输入结束事件等仅依赖 SDK 的操作。
 音视频数据保存另需 `numpy==2.2.6`，相机解码还需 `av==16.1.0`；本部署包及 SDK Release 均不附带它们。
 使用这些选项的应用需单独准备匹配 ARM64 与设备 Python ABI（当前配套为 Python 3.10）的依赖包，
 独立检查完整性与许可证。不要向已校验的基础包追加文件，或重写校验和绕过检查。

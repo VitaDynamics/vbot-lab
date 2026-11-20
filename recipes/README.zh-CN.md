@@ -15,7 +15,7 @@
 | 传感器 | [sensors](sensors/README.zh-CN.md)：电池、本体／LiDAR IMU、点云布局 | pub/sub |
 | 相机 | [camera](camera/README.zh-CN.md)：H.265 元数据、保存与解码 | pub/sub |
 | Perception | [perception](perception/README.zh-CN.md)：目标／人体框、人体关键点 | pub/sub |
-| Audio | [audio](audio/README.zh-CN.md)：本体／UWB 音频、ASR、输入结束事件 | pub/sub |
+| Audio | [audio](audio/README.zh-CN.md)：本体／UWB 音频、输入结束事件 | pub/sub |
 | 运动 | [locomotion](locomotion/README.zh-CN.md)：站起／趴下；[subscribe-state](subscribe-state/README.zh-CN.md)：姿态与心跳 | service + pub/sub |
 | 系统与外设 | [system-peripherals](system-peripherals/README.zh-CN.md)：系统／显示状态及应用版本；[device-info](device-info/README.zh-CN.md)：固件查询；[service-call](service-call/README.zh-CN.md)：灯光状态 | service + pub/sub |
 | RCP | [rcp-task](rcp-task/README.zh-CN.md)：Sleep DAG 提交、结果与取消 | action |
@@ -24,7 +24,7 @@
 各分类覆盖上表所列实现，并非每条公开路由都有独立示例。SLAM 读取不切换模式；
 主动建图、保存与定位按[建图流程](../docs/guides/mapping-localization.zh-CN.md)执行。现有辅助示例入口继续保留。
 
-这些入口已有 Python／C++ 源码与 Bazel 目标。适配四足 EDU 的机器人应用版本 **V1.6.0-15**、**V1.6.0-17**，SDK 配套为 edu-sdk-2026.10.31；安装步骤见 [客户端开发库](../packages/README.zh-CN.md)及 [Python SDK](../packages/aorta/python/README.zh-CN.md)。SDK 可导入、代码可构建不代表设备接口已就绪；先检查目标固件的路由与类型。
+这些入口已有 Python／C++ 源码与 Bazel 目标。适配四足 EDU／DEV 的机器人应用版本 **V1.7.0-6**，SDK 配套为 edu-sdk-2026.11.18；安装步骤见 [客户端开发库](../packages/README.zh-CN.md)及 [Python SDK](../packages/aorta/python/README.zh-CN.md)。SDK 可导入、代码可构建不代表设备接口已就绪；先检查目标固件的路由与类型。
 
 ## Python 运行流程
 
@@ -65,4 +65,6 @@ bazel test //tests:recipe_cpp_test //tests:recipe_cpp_sdk_test
 
 基础 C++ 目标均标记为 manual，不随普通 `//recipes/...` 通配构建隐式引入 SDK 依赖。
 基础相机目标读取／保存 H.265；额外的 `:main_cpp_decode` 在安装 FFmpeg 开发依赖后解码 RGB。
+可选 ARM64 目标 `:main_cpp_s100_decode` 通过地瓜 S100 原生 SDK 在内存中解码 NV12，
+见[相机指南](camera/README.zh-CN.md#c-s100-硬件解码)。
 C++ 预览需要编译与动态链接，但不会连接设备。设备在线运行需完成 SSH 登录、shell 配置，并使用 ARM64 可执行文件及匹配运行库。

@@ -5,7 +5,7 @@
 The system invokes `/userdata/vbot/init.sh` **as the vbot user during startup**.
 Use this entry point to launch user programs automatically after the device reboots;
 no interactive SSH session is required. This guide applies to the current
-`foot_quadruped` EDU software.
+`foot_quadruped` EDU / DEV software.
 
 This is a boot entry point, not a process supervisor. It does not by itself restart a
 crashed application, rotate logs, or guarantee that network connections and robot interfaces

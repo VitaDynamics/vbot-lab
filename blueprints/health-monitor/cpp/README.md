@@ -5,8 +5,8 @@
 C++17 / Aorta C++ SDK implementation of the [health-monitor Blueprint](../README.md).
 It combines `/locomotion/status`, `/bms_state` and `/system/sm_status`; it never publishes
 control messages, calls services/actions, or records audio/video. Use foot_quadruped
-applications V1.6.0-15 and V1.6.0-17, SDK 2026.10.20 / ABI 13 and Schema pack 2026.10.20-v4 from
-Release edu-sdk-2026.10.31. No Python runtime or wheel is needed on the robot.
+applications V1.7.0-6, SDK 2026.11.15 / ABI 14 and Schema pack 2026.11.18-v4 from
+Release edu-sdk-2026.11.18. No Python runtime or wheel is needed on the robot.
 
 ## Build and preview — development container
 
@@ -61,21 +61,21 @@ these paths if your extracted directories differ. The AMD64 container cross-comp
 do not run the ARM64 program or ARM64 tests there.
 
 ```bash
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.11.18/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.11.18/edu-schema" &&
 bazel build --config=arm64 //blueprints/health-monitor:main_cpp &&
 PACKAGE_DIR=$(mktemp -d /tmp/vbot-health-cpp-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
 cp -L bazel-bin/blueprints/health-monitor/main_cpp "$PACKAGE_DIR/bin/health-monitor" &&
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
 cp blueprints/health-monitor/config.json "$PACKAGE_DIR/config.json" &&
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
   "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
   "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
-file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+file "$PACKAGE_DIR/bin/health-monitor" "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/bin/health-monitor" &&
 (cd "$PACKAGE_DIR" && find bin lib licenses config.json -type f -exec sha256sum {} + > SHA256SUMS)
 ```

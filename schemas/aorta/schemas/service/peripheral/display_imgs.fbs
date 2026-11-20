@@ -19,6 +19,9 @@ table DisplayImgsRequest {
   aorta_header: aorta.sys.AortaHeader (id: 0);
   images: [ShowImg] (id: 1);
   duration_ms: [uint] (id: 2);
+  // Repeat the inline sequence. False preserves legacy play-once behavior.
+  // Inline duration_ms=0 means no delay, including when loop is true.
+  loop: bool = false (id: 3);
 }
 
 table DisplayImgsResponse {

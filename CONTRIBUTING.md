@@ -22,7 +22,7 @@ Technical support is also available at [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.c
 - Maintain every document in English and Simplified Chinese. Default filenames use English; translations use `.zh-CN.md`. Update both in the same change and retain language navigation and same-language document links.
 - Write user guides as complete, correct usage workflows: prerequisites, commands, responses, completion conditions, and recovery. Keep test reports separate from usage instructions.
 - Follow the [robot-type documentation structure](docs/robots/README.md): reuse shared chapters and hardware specifications, isolate type-specific differences, and update the release scope and compatibility matrix without implying support for unreleased types.
-- Keep the existing shared wired connection and sensor specification for `foot_quadruped` and `wheel_quadruped`; do not duplicate them or apply them to `foot_humanoid`. Current EDU release scope remains `foot_quadruped` until separately released and documented.
+- Keep the existing shared wired connection and sensor specification for `foot_quadruped` and `wheel_quadruped`; do not duplicate them or apply them to `foot_humanoid`. Current EDU / DEV software scope remains `foot_quadruped` until other types are separately released and documented. Maintain one shared interface reference for EDU and DEV; preserve published package names and configuration paths.
 - Include the dependencies needed to build Schema changes and keep generated Python bindings consistent.
 - Include reproducible steps and relevant test results; follow the [security guidance](SECURITY.md) when sharing reports.
 - Run `python3 tools/run_checks.py --scope repository` on the host or CI runner; run `python3 tools/run_checks.py --scope recipes` and relevant Bazel checks inside the development container. Distinguish offline tests from actual harness-session and device behavior.
@@ -31,22 +31,23 @@ Technical support is also available at [vbot-edu@vbot.cn](mailto:vbot-edu@vbot.c
 
 ## Maintainers and review
 
-The repository administrators are the maintenance team. They triage issues, review
+The repository maintainers triage issues, review
 contributions and coordinate compatibility changes. [CODEOWNERS](.github/CODEOWNERS)
-lists the reviewers for all repository paths; update it when administrator membership changes.
+lists the reviewers for all repository paths; update it when maintainer membership changes.
 Review routing does not grant repository permissions or replace configured merge requirements.
 
+Only repository maintainers may commit and push updates to repository branches.
+Other contributors work in forks and submit pull requests for maintainer review.
 VBOT Lab version iterations use a separate `pre_release/V<major>.<minor>.<patch>.X`
-branch for each version family. After checks, maintainers may commit and push directly
-to that iteration branch; iteration updates do not require a PR. A topic PR targeting
-the iteration branch remains optional when review is wanted.
-V1.6.0 application development uses `release/V1.6.0`; `Rel/V1.6.0` records the formal snapshot.
+branch for each version family.
+Current V1.7.0-6 development uses `pre_release/V1.7.0.X`.
+The earlier V1.6.0 version retains `release/V1.6.0` and its formal snapshot `Rel/V1.6.0`.
 `main` is reserved for the latest formal release. Open a release-promotion PR only when a formal
 release has been explicitly requested; do not create one during ordinary iteration work.
 Do not push directly to `main` or imply support for unreleased capabilities.
 PRs to `main` require approval from another listed maintainer, passing `repository-layout`
 checks against the current base, and resolved review discussions. New reviewable commits
-require renewed approval. Maintainers merge with **Squash and merge**; administrators
+require renewed approval. Repository maintainers merge with **Squash and merge** and
 follow the same protection rules. See the [collaboration workflow](.github/WORKFLOWS.md)
 for the checks and version-tag policy.
 

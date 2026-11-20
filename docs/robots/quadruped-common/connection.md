@@ -7,7 +7,7 @@ use the same wired or Wi-Fi connection and SSH login procedures described here.
 It connects your computer to the robot and opens a terminal using the `vbot` account;
 it does not install an SDK, deploy an application, or start robot motion.
 These instructions do not apply to bipedal robots (`foot_humanoid`).
-The current EDU release scope remains `foot_quadruped` only; a shared connection procedure
+The current EDU / DEV release scope remains `foot_quadruped` only; a shared connection procedure
 does not establish firmware, SDK, or API availability for `wheel_quadruped`.
 
 Choose one connection method: complete wired steps 1–2, or use the wireless procedure
@@ -210,7 +210,7 @@ device operations. Advice-only requests and offline checks do not connect or ins
 
 ## Next steps
 
-For the current `foot_quadruped` EDU software, continue with
+For the current `foot_quadruped` EDU / DEV software, continue with
 [device shell configuration and checks](../../getting-started/device-environment.md).
 This software step is separate from the shared connection procedure.
 
@@ -226,5 +226,5 @@ For Foxglove viewing over Wi-Fi, use the robot's reachable Wi-Fi IP as the SSH e
 and forward the bridge through a local tunnel. Follow [Foxglove live viewing](../../guides/foxglove.md)
 for the device-side listener, computer-side forwarding command and local WebSocket URL.
 
-Return to the [four-legged EDU guide](../foot_quadruped/README.md) or the
+Return to the [four-legged EDU / DEV guide](../foot_quadruped/README.md) or the
 [four-wheeled robot-dog reference](../wheel_quadruped/README.md).

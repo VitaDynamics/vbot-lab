@@ -13,9 +13,18 @@ ROUTES = {
 
 def summarize(stream, m):
     if stream == "battery":
+        alarm_full = m.AlarmFull()
         return dict(timestamp_ns=m.SensorTimestampNs(), voltage_v=m.VoltageMv() / 1000,
                     current_a=m.CurrentMa() / 1000, soc_percent=m.SocPercent(),
-                    alarm=m.Alarm(), charger_connected=m.IsChargerConnected())
+                    alarm=m.Alarm(), alarm_full=alarm_full,
+                    effective_alarm=m.Alarm() if alarm_full is None else alarm_full,
+                    charger_connected=m.IsChargerConnected(),
+                    charge_state=m.ChargeState(), charge_source=m.ChargeSource(),
+                    pd_role=m.PdRole(), p_positive_voltage_mv=m.PPositiveVoltageMv(),
+                    recharge_thresh_percent=m.RechargeThreshPercent(),
+                    record_counts_start=m.RecordCountsStart(), record_counts_end=m.RecordCountsEnd(),
+                    smart_charge_soc_limit=m.SmartChargeSocLimit(),
+                    smart_charge_enabled=m.SmartChargeEnabled())
     if stream in ("imu", "lidar-imu"):
         orientation = vector(m.Orientation(), True)
         norm = None if orientation is None else math.sqrt(sum(value * value for value in orientation))

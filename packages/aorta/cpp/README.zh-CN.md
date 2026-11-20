@@ -8,8 +8,8 @@
 每个 Bash 命令块应作为一条命令链执行。`&&` 会在失败后跳过本段后续命令，
 并保留下一步所需的 shell 变量。处理错误后，再执行下一个命令块。
 
-使用 [edu-sdk-2026.10.31 版本](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31)：
-C++ SDK `2026.10.20`、ABI `13`，配套 EDU Schema pack `2026.10.20-v4`。
+使用 [edu-sdk-2026.11.18 版本](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.11.18)：
+C++ SDK `2026.11.15`、ABI `14`，配套 EDU Schema pack `2026.11.18-v4`，EDU、DEV 设备共用。
 示例使用 C++17、Bazel 7.6.1 与发布包中的生成头文件，不依赖 Python wheel，也无需本地生成 Schema。
 
 ## 准备发布制品
@@ -37,17 +37,17 @@ bazel --version
 不在 AMD64 容器内执行 ARM64 程序／测试，无需另建容器或在机器人上编译。
 
 将对应 SDK 压缩包、EDU Schema 压缩包及 `SHA256SUMS` 下载至
-`artifacts/edu-sdk-2026.10.31/`。Linux x86_64 上从仓库根目录执行：
+`artifacts/edu-sdk-2026.11.18/`。Linux x86_64 上从仓库根目录执行：
 
 ```bash
-cd artifacts/edu-sdk-2026.10.31 &&
+cd artifacts/edu-sdk-2026.11.18 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-x86_64 edu-schema &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
-tar --zstd -xf aorta-edu-schema-pack-2026.10.20-v4.tar.zst -C edu-schema &&
+tar --zstd -xf aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
+tar --zstd -xf aorta-edu-schema-pack-2026.11.18-v4.tar.zst -C edu-schema &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-x86_64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema"
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.11.18/cpp-sdk-x86_64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.11.18/edu-schema"
 ```
 
 确认所选两个压缩包的校验均通过；校验命令会跳过未下载制品。使用新的解压目录；
@@ -104,6 +104,10 @@ RCP 使用 `execute_task_msg.h` 的 `ExecuteTaskAction` 和生成的 `*Msg`／va
 
 ## 可选相机解码
 
+S100 原生 VPU 解码输出 NV12，使用独立 ARM64 目标并在本地提供地瓜 SDK，
+流程见[硬件解码 Recipe](../../../recipes/camera/README.zh-CN.md#c-s100-硬件解码)。
+下文 FFmpeg 流程仅适用于独立的软件解码目标。
+
 FFmpeg 以独立目录提供、而非安装到系统时，在构建前将 `VBOT_FFMPEG_DIR`
 设为该目录的绝对路径。支持的目录布局为 FFmpeg 4.4 头文件位于 `include/`，
 `libavcodec.so.58`、`libavutil.so.56`、`libswscale.so.5` 位于 `lib/`，
@@ -135,13 +139,13 @@ bazel run //recipes/camera:main_cpp_decode -- --decode --consent
 并为设备构建选择它：
 
 ```bash
-cd artifacts/edu-sdk-2026.10.31 &&
+cd artifacts/edu-sdk-2026.11.18 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-aarch64 &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
+tar --zstd -xf aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.11.18/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.11.18/edu-schema" &&
 bazel build --config=arm64 //recipes/subscribe-state:main_cpp &&
 file bazel-bin/recipes/subscribe-state/main_cpp &&
 aarch64-linux-gnu-readelf -d bazel-bin/recipes/subscribe-state/main_cpp
@@ -182,15 +186,15 @@ PACKAGE_DIR=$(mktemp -d /tmp/vbot-cpp-app-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
 cp -L "bazel-bin/recipes/$RECIPE/main_cpp" "$PACKAGE_DIR/bin/$RECIPE" &&
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
    "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
    "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
    "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
-file "$PACKAGE_DIR/bin/$RECIPE" "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+file "$PACKAGE_DIR/bin/$RECIPE" "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/bin/$RECIPE" &&
-aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 (cd "$PACKAGE_DIR" && find bin lib licenses -type f -exec sha256sum {} + > SHA256SUMS)
 ```
 

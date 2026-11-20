@@ -2,27 +2,28 @@
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 
-**面向 VBOT EDU 机器人的 agent-native 开发工作区。**
+**面向 VBOT EDU／DEV 机器人的 agent-native 开发工作区。**
 
 [开发文档](docs/README.zh-CN.md) · [Vbot Viewer](docs/guides/vbot-viewer.zh-CN.md) · [社区与支持](docs/community/README.zh-CN.md)
 
 VBOT Lab 汇集面向任务的 Skills、能力索引、Aorta Python SDK、接口定义和参考程序，
 用于开发机器人应用。
 
-当前适配的机器人应用版本：**V1.6.0-15**、**V1.6.0-17**，适用于 `foot_quadruped` EDU。
+当前适配的机器人应用版本：**V1.7.0-6**，适用于 `foot_quadruped` EDU／DEV。
+两个产品系列共用相同的开放软件接口、SDK 与 Recipes。
 SDK 与平台配套见[兼容矩阵](docs/compatibility.zh-CN.md)。
 
 ## 与 Agent 开始开发
 
-先切换到 V1.6.0 开发分支，再在 Agent 中打开仓库：
+先切换到 V1.7.0 开发分支，再在 Agent 中打开仓库：
 
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout release/V1.6.0
+git checkout pre_release/V1.7.0.X
 ```
 
-已有仓库先保留本地修改，执行 `git fetch origin`，再执行 `git checkout release/V1.6.0`。
+已有仓库先保留本地修改，执行 `git fetch origin`，再执行 `git checkout pre_release/V1.7.0.X`。
 本版本更新见[发布说明](CHANGELOG.zh-CN.md)。在 Codex 或 Claude Code 中打开仓库，然后提出任务：
 
 > 检查这台工作站是否具备 VBOT 开发条件。报告已有工具、缺失依赖和发布限制。
@@ -69,7 +70,7 @@ SSH 登录、部署并收到三条解码后的 `/locomotion/status` 消息。
 
 ## 范围与安全
 
-当前 EDU 发布对象为 `foot_quadruped`；
+当前发布对象为 EDU、DEV 系列的 `foot_quadruped`；
 `wheel_quadruped` 与 `foot_humanoid` 为后续版本。
 共用硬件参数或连接流程不代表软件兼容，请核对[设备指南](docs/robots/README.zh-CN.md)
 及[兼容矩阵](docs/compatibility.zh-CN.md)。

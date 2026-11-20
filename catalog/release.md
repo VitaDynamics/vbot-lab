@@ -7,29 +7,29 @@ snapshot. It is a local, machine-readable pairing configuration, not a release
 announcement or an installer. Component versions remain independent.
 
 The configuration uses the selected application, SDK, Schema and development image
-references. It records the intended source branch and tag; this does not create Git
-refs or announce a release. The development branch is `release/V1.6.0`, the formal
-source tag is `Rel/V1.6.0`, the supported robot applications are
-`V1.6.0-15` and `V1.6.0-17`, and the SDK Release is `edu-sdk-2026.10.31`. The image digest is pinned.
+references. It records the development branch, with an optional tag for a source
+snapshot; this does not create Git refs or announce a release. The development branch is `pre_release/V1.7.0.X`,
+the supported robot application is `V1.7.0-6`, and the SDK Release is
+`edu-sdk-2026.11.18`. The image digest is pinned.
 
 ## Fields
 
 | Field | Meaning and allowed values |
 | --- | --- |
 | `format_version` | Integer `1`; unknown fields and duplicate JSON keys are rejected |
-| `workspace.branch` | Development branch for the selected release: `release/V1.6.0`. The format also accepts `main` and long-lived iteration branches such as `pre_release/V1.6.1.X`; `X` is literal |
-| `workspace.tag` | Formal snapshot `Rel/V1.6.0`, matching the `release/V1.6.0` branch family. Iteration branches instead use a matching numeric iteration tag; robot application and SDK versions remain separate |
+| `workspace.branch` | Current development branch: `pre_release/V1.7.0.X`; `X` is literal. The format also accepts `main` and `release/V<major>.<minor>.<patch>` for formal versions |
+| `workspace.tag` | Optional source snapshot for iteration work; omit when developing on the version-family branch. If supplied, an iteration tag must match the branch family and use a numeric iteration. Formal release configurations require a source tag, using `Rel/V<major>.<minor>.<patch>` for a release branch. Application and SDK versions remain separate |
 | `robots` | Current released robot types from `catalog/robots/`; default pairing and supported versions must match their profiles |
-| `robots.<type>.application_version` | Default application pairing, currently `V1.6.0-17`; retained as a single version for package metadata |
-| `robots.<type>.supported_application_versions` | Optional nonempty list of unique exact versions, currently `V1.6.0-15` and `V1.6.0-17`; must include the default and match the robot profile. Omission means only the default, not a range |
+| `robots.<type>.application_version` | Default application pairing, currently `V1.7.0-6`; retained as a single version for package metadata |
+| `robots.<type>.supported_application_versions` | Optional nonempty list of unique exact versions, currently `V1.7.0-6`; must include the default and match the robot profile. Omission means only the default, not a range |
 | `sdk.repository`, `sdk.release_tag` | GitHub download repository (`owner/name`) and exact EDU SDK bundle Release tag |
 | `sdk.aorta_version` | Aorta SDK package version, aligned with the Python and C++ SDK |
 | `sdk.python` | Minimum Python version (`major.minor`), exact versions of the four wheel packages, and available wheel platform tags |
 | `sdk.cpp` | Exact SDK version, positive integer ABI, distribution identifier and available architectures; keep ABI aligned with the Bazel native-library import |
 | `sdk.assets` | Attachment inventory: exact filenames and lowercase 64-character SHA-256 values, including checksum/manifest/license attachments; no credentials or signed download URLs |
-| `schema` | Schema version, pack revision, archive name/checksum and ROS 2 bridge pairing from the generated `schemas/MANIFEST.json`; the pack revision may differ from the Schema version |
+| `schema` | Downloaded Schema archive version/revision/name/checksum and bridge pairing recorded by the selected SDK Release. The current checked-in ROS definition version is recorded separately in `schemas/MANIFEST.json` |
 | `development.bazel_version` | Exact `.bazelversion` value |
-| `development.image` | Tagged Compose default image reference and a `sha256:<64 lowercase hex characters>` digest; `null` means the digest has not been recorded |
+| `development.image` | Tagged Compose default image reference and a `sha256:<64 lowercase hex characters>` digest, matching the selected development image |
 
 Package versions use three numeric components, optionally followed by a revision such
 as `-v4`. Application versions use `V<major>.<minor>.<patch>`, optionally with a numeric build suffix such as `-10`. Unknown compatibility
@@ -42,18 +42,21 @@ SDK binaries have their own Release references and hashes.
 
 ## Source branches and tags
 
-Develop V1.6.0 applications on `release/V1.6.0`, not on a detached tag or an iteration
-branch. `Rel/V1.6.0` identifies its formal source snapshot, paired with robot applications
+Develop the current V1.7.0-6 applications on `pre_release/V1.7.0.X`, not on a detached
+tag or the earlier V1.6.0 branch. The iteration configuration selects this branch directly.
+
+The earlier V1.6.0 applications use `release/V1.6.0`. `Rel/V1.6.0` identifies that formal source snapshot, paired with robot applications
 `V1.6.0-15` and `V1.6.0-17`. The earlier `V1.6.0.15` tag remains an iteration snapshot, not the development
 entry point. `main` contains the latest formal release.
 
 At formal promotion, merge the reviewed changes to `main` through its PR process, then
-create `release/V1.6.0` and `Rel/V1.6.0` from that same merged commit. This keeps the three
+create the matching `release/V<major>.<minor>.<patch>` and `Rel/V<major>.<minor>.<patch>` from that same merged commit. This keeps the three
 references aligned without rewriting history. Selecting a branch or creating a tag does
 not automatically create a GitHub Release.
 
 For a new version family, prepare iterations on its own
-`pre_release/V<major>.<minor>.<patch>.X` branch; iteration updates do not require a PR.
+`pre_release/V<major>.<minor>.<patch>.X` branch.
+Only repository maintainers may commit and push updates to repository branches.
 The V1.6.0 iteration is complete. Do not reuse its branch for another family.
 Existing tags identify immutable snapshots. See the
 [collaboration workflow](../.github/WORKFLOWS.md) for review and promotion steps.
@@ -73,11 +76,11 @@ python3 tests/test_release.py
 
 The tool uses only the standard library and local files. It does not contact GitHub,
 Docker or a robot, install anything, create tags or publish Releases. Output is JSON:
-exit `0` means locally consistent (possibly with `pending` fields), `1` means strict
-completion was requested but fields remain unfilled, and `2` means invalid input or
+exit `0` means locally consistent, `1` means strict completion was requested but
+required metadata is incomplete, and `2` means invalid input or
 a mismatch. Argument errors also return `2`, with argparse output on stderr.
 
-To require the source tag and image digest to be filled:
+To require complete metadata for the selected source mode and the image digest:
 
 ```bash
 python3 tools/check_release.py --require-complete
@@ -85,7 +88,8 @@ python3 tools/check_release.py --require-complete
 
 Completion checks syntax and recorded
 pairing; it does not prove tag existence, download visibility, image identity or device
-compatibility. A missing image digest or source tag intentionally fails this strict check.
+compatibility. Branch-based iterations do not require a source tag. A missing image digest
+or a missing source tag for a formal release fails this strict check.
 
 After downloading SDK assets through the [SDK guide](../packages/aorta/python/README.md),
 optionally compare the published manifest and hash the local attachments:

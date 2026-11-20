@@ -13,7 +13,7 @@ from health_monitor.errors import ApplicationError
 ROUTES = {"state": ("/locomotion/status", "locomotion.LocomotionStatus"),
           "battery": ("/bms_state", "bms.BmsState"),
           "system": ("/system/sm_status", "sm.SmStatus")}
-VERSIONS = {"aorta-sdk": "2026.10.20", "aorta-msgs": "2026.10.20", "vbot-edu-msgs": "2026.10.20"}
+VERSIONS = {"aorta-sdk": "2026.11.15", "aorta-msgs": "2026.11.15", "vbot-edu-msgs": "2026.11.18"}
 
 
 def check_device():

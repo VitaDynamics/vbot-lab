@@ -3,7 +3,7 @@
 <p align="center">English | <a href="customization.zh-CN.md">中文</a></p>
 
 Scope and status follow the [Agent capability overview](README.md).
-These documents are consumed by the EDU device's `vbot-agent-harness` process.
+These documents are consumed by the EDU / DEV device's `vbot-agent-harness` process.
 Write and review them in your own development workspace, then use the
 [Skills / AGENTS.md content API](content-api.md) to inject their text into the service.
 They do not grant capabilities beyond the documented developer interfaces.
@@ -76,7 +76,7 @@ not the artifact to import into the robot runtime.
 The [content API reference](content-api.md) documents requests, responses, upload / readback
 commands, returned-path checks, and deletion / recovery boundaries. Content is managed
 by the device service; the examples do not write directly into its filesystem.
-The supported robot application versions are **V1.6.0-15** and **V1.6.0-17**;
+The supported robot application versions are **V1.7.0-6**;
 see the [compatibility matrix](../../compatibility.md) for pairing requirements.
 
 After upload, check readback and use a matching request in a new Turn, following the

@@ -1,10 +1,11 @@
-# Four-legged robot dog EDU
+# Four-legged robot dog — EDU / DEV
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
 - Build identifier: `foot_quadruped`.
-- EDU scope: the only robot type in the current release scope.
-- Supported robot application versions: `V1.6.0-15` and `V1.6.0-17`.
+- Product series: EDU and DEV, sharing the same public software interfaces, SDK and Recipes.
+- Release scope: the only robot type in the current software release scope.
+- Supported robot application versions: `V1.7.0-6`.
 - Available guides: connection, shell setup, hardware, SLAM, and Agent interfaces.
   Python/C++ Recipes are available; see the compatibility matrix for component availability.
 

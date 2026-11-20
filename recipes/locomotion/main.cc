@@ -84,6 +84,8 @@ int main(int argc, char **argv) {
         while (true) {
           auto bytes = reports.Next(end);
           const auto *report = recipe::Decode<task::TaskReport>(bytes);
+          if (report->kind() != task::TaskReportKind_TERMINAL)
+            continue;
           if (recipe::Text(report->req_id()) != id)
             continue;
           const auto *context = report->result_as_LocomotionTaskResult();

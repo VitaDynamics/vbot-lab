@@ -2,28 +2,29 @@
 
 <p align="center">English | <a href="README.zh-CN.md">中文</a></p>
 
-**An agent-native development workspace for VBOT EDU robots.**
+**An agent-native development workspace for VBOT EDU and DEV robots.**
 
 [Documentation](docs/README.md) · [Vbot Viewer](docs/guides/vbot-viewer.md) · [Community](docs/community/README.md)
 
 VBOT Lab brings together task-oriented Skills, a capability catalog, the Aorta Python SDK,
 interface definitions, and reference programs for building robot applications.
 
-Supported robot application versions: **V1.6.0-15** and **V1.6.0-17**, for `foot_quadruped` EDU.
+Supported robot application: **V1.7.0-6**, for `foot_quadruped` EDU / DEV.
+Both product series share the same public software interfaces, SDK and Recipes.
 See the [compatibility matrix](docs/compatibility.md) for SDK and platform pairing.
 
 ## Build with your Agent
 
-Select the V1.6.0 development branch before opening the checkout in your Agent:
+Select the V1.7.0 development branch before opening the checkout in your Agent:
 
 ```bash
 git clone https://github.com/VitaDynamics/vbot-lab.git &&
 cd vbot-lab &&
-git checkout release/V1.6.0
+git checkout pre_release/V1.7.0.X
 ```
 
 For an existing checkout, preserve local changes, run `git fetch origin`, then
-`git checkout release/V1.6.0`. See the [release notes](CHANGELOG.md) for this version.
+`git checkout pre_release/V1.7.0.X`. See the [release notes](CHANGELOG.md) for this version.
 Open this checkout in Codex or Claude Code, then ask:
 
 > Check this workstation for VBOT development. Report available tools, missing dependencies,
@@ -71,7 +72,7 @@ Repository validation is a separate [contribution workflow](#contributing-and-va
 
 ## Scope and safety
 
-The current EDU release target is `foot_quadruped`;
+The current release target is `foot_quadruped` in the EDU and DEV series;
 `wheel_quadruped` and `foot_humanoid` remain future releases.
 Shared robot-dog hardware or connection procedures do not establish software compatibility.
 Check the [robot guides](docs/robots/README.md) and [compatibility matrix](docs/compatibility.md).

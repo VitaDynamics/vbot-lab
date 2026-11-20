@@ -7,7 +7,7 @@
 本功能域用于观察姿态／动作状态、跟踪请求的完成情况，或接入明确要求的控制输入。
 
 Python 和 C++ SDK 实现见 [locomotion Recipe](../../recipes/locomotion/README.zh-CN.md)，包含源码、Bazel 目标、离线预览与显式设备运行。接口语义以下文为准。
-在选定的 `foot_quadruped` EDU 设备上完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)。
+在选定的 `foot_quadruped` EDU／DEV 设备上完成[设备 shell 配置](../getting-started/device-environment.zh-CN.md)。
 准确类型与 ROS 映射见[接口表](aorta-ros2.zh-CN.md)，不能混淆输出 topic 与控制输入。
 
 ## 路由与数据含义
@@ -39,10 +39,28 @@ timeout 15s aorta topic echo /locomotion/status --count 1
 2. 用户要求操作时，先建立对应报告订阅，再发送请求，并保留 service 契约使用的请求 ID。
 3. Service 启动回复只表示是否接纳，不表示完成。按确切请求匹配终态，
    再检查成功／失败／取消与结构化结果；单纯变为空闲不能证明请求动作成功。
-4. 任务报告先检查 `result_type` 再读取 `result`。运动结果含 `stage` 时区分准备与执行。
+4. 任务报告先要求 `kind=TERMINAL`（0，也是旧消息的默认值）。`PROGRESS`（1）即使
+   `status=SUCCESS` 也只表示活动，不表示完成。再检查 `result_type` 并读取 `result`；运动结果含 `stage` 时区分准备与执行。
    使用稳定的状态／原因字段决策；`diagnostic` 是说明文字，不是机器可读错误码。
 5. 请求 ID 为空的动作报告不能安全地结束某个指定请求。
    每个请求设定超时，没有匹配终态时报告结果未知，不盲目重发可能仍在执行的操作。
+
+### TaskReport 字段
+
+[TaskReport Schema](../../schemas/aorta/schemas/topic/task/task_report.fbs) 保留既有字段 ID，
+追加以下原生字段：
+
+| 字段 | 含义 |
+| --- | --- |
+| `kind` | `TERMINAL=0` 或 `PROGRESS=1`；先检查它，再解释 `status` 或结果 union |
+| `phase` | 由发布方定义的阶段标签，不是完成标志或稳定错误码 |
+| `progress_seq` | 以 `req_id` 为范围的有效进展序号；零、重复值和旧值不能延长进展等待期限 |
+
+上方公开的机身／头部任务报告路由承载终态，不是进度流。当前 ROS `aorta_msgs/msg/TaskReport`
+表示不包含这三个字段。原生 `BaseActionTaskResult` 还包含 `error_code`、`error_detail`，
+当前 ROS 对应结果分支不暴露它们。
+RCP 图的 `execution_timeout_ms` 仍是固定节点截止时间，进度不能延长它。
+即使能力持续上报活动，也要保留总超时。
 
 ## 控制输入行为
 
@@ -130,6 +148,27 @@ QoS 为 reliable、volatile、keep-last、深度 4。`x`、`y`、`yaw`、`stop_d
 ```bash
 timeout 15s ros2 interface show function_msgs/srv/ControlFollowing
 ```
+
+## 运行时控制服务
+
+`/locomotion/runtime_control` 使用
+[RuntimeControlRequest / RuntimeControlResponse](../../schemas/aorta/schemas/service/locomotion/runtime_control.fbs)。
+`TRY_RESUME_PILOT=1` 仅在当前 pilot 状态允许时请求恢复，不是通用站起或急停命令。
+结合响应 `status` 与 `outcome` 判断；`APPLIED` 表示已分发事件，不是物理动作完成。
+
+原生契约还定义 `SET_COMMAND_SMOOTHING_OVERRIDE=2`、`CLEAR_COMMAND_SMOOTHING_OVERRIDE=3`，
+用于当前 NORMAL 策略的临时平滑参数覆盖：
+
+| 请求字段 | 契约 |
+| --- | --- |
+| `owner` | 调用方会话唯一的非空标识，最多 128 字节；其他活跃所有者占用时返回 `CONFLICT` |
+| `cmd_smoothing_ratio` | 仅 SET 使用：有限 double，`0 <= ratio < 1`；不改配置默认值，不重置控制器历史 |
+| `valid_until_ns` | 仅 SET 使用：CLOCK_REALTIME 的 Unix 绝对纳秒时间，不能使用传感器／PHC 时间；服务接收时剩余时间须大于零且不超过 3 秒 |
+
+建议申请 2.5 秒租约并在到期前续租，为传输留出余量。已释放或过期的 owner 不能复活该租约，
+应建立新的会话标识。CLEAR 只释放自己的覆盖；动作退出也会释放。无效截止时间会被拒绝而不是裁剪，
+不能假设进程退出等于立即释放。当前 ROS `aorta_msgs/srv/RuntimeControl` 请求只有 `command`，
+不能表达这些租约字段；需要配套原生 SDK。此类命令会改变实时控制行为，须满足现场监督等运控安全条件。
 
 ## 解释与排障
 

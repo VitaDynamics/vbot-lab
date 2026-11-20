@@ -9,7 +9,7 @@ illustrated fastener configuration are shared by four-legged robot dogs
 This specification does not apply to bipedal robots (`foot_humanoid`).
 
 Both robot-dog types use this single reference. Shared mechanical hardware does
-not change the [EDU software release scope](../../robots/README.md).
+not change the [EDU / DEV software release scope](../../robots/README.md).
 
 These are mechanical drawings and a component CAD model, not a robot URDF,
 an arm-control interface, or a statement of supported payload.

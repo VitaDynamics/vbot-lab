@@ -2,7 +2,7 @@
 
 <p align="center"><a href="head-trajectories.md">English</a> | 中文</p>
 
-本清单列出当前四足 EDU 预设引用的 66 个头部 CSV 轨迹，与[身体 NPZ 轨迹](body-trajectories.zh-CN.md)分开管理。
+本清单列出文档中的四足预设引用的 66 个头部 CSV 轨迹，与[身体 NPZ 轨迹](body-trajectories.zh-CN.md)分开管理。
 CSV 在这里是头部轨迹资源，不是被 NPZ 替代的旧版身体轨迹。
 
 ## 如何选择和填写

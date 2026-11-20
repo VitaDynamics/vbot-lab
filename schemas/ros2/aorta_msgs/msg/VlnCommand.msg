@@ -3,7 +3,7 @@
 #
 # fbs type:  aorta.services.rcp.VlnCommand [table]
 # fbs path:  schemas/service/rcp/function_input.fbs
-# sha256:    98a537a9c943483df02dd5dc10a14468d9bb2e7ae7a55d33fbc76cecac8f1d0d
+# sha256:    2fb74890e17fb290de73201875411ffee46468301f3f8111992c229c0d6f425d
 # root type: no
 #
 # enum aorta.services.rcp.VlnMethod; constants in aorta_msgs/msg/VlnMethod
@@ -12,3 +12,8 @@ float32 x
 float32 y
 string frame
 float32 stop_distance
+# NAV_TO_POINT only, m/s. 0 keeps the legacy 0.5 m/s cap. Positive values
+# select a task-local target subject to VLN and locomotion limits.
+# Negative or non-finite values are rejected as invalid input.
+# Does not modify persistent follow speed; ignored for other methods.
+float32 max_xvel

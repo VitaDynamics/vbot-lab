@@ -5,7 +5,7 @@
 Select specifications by robot type. This index retains the original sensor-document
 path; parameter tables are maintained in the linked hardware specification only.
 
-| Robot type | Build identifier | Sensor specification | EDU release scope |
+| Robot type | Build identifier | Sensor specification | EDU / DEV software scope |
 | --- | --- | --- | --- |
 | Four-legged robot dog | `foot_quadruped` | [Shared robot-dog specification](quadruped-common/sensors.md) | Current release target |
 | Four-wheeled robot dog | `wheel_quadruped` | [Same shared robot-dog specification](quadruped-common/sensors.md) | Future release; guide not released |
@@ -13,7 +13,7 @@ path; parameter tables are maintained in the linked hardware specification only.
 
 The shared specification covers the stereo camera, LiDAR, infrared camera, UWB radar,
 and IMU for the documented robot-dog hardware configuration.
-Shared sensors do not imply shared firmware, public interfaces, SDK compatibility, or EDU availability.
+Shared sensors do not imply shared firmware, public interfaces, SDK compatibility, or software availability.
 
 See the [robot-type guides](../robots/README.md) and
 [compatibility matrix](../compatibility.md) before following a device workflow.

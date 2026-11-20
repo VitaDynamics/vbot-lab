@@ -10,8 +10,8 @@ Run each Bash block as one command chain. `&&` skips the rest of that block afte
 a failure while retaining shell variables for the next step. Fix the error before
 continuing to another block.
 
-Use the [edu-sdk-2026.10.31 release](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.10.31):
-C++ SDK `2026.10.20`, ABI `13`, with EDU Schema pack `2026.10.20-v4`.
+Use the [edu-sdk-2026.11.18 release](https://github.com/VitaDynamics/vbot-lab/releases/tag/edu-sdk-2026.11.18):
+C++ SDK `2026.11.15`, ABI `14`, with EDU Schema pack `2026.11.18-v4` for both EDU and DEV devices.
 The examples use C++17, Bazel 7.6.1 and the release's generated headers.
 They do not require Python wheels or local Schema generation.
 
@@ -46,17 +46,17 @@ target headers; it does not download a compiler or SDK. Do not run ARM64 binarie
 in the AMD64 container. No second container or device-side compilation is needed.
 
 Download the matching SDK archive, the EDU Schema archive and `SHA256SUMS` into
-`artifacts/edu-sdk-2026.10.31/`. From the checkout root on Linux x86_64:
+`artifacts/edu-sdk-2026.11.18/`. From the checkout root on Linux x86_64:
 
 ```bash
-cd artifacts/edu-sdk-2026.10.31 &&
+cd artifacts/edu-sdk-2026.11.18 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-x86_64 edu-schema &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
-tar --zstd -xf aorta-edu-schema-pack-2026.10.20-v4.tar.zst -C edu-schema &&
+tar --zstd -xf aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-x86_64.tar.zst -C cpp-sdk-x86_64 &&
+tar --zstd -xf aorta-edu-schema-pack-2026.11.18-v4.tar.zst -C edu-schema &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-x86_64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema"
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.11.18/cpp-sdk-x86_64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.11.18/edu-schema"
 ```
 
 Both selected archive checksums must pass; the checksum command skips absent assets.
@@ -119,6 +119,11 @@ DAG helper types are in `aorta::action::rcp`; wire enums remain in
 
 ## Optional camera decoding
 
+For S100 native VPU decoding to NV12, use the
+[hardware-decoding Recipe](../../../recipes/camera/README.md#c-s100-hardware-decoding).
+It has a separate ARM64 target and locally supplied D-Robotics SDK; the FFmpeg
+instructions below apply only to the independent software-decoding target.
+
 If FFmpeg is supplied as a separate directory rather than installed system-wide,
 set `VBOT_FFMPEG_DIR` to its absolute path before building. The supported bundle
 layout is FFmpeg 4.4 headers in `include/` and shared libraries `libavcodec.so.58`,
@@ -153,13 +158,13 @@ Keep the shared Schema directory prepared above. In the same development contain
 extract the ARM64 SDK into a separate new directory and select it for the device build:
 
 ```bash
-cd artifacts/edu-sdk-2026.10.31 &&
+cd artifacts/edu-sdk-2026.11.18 &&
 sha256sum --ignore-missing -c SHA256SUMS &&
 mkdir cpp-sdk-aarch64 &&
-tar --zstd -xf aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
+tar --zstd -xf aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-aarch64.tar.zst -C cpp-sdk-aarch64 &&
 cd ../.. &&
-export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.10.31/cpp-sdk-aarch64" &&
-export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.10.31/edu-schema" &&
+export AORTA_CPP_SDK_DIR="$PWD/artifacts/edu-sdk-2026.11.18/cpp-sdk-aarch64" &&
+export AORTA_EDU_SCHEMA_DIR="$PWD/artifacts/edu-sdk-2026.11.18/edu-schema" &&
 bazel build --config=arm64 //recipes/subscribe-state:main_cpp &&
 file bazel-bin/recipes/subscribe-state/main_cpp &&
 aarch64-linux-gnu-readelf -d bazel-bin/recipes/subscribe-state/main_cpp
@@ -204,15 +209,15 @@ PACKAGE_DIR=$(mktemp -d /tmp/vbot-cpp-app-XXXXXX) &&
 test -n "$PACKAGE_DIR" &&
 mkdir -p "$PACKAGE_DIR/bin" "$PACKAGE_DIR/lib" "$PACKAGE_DIR/licenses/aorta" &&
 cp -L "bazel-bin/recipes/$RECIPE/main_cpp" "$PACKAGE_DIR/bin/$RECIPE" &&
-cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.13" "$PACKAGE_DIR/lib/" &&
+cp -L "$AORTA_CPP_SDK_DIR/lib/libaorta_core.so.14" "$PACKAGE_DIR/lib/" &&
 cp LICENSE NOTICE "$PACKAGE_DIR/licenses/" &&
 cp "$AORTA_CPP_SDK_DIR/LICENSE" "$AORTA_CPP_SDK_DIR/NOTICE" \
    "$AORTA_CPP_SDK_DIR/FLATBUFFERS-LICENSE" \
    "$AORTA_CPP_SDK_DIR/THIRD_PARTY_COMPONENTS.md" \
    "$AORTA_CPP_SDK_DIR/THIRD_PARTY_NOTICES.md" "$PACKAGE_DIR/licenses/aorta/" &&
-file "$PACKAGE_DIR/bin/$RECIPE" "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+file "$PACKAGE_DIR/bin/$RECIPE" "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/bin/$RECIPE" &&
-aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/lib/libaorta_core.so.13" &&
+aarch64-linux-gnu-readelf -d "$PACKAGE_DIR/lib/libaorta_core.so.14" &&
 (cd "$PACKAGE_DIR" && find bin lib licenses -type f -exec sha256sum {} + > SHA256SUMS)
 ```
 

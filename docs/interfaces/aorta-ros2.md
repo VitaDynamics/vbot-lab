@@ -2,20 +2,21 @@
 
 <p align="center">English | <a href="aorta-ros2.zh-CN.md">中文</a></p>
 
-Aorta is the native communication layer for VBOT EDU robots. `aorta_ros2_bridge` preserves
+Aorta is the native communication layer for VBOT EDU and DEV robots. `aorta_ros2_bridge` preserves
 a subset of previously published ROS 2 interfaces; it is not a second, fully equivalent
 robot interface. Start with the [device shell setup](../getting-started/device-environment.md).
 
 ## Version scope
 
-This reference targets robot applications **V1.6.0-15** and **V1.6.0-17** on `foot_quadruped` EDU.
+This reference targets robot application **V1.7.0-6** on `foot_quadruped` EDU / DEV.
 Discover the exact routes and inspect their delivered types before use; configuration
 limits are listed in the [compatibility matrix](../compatibility.md).
 Other robot types are not covered by this software scope.
 
 This page lists the public topic set and supported mappings, along with services and the
-RCP action. The service table lists 25 request/reply routes. The topic tables contain
-48 distinct Aorta routes: 44 subscription outputs and 4 command inputs.
+RCP action. The service table lists 35 Aorta services through 36 ROS 2 service entrances
+(expression playback has both a compatibility and a full-field entrance). The topic tables
+contain 46 distinct Aorta routes: 42 subscription outputs and 4 command inputs.
 After discovering an output, take a bounded sample to check its
 producer; do not publish to command topics as an environment check.
 Python SDK wheel installation and checked-in Schema sources are documented separately;
@@ -35,7 +36,7 @@ capability-check entries.
 | [Sensors and hardware telemetry](sensors.md) | Battery, IMU, LiDAR, UWB, GNSS, servo feedback |
 | [Cameras and AprilTags](cameras.md) | Calibration, compressed video, tag detection |
 | [Perception](perception.md) | Object detections and human keypoints |
-| [Audio](audio.md) | Audio frames, ASR text, voice events, UWB input completion, PCM playback and speech-policy service |
+| [Audio](audio.md) | Audio frames, UWB input completion, PCM playback and speech-policy service |
 | [Locomotion](locomotion.md) | State, terminal reports, joystick/velocity inputs |
 | [System and peripherals](system-peripherals.md) | System state, display, ear-light modulation |
 | [RCP](rcp.md) | Task action and trace events |
@@ -90,8 +91,6 @@ robot capabilities and are not included in this list.
 | [System state machine](system-peripherals.md) | `/system/sm_status` | `/sm/status` | pub/sub — subscribe | `sm.SmStatus` | `software_msgs/msg/SystemStateMachineStatus` |
 | [OTA application version](system-peripherals.md) | `/ota_version` | `/ota_version` | pub/sub — subscribe | `aorta.topic.system_monitor.OtaVersion` | `std_msgs/msg/String` |
 | [Display state](system-peripherals.md) | `/display_node/status` | `/display_node/status` | pub/sub — subscribe | `aorta.topic.peripheral.DisplayStatus` | `aorta_msgs/msg/DisplayStatus` |
-| [Voice interaction events](audio.md) | `/voice/event` | `/voice/event` | pub/sub — subscribe | `aorta.voice.VoiceEvent` | `aorta_msgs/msg/VoiceEvent` |
-| [Final recognized text; provider distinguishes body / UWB input](audio.md) | `/speech/asr_result` | `/speech/asr_result` | pub/sub — subscribe | `aorta.topic.speech.AsrResult` | `aorta_msgs/msg/AsrResult` |
 | [Robot-body microphone audio frames](audio.md) | `/raw_audio_dump` | `/raw_audio_dump` | pub/sub — subscribe | `foxglove.RawAudio` | `foxglove_msgs/msg/RawAudio` |
 | [UWB signalling audio frames from the remote control](audio.md) | `/audio/uwb_adpcm_segment` | `/audio/uwb_adpcm_segment` | pub/sub — subscribe | `foxglove.RawAudio` | `foxglove_msgs/msg/RawAudio` |
 | [UWB audio input-end event](audio.md) | `/uwb/audio_done` | `/uwb/audio_done` | pub/sub — subscribe | `aorta.uwb.AudioDoneEvent` | `aorta_msgs/msg/AudioDoneEvent` |
@@ -153,7 +152,11 @@ environment check, even when their purpose is read-only.
 | `/get_jpeg_images` | `/get_jpeg_images` | service — [capture JPEG images](cameras.md); use the response's actual dimensions |
 | `/display_node/get_supported_emotions` | `/display_node/get_supported_emotions` | service — query available expressions |
 | `/display_node/play_emotion` | `/display_node/play_emotion` | service — play an expression |
+| `/display_node/play_emotion` | `/display_node/play_emotion_native` | service — [play a registered sequence with native fields](system-peripherals.md#registered-image-sequences) |
 | `/display_node/display_imgs` | `/display_node/display_imgs` | service — display images |
+| `/display_node/add_images` | `/display_node/add_images` | service — [register a persistent JPEG sequence](system-peripherals.md#registered-image-sequences) |
+| `/display_node/get_images_status` | `/display_node/get_images_status` | service — [query registered sequences and upload/storage status](system-peripherals.md#registered-image-sequences) |
+| `/display_node/del_images` | `/display_node/del_images` | service — [delete a registered sequence or cancel an incomplete upload](system-peripherals.md#registered-image-sequences) |
 | `/light_node/status` | `/light_node/status` | service — query ear-light state, despite the name `status` |
 | `/light_node/control` | `/light_node/control` | service — control the ear-light effect |
 | `/light_node/gradient` | `/light_node/gradient` | service — set an ear-light gradient |
@@ -171,6 +174,13 @@ environment check, even when their purpose is read-only.
 | `/locomotion/control_enable` | `/locomotion/control_enable` | service — [pause/resume control and motor communication](locomotion.md) |
 | `/system/power_saving/enable` | `/system/power_saving/enable` | service — [enter/exit power-saving mode](system-peripherals.md) |
 | `/function/following` | `/function/following` | service — [follow/navigation mode control](locomotion.md) |
+| `/light_node/fill_light` | `/light_node/fill_light` | service — [control the fill light](system-peripherals.md#fill-light) (application `V1.7.0-6`) |
+| `/system/power_saving/set_policy` | `/system/power_saving/set_policy` | service — [set the power-saving policy](system-peripherals.md#automatic-power-saving-policy) (application `V1.7.0-6`) |
+| `/slam/map_asset/list` | `/slam/map_asset/list` | service — [list stored maps](../guides/mapping-localization.md#9-manage-saved-map-assets) (application `V1.7.0-6`) |
+| `/slam/map_asset/get_metadata` | `/slam/map_asset/get_metadata` | service — [query one map's metadata](../guides/mapping-localization.md#9-manage-saved-map-assets) (application `V1.7.0-6`) |
+| `/slam/map_asset/set_active_map` | `/slam/map_asset/set_active_map` | service — [select the active map](../guides/mapping-localization.md#9-manage-saved-map-assets); mutates device state (application `V1.7.0-6`) |
+| `/slam/map_asset/remove` | `/slam/map_asset/remove` | service — [delete a stored map](../guides/mapping-localization.md#9-manage-saved-map-assets); not reversible (application `V1.7.0-6`) |
+| `/slam/map_asset/move` | `/slam/map_asset/move` | service — [move/rename a stored map](../guides/mapping-localization.md#9-manage-saved-map-assets); mutates device state (application `V1.7.0-6`) |
 
 Firmware queries require the appropriate `target_device_type`: MOTOR=`0`, SERVO=`1`,
 LIDAR=`2`, UWB=`3`. Inspect the delivered request type before calling; an empty/default request

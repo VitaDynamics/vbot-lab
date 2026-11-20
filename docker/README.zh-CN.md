@@ -1,4 +1,4 @@
-# EDU 开发容器
+# EDU／DEV 开发容器
 
 <p align="center"><a href="README.md">English</a> | 中文</p>
 

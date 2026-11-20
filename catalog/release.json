@@ -1,28 +1,26 @@
 {
   "format_version": 1,
   "workspace": {
-    "branch": "release/V1.6.0",
-    "tag": "Rel/V1.6.0"
+    "branch": "pre_release/V1.7.0.X"
   },
   "robots": {
     "foot_quadruped": {
-      "application_version": "V1.6.0-17",
+      "application_version": "V1.7.0-6",
       "supported_application_versions": [
-        "V1.6.0-15",
-        "V1.6.0-17"
+        "V1.7.0-6"
       ]
     }
   },
   "sdk": {
     "repository": "VitaDynamics/vbot-lab",
-    "release_tag": "edu-sdk-2026.10.31",
-    "aorta_version": "2026.10.20",
+    "release_tag": "edu-sdk-2026.11.18",
+    "aorta_version": "2026.11.15",
     "python": {
       "minimum_version": "3.10",
       "wheels": {
-        "aorta_sdk": "2026.10.20",
-        "aorta_msgs": "2026.10.20",
-        "vbot_edu_msgs": "2026.10.20",
+        "aorta_sdk": "2026.11.15",
+        "aorta_msgs": "2026.11.15",
+        "vbot_edu_msgs": "2026.11.18",
         "flatbuffers": "25.12.19"
       },
       "platforms": [
@@ -32,8 +30,8 @@
       ]
     },
     "cpp": {
-      "version": "2026.10.20",
-      "abi": 13,
+      "version": "2026.11.15",
+      "abi": 14,
       "distribution": "ubuntu22.04",
       "architectures": [
         "x86_64",
@@ -42,48 +40,48 @@
     },
     "assets": [
       {
-        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst",
-        "sha256": "80267ec464c016c003e43c22dbe0a921310e9a2f8a2f516a221fab81b74c5264"
+        "name": "aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-aarch64.tar.zst",
+        "sha256": "f63bf33028a23dd16664260fe2ccd7adbf33f8594ee776469f49a7d98f29431d"
       },
       {
-        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-aarch64.tar.zst.sha256",
-        "sha256": "0491a47f725839325dea6e8141afd42ac44eb7147b3f9a3e843eada76aee4fd0"
+        "name": "aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-aarch64.tar.zst.sha256",
+        "sha256": "25e45a0f6f6a65dc6779ddb713c40bd3b313847c7d969b2a9d8fa483f0d03576"
       },
       {
-        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst",
-        "sha256": "73d5884009766e5bdd5607191ae0e6b6840471d89283277c98f09e467d889157"
+        "name": "aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-x86_64.tar.zst",
+        "sha256": "fe4dca6e57dc91dc0e040566ef291adfa800f37ab5270f3893bbd3d49e464004"
       },
       {
-        "name": "aorta-cpp-sdk-2026.10.20-abi13-ubuntu22.04-x86_64.tar.zst.sha256",
-        "sha256": "8aebc3eea281b02588f55c177f4947c10f0506f983aed6f001f836088cc2c73f"
+        "name": "aorta-cpp-sdk-2026.11.15-abi14-ubuntu22.04-x86_64.tar.zst.sha256",
+        "sha256": "4264e7a6abf16eea25c9b5ed4f294036ea5c9d257d9054fd3e2765ff9111398e"
       },
       {
-        "name": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst",
-        "sha256": "e6a590fda45d7c27e76f28e79566a5371a40cb065809040d7d378392cfb75e4e"
+        "name": "aorta-edu-schema-pack-2026.11.18-v4.tar.zst",
+        "sha256": "5e304b09c0d3669130a4c3f0159a52bf2093ca70164ad129414b15f4688086ff"
       },
       {
-        "name": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst.sha256",
-        "sha256": "b45b12f29f4bb9c81af92a4e27638f2adb21dbaab970c4efe637fc3271284faa"
+        "name": "aorta-edu-schema-pack-2026.11.18-v4.tar.zst.sha256",
+        "sha256": "4b1f48441146e3ec09e96e4a78cd934ada1753682f305a2f0c1f56b608dc55ed"
       },
       {
-        "name": "aorta_msgs-2026.10.20-py3-none-any.whl",
-        "sha256": "2500bb44f397b65676e81ca6d7afd103892bd2e3bfedc3e463d1036dbbecfd2c"
+        "name": "aorta_msgs-2026.11.15-py3-none-any.whl",
+        "sha256": "1004add643681f74611bb9cd84a9431f35f1cdabd86473082a499efe7fbcf6fc"
       },
       {
-        "name": "aorta_sdk-2026.10.20-py3-none-linux_aarch64.whl",
-        "sha256": "559f8c22871fda131e6d706fa9dd5edc4b07fa3297cf42f51a844318bf9ff7ba"
+        "name": "aorta_sdk-2026.11.15-py3-none-linux_aarch64.whl",
+        "sha256": "39fd8c8146aec4c4bcc9c844388b96fbfd98175f346ff68a5dcaca8c188e2380"
       },
       {
-        "name": "aorta_sdk-2026.10.20-py3-none-linux_x86_64.whl",
-        "sha256": "e0909b322f20b78a2b043a9605b5f495f8555039480999273fb4e6ad0eb1c5f0"
+        "name": "aorta_sdk-2026.11.15-py3-none-linux_x86_64.whl",
+        "sha256": "808389741428bf393756d539e3d3835c44ea1b0baa438d5d63444078fdc04fc0"
       },
       {
-        "name": "aorta_sdk-2026.10.20-py3-none-macosx_11_0_arm64.whl",
-        "sha256": "8b4e36435a0b8cff560f83d3ca4b9a672c12bf2745e70bc7ebfb8a3d6eb827f7"
+        "name": "aorta_sdk-2026.11.15-py3-none-macosx_11_0_arm64.whl",
+        "sha256": "14cc7fad8cbbe8641aab7153c020cd66bee90a1c0a6a1bf59e1ee4342412e380"
       },
       {
         "name": "EDU_SDK_MANIFEST.json",
-        "sha256": "c455469d9b59fe4d87c42cd922a4b09dcfae35715c915c9be464a0be2540a25b"
+        "sha256": "b01916e68f2817870338c5eb178927c5bfcc5d7ddcb99e1b9ebd8047114fcb2f"
       },
       {
         "name": "flatbuffers-25.12.19-py2.py3-none-any.whl",
@@ -95,24 +93,24 @@
       },
       {
         "name": "SHA256SUMS",
-        "sha256": "eac62f2a85a310712f127ef920dba51b2374d7aeea96e94b38cc899f2575393d"
+        "sha256": "9f014cca70c8c141e667753337eb870f8a65b743a2336266b5b3755d72d52000"
       },
       {
-        "name": "vbot_edu_msgs-2026.10.20-py3-none-any.whl",
-        "sha256": "22a3b33e92dde8a42ffd471c1f64b6a66f0bb448e9cca9379beaf60486aed46f"
+        "name": "vbot_edu_msgs-2026.11.18-py3-none-any.whl",
+        "sha256": "f46e11f150efef1aaf3b87d65dedb058317c1ebafa74ff3a8781550c0c28e2f8"
       },
       {
-        "name": "vbot_edu_msgs-2026.10.20-py3-none-any.whl.sha256",
-        "sha256": "d15427124525a80f4d6b7b132c79a5aacf4e2d47ec401c435e172fd8621077eb"
+        "name": "vbot_edu_msgs-2026.11.18-py3-none-any.whl.sha256",
+        "sha256": "09d2dcd90dbb0dae715271bb019bc2b36f0a337de84ab0cf3770a4e3f3286f90"
       }
     ]
   },
   "schema": {
-    "version": "2026.10.20",
-    "pack_version": "2026.10.20-v4",
-    "asset": "aorta-edu-schema-pack-2026.10.20-v4.tar.zst",
-    "sha256": "e6a590fda45d7c27e76f28e79566a5371a40cb065809040d7d378392cfb75e4e",
-    "ros2_bridge_version": "2026.10.21"
+    "version": "2026.11.18",
+    "pack_version": "2026.11.18-v4",
+    "asset": "aorta-edu-schema-pack-2026.11.18-v4.tar.zst",
+    "sha256": "5e304b09c0d3669130a4c3f0159a52bf2093ca70164ad129414b15f4688086ff",
+    "ros2_bridge_version": "2026.11.4"
   },
   "development": {
     "bazel_version": "7.6.1",

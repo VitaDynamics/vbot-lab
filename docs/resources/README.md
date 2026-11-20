@@ -6,7 +6,7 @@ For invocation choices and field mappings, see [direct services versus RCP](../g
 
 Resource identifiers are separate from orchestration. Body/head trajectories, screen expressions and light modes are different capabilities. RCP can combine them, but the resources themselves are not DAGs.
 
-These lists describe the current foot-quadruped EDU resource set. Installed resources can vary with device software; do not infer support for other robot types from a shared identifier.
+Use these resource references for foot-quadruped EDU / DEV development. Installed resources can vary with device software; do not infer support for other robot types from a shared identifier.
 
 - [Body trajectories](body-trajectories.md)
 - [Head trajectories](head-trajectories.md): CSV names and their body/preset pairing

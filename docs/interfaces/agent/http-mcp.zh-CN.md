@@ -3,14 +3,14 @@
 <p align="center"><a href="http-mcp.md">English</a> | 中文</p>
 
 适用范围及兼容性见 [Agent 能力总览](README.zh-CN.md)。
-本地服务在 S100 上以 `vbot` 身份运行，EDU 运行时作为 MCP 客户端。
+本地服务在 S100 上以 `vbot` 身份运行，设备运行时作为 MCP 客户端。
 这是 HTTP 请求／响应接口，不是 Aorta 或 ROS2 pub/sub。
 
 ## 地址与协议
 
 | 项目 | 契约 |
 | --- | --- |
-| 默认 S100 入口 | `http://192.168.127.2:18080/mcp` |
+| S100 入口示例 | `http://192.168.127.2:18081/mcp`；替换为自己注册的服务 URL |
 | 传输方式 | HTTP POST，承载 JSON-RPC `2.0` |
 | 协议版本 | `2025-06-18` |
 | 请求 Content-Type | `application/json` |
@@ -19,8 +19,9 @@
 | 可选传输会话 | 初始化返回 `Mcp-Session-Id` 时，后续请求须携带 |
 | 开发环境 | S100、`vbot` 账户、可写用户目录 `/userdata/vbot` |
 
-上表地址是默认开发者服务入口。新增 S100 服务或接入其他可达且可信的 HTTP MCP 服务时，
-通过[连接配置 API](mcp-config.zh-CN.md)注册其真实 URL。
+上表地址仅为示例，不代表内置监听服务或已自动启用的连接。
+启动自己的 S100 服务或其他可达且可信的 HTTP MCP 服务后，
+通过[连接配置 API](mcp-config.zh-CN.md)注册真实 URL。
 只修改检查客户端的 `MCP_URL` 不会改变设备运行时的连接目标。
 注册地址中的回环地址指 Agent 运行时所在机器，不是工作站。
 设备服务应监听预期的可信网卡，不得将服务暴露或转发到不可信网络、校园公网或互联网。
@@ -41,7 +42,7 @@
 [HTTP 传输规范](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports)。
 
 即使通用 MCP 框架支持 Resources、Prompts 或 stdio transport，
-它们仍不属于当前 EDU 开发契约。
+它们仍不属于当前设备开发契约。
 
 ## 工具定义与返回值
 
@@ -90,7 +91,7 @@
 }
 ```
 
-`structuredContent` 是可选输出示例，不是新增的 EDU 通用必选字段。
+`structuredContent` 是可选输出示例，不是新增的设备通用必选字段。
 应保留可用的 `content` 并检查 `isError`，HTTP `200` 不等于工具成功。
 协议错误使用 JSON-RPC `error` 对象；工具执行失败保留可操作的错误信息，并设置 `isError=true`，参见
 [MCP 工具结果契约](https://modelcontextprotocol.io/specification/2025-06-18/server/tools)。

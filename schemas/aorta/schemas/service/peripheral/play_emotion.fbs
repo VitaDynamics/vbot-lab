@@ -15,6 +15,9 @@ table PlayEmotionRequest {
   pre_check: bool = false (id: 3);
   mode: ubyte = 0 (id: 4);
   duration_ms: int = 0 (id: 5);     // -1=play sequence then restore default
+  // Only needed to play a registered custom image sequence. Leave empty for
+  // built-in emotions selected by mode. A nonempty name takes precedence over mode.
+  custom_images_name: string (id: 6);
 }
 
 table PlayEmotionResponse {

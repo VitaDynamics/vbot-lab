@@ -6,6 +6,9 @@ This product includes software developed at VitaDynamics.
 Licensed under the Apache License, Version 2.0. See the LICENSE file in the
 root of this distribution for the full license text.
 
+The Aorta and vbot names and logos, including the brand assets in
+`docs/assets/brand/`, are excluded from that license; see TRADEMARKS.md.
+
 ================================================================================
 Third-party derived works included in this source distribution
 ================================================================================
@@ -40,15 +43,16 @@ Third-party derived works included in this source distribution
    Copyright (c) 2023 ZettaScale Technology
    Upstream license: EPL-2.0 OR Apache-2.0 (Apache-2.0 branch exercised here).
 
-   `tools/zenohd/src/main.rs` and `tools/zenohd/build.rs` are adapted from the
-   upstream `zenohd` sources and retain their original copyright and
-   SPDX-License-Identifier headers.
+   `tools/zenohd/src/main.rs` is a modified copy of the upstream `zenohd`
+   source and carries a notice at the top of the file describing the changes.
+   `tools/zenohd/build.rs` is an unmodified copy. Both files retain their
+   original copyright and SPDX-License-Identifier headers.
 
 The verbatim upstream MIT license text for the Foxglove work above is in
 `THIRD_PARTY_LICENSES/`. The zenoh sources retain their own license headers;
 their upstream license texts are not vendored here (see docs/licensing.md).
 
-For the complete third-party dependency inventory (627 Rust crates and the
-Bazel module closure) see `docs/sbom/`. For the project licensing policy,
+For the complete third-party dependency inventory (Rust crates and the Bazel
+module closure) see `docs/sbom/`. For the project licensing policy,
 including the obligations that attach to source and to binary distributions,
 see `docs/licensing.md`.

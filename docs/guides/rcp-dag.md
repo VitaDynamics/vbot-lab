@@ -167,7 +167,7 @@ do not use NONE/NO_EFFECT as substitutes for real resource ownership.
 | `id` | String | Non-empty unique ID within this graph |
 | `dependencies` | Empty string array | Existing node IDs to wait for; empty means an entry node. File order does not impose sequence |
 | `wait_time_ms` | 0 / int32 | Use nonnegative milliseconds after dependencies become ready, not an absolute timestamp |
-| `execution_timeout_ms` | 0 / int32 | Use a positive finite node budget when needed; 0 adds no positive DAG timeout, but task/service timeouts may still apply |
+| `execution_timeout_ms` | 0 / int32 | Fixed node execution deadline in milliseconds; progress does not extend it. Use a positive budget when needed; 0 adds no positive DAG timeout, but task/service timeouts may still apply |
 | `lifecycle` | UNSPECIFIED / enum | Explicitly choose NORMAL, DAEMON or BARRIER as below; unspecified ordinary nodes default to NORMAL, BarrierCommand defaults to BARRIER |
 | `condition` | Empty string | Leave empty for ordinary graphs. Current executor specially handles literal `false` as skip; do not write script expressions |
 | `command_type` | Union discriminator | One of the 13 types in the [command reference](../interfaces/rcp-commands.md) |

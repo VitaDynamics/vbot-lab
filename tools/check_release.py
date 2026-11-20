@@ -88,13 +88,16 @@ def validate(config, root):
                                "development"))
     require(type(config["format_version"]) is int and config["format_version"] == 1,
             "Unsupported release format_version")
-    workspace = fields(config["workspace"], "workspace", ("branch", "tag"))
+    workspace = config["workspace"]
+    require(isinstance(workspace, dict), "workspace: expected object")
+    workspace_fields = ("branch", "tag") if "tag" in workspace else ("branch",)
+    fields(workspace, "workspace", workspace_fields)
     branch = workspace["branch"]
     require(isinstance(branch, str) and (branch == "main" or
             re.fullmatch(r"(?:pre_release/V\d+\.\d+\.\d+\.X|release/V\d+\.\d+\.\d+)", branch) is not None),
             "workspace.branch: expected main, release/V<major>.<minor>.<patch>, "
             "or pre_release/V<major>.<minor>.<patch>.X")
-    source_tag = workspace["tag"]
+    source_tag = workspace.get("tag")
     if isinstance(source_tag, str) and source_tag.startswith("Rel/"):
         text(source_tag, "workspace.tag", r"Rel/V\d+\.\d+\.\d+")
     else:
@@ -181,9 +184,13 @@ def validate(config, root):
     repository_rule = (root / "packages/aorta/cpp/repositories.bzl").read_text(encoding="utf-8")
     require(set(re.findall(r"lib/libaorta_core\.so\.(\d+)", repository_rule)) == {str(cpp["abi"])},
             "sdk.cpp: Bazel libaorta_core ABI mismatch")
-    manifest = read_json(root / "schemas/MANIFEST.json")
-    require(manifest["schema_pack"] == {"version": schema["version"], "asset": schema["asset"], "sha256": schema["sha256"]}
-            and manifest["ros2_bridge_version"] == schema["ros2_bridge_version"], "schema: checked-in MANIFEST mismatch")
+    manifest = fields(read_json(root / "schemas/MANIFEST.json"), "schema.MANIFEST",
+                      ("format_version", "file_counts", "ros2_bridge_version", "schema_pack"))
+    version(manifest["ros2_bridge_version"], "schema.MANIFEST.ros2_bridge_version")
+    require(manifest["schema_pack"] == {"version": schema["version"], "asset": schema["asset"], "sha256": schema["sha256"]},
+            "schema: checked-in MANIFEST mismatch")
+    # The checked-in ROS definitions may be newer than the downloaded SDK pack.
+    # Validate the SDK's own bridge pairing against EDU_SDK_MANIFEST.json below.
     for suffix in (".md", ".zh-CN.md"):
         py_guide = (root / f"packages/aorta/python/README{suffix}").read_text(encoding="utf-8")
         cpp_guide = (root / f"packages/aorta/cpp/README{suffix}").read_text(encoding="utf-8")
@@ -209,8 +216,14 @@ def validate(config, root):
         require(selected[0] == image["reference"] + "@" + image["digest"],
                 "development: Compose default image digest mismatch")
 
-    return [name for name, value in (("workspace.tag", workspace["tag"]),
-                                    ("development.image.digest", image["digest"])) if value is None]
+    pending = []
+    # A development branch is a complete source selection for iteration work.
+    # Explicit snapshot entries and formal releases still require a source tag.
+    if source_tag is None and ("tag" in workspace or not branch.startswith("pre_release/")):
+        pending.append("workspace.tag")
+    if image["digest"] is None:
+        pending.append("development.image.digest")
+    return pending
 
 
 def check_sdk_manifest(config, path):
@@ -247,7 +260,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT, help="complete VBOT Lab checkout")
     parser.add_argument("--config", type=Path, help="configuration JSON; default: <root>/catalog/release.json")
-    parser.add_argument("--require-complete", action="store_true", help="also reject unfilled source tag or image digest")
+    parser.add_argument("--require-complete", action="store_true", help="also require the image digest and any required source snapshot tag")
     parser.add_argument("--sdk-manifest", type=Path, help="compare an already-downloaded EDU_SDK_MANIFEST.json")
     parser.add_argument("--sdk-assets-dir", type=Path, help="hash all declared SDK assets in an existing directory")
     args = parser.parse_args(argv)

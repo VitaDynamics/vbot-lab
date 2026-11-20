@@ -2,7 +2,7 @@
 
 <p align="center">English | <a href="head-trajectories.zh-CN.md">中文</a></p>
 
-This list contains 66 head CSV trajectories referenced by the current foot-quadruped EDU presets.
+This list contains 66 head CSV trajectories referenced by the documented foot-quadruped presets.
 They are separate from [body NPZ trajectories](body-trajectories.md), not older body files replaced by NPZ.
 
 ## Select and fill in a resource
